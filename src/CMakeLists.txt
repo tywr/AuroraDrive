@@ -1,4 +1,7 @@
+set(CMAKE_BUILD_TYPE Debug)
+
 juce_add_plugin(${PROJECT_NAME}
+    PLIST_TO_MERGE "<key>NSMicrophoneUsageDescription</key><string>This app needs to use your microphone to process the audio signal.</string>"
     # VERSION ...                               # Set this if the plugin version is different to the project version
     # ICON_BIG ...                              # ICON_* arguments specify a path to an image file to use as an icon for the Standalone
     # ICON_SMALL ...
@@ -14,7 +17,10 @@ juce_add_plugin(${PROJECT_NAME}
                                                 # GarageBand 10.3 requires the first letter to be upper-case, and the remaining letters to be lower-case
     # FORMATS AU VST3 Standalone                  # The formats to build. Other valid formats are: AAX Unity VST AU AUv3
     FORMATS Standalone                  # The formats to build. Other valid formats are: AAX Unity VST AU AUv3
-    PRODUCT_NAME ${PROJECT_NAME})        # The name of the final executable, which can differ from the target name
+    PRODUCT_NAME ${PROJECT_NAME}        # The name of the final executable, which can differ from the target name
+    MICROPHONE_PERMISSION_ENABLED TRUE
+    
+)
 
 
 target_sources(${PROJECT_NAME}

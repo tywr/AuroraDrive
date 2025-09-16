@@ -3,7 +3,8 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 
 //==============================================================================
-class AudioPluginAudioProcessor final : public juce::AudioProcessor {
+class AudioPluginAudioProcessor final : public juce::AudioProcessor,
+                                        public juce::ChangeBroadcaster {
   public:
     //==============================================================================
     AudioPluginAudioProcessor();
@@ -17,6 +18,9 @@ class AudioPluginAudioProcessor final : public juce::AudioProcessor {
 
     void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
     using AudioProcessor::processBlock;
+
+    float getInputLevel() const { return inputLevel.get(); }
+    float getOutputLevel() const { return outputLevel.get(); }
 
     //==============================================================================
     juce::AudioProcessorEditor* createEditor() override;
@@ -42,6 +46,8 @@ class AudioPluginAudioProcessor final : public juce::AudioProcessor {
     void setStateInformation(const void* data, int sizeInBytes) override;
 
   private:
+    juce::Atomic<float> inputLevel = 0.0f;
+    juce::Atomic<float> outputLevel = 0.0f;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioPluginAudioProcessor)
 };

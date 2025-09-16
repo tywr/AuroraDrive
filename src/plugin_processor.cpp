@@ -123,6 +123,12 @@ void AudioPluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
 
+    float currentLevel = buffer.getRMSLevel(0, 0, buffer.getNumSamples());
+
+    inputLevel = currentLevel;
+    // DBG("Hello" << currentLevel);
+    sendChangeMessage();
+
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...
     // Make sure to reset the state if your inner loop is processing
