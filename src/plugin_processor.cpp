@@ -113,6 +113,7 @@ void AudioPluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
+    float meter_decay_factor = 0.95f;
 
     // In case we have more outputs than inputs, this code clears any output
     // channels that didn't contain input data, (because these aren't
@@ -123,11 +124,7 @@ void AudioPluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
 
-    float currentLevel = buffer.getRMSLevel(0, 0, buffer.getNumSamples());
-
-    inputLevel = currentLevel;
-    // DBG("Hello" << currentLevel);
-    sendChangeMessage();
+    processInputLevels(buffer, meter_decay_factor);
 
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...
@@ -140,6 +137,37 @@ void AudioPluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
         juce::ignoreUnused(channelData);
         // ..do something to the data...
     }
+
+    processOutputLevels(buffer, meter_decay_factor);
+}
+
+void AudioPluginAudioProcessor::processInputLevels(
+    juce::AudioBuffer<float>& buffer, float decay_factor) {
+
+    float in_gain_linear = juce::Decibels::decibelsToGain(inGain.get());
+    buffer.applyGain(in_gain_linear);
+
+    inputLevel = buffer.getRMSLevel(0, 0, buffer.getNumSamples());
+    if (inputLevel.get() > smoothedInputLevel.get()) {
+        smoothedInputLevel = inputLevel;
+    } else {
+        smoothedInputLevel = smoothedInputLevel.get() * decay_factor;
+    }
+    sendChangeMessage();
+}
+
+void AudioPluginAudioProcessor::processOutputLevels(
+    juce::AudioBuffer<float>& buffer, float decay_factor) {
+    float out_gain_linear = juce::Decibels::decibelsToGain(outGain.get());
+    buffer.applyGain(out_gain_linear);
+
+    outputLevel = buffer.getRMSLevel(0, 0, buffer.getNumSamples());
+    if (outputLevel.get() > smoothedOutputLevel.get()) {
+        smoothedOutputLevel = outputLevel;
+    } else {
+        smoothedOutputLevel = smoothedOutputLevel.get() * decay_factor;
+    }
+    sendChangeMessage();
 }
 
 //==============================================================================

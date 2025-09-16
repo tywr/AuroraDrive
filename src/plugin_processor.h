@@ -19,8 +19,18 @@ class AudioPluginAudioProcessor final : public juce::AudioProcessor,
     void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
     using AudioProcessor::processBlock;
 
+    float getRawInputLevel() const { return rawInputLevel.get(); }
+    float getRawOutputLevel() const { return rawOutputLevel.get(); }
+
+    void setInGain(float gain) { inGain = gain; }
+    float getInGain() const { return inGain.get(); }
+    void setOutGain(float gain) { outGain = gain; }
+    float getOutGain() const { return outGain.get(); }
+
     float getInputLevel() const { return inputLevel.get(); }
     float getOutputLevel() const { return outputLevel.get(); }
+    float getSmoothedInputLevel() const { return smoothedInputLevel.get(); }
+    float getSmoothedOutputLevel() const { return smoothedOutputLevel.get(); }
 
     //==============================================================================
     juce::AudioProcessorEditor* createEditor() override;
@@ -42,12 +52,25 @@ class AudioPluginAudioProcessor final : public juce::AudioProcessor,
     void changeProgramName(int index, const juce::String& newName) override;
 
     //==============================================================================
+    void processInputLevels(juce::AudioBuffer<float>& buffer,
+                            float decay_factor = 0.95f);
+    void processOutputLevels(juce::AudioBuffer<float>& buffer,
+                             float decay_factor = 0.95f);
+
+    //==============================================================================
     void getStateInformation(juce::MemoryBlock& destData) override;
     void setStateInformation(const void* data, int sizeInBytes) override;
 
   private:
+    juce::Atomic<float> rawInputLevel = 0.0f;
+    juce::Atomic<float> inGain = 1.0f;
     juce::Atomic<float> inputLevel = 0.0f;
+    juce::Atomic<float> smoothedInputLevel = 0.0f;
+
+    juce::Atomic<float> rawOutputLevel = 0.0f;
+    juce::Atomic<float> outGain = 1.0f;
     juce::Atomic<float> outputLevel = 0.0f;
+    juce::Atomic<float> smoothedOutputLevel = 0.0f;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioPluginAudioProcessor)
 };

@@ -4,7 +4,8 @@
 
 //==============================================================================
 class AudioPluginAudioProcessorEditor final : public juce::AudioProcessorEditor,
-                                              public juce::ChangeListener {
+                                              public juce::ChangeListener,
+                                              public juce::Slider::Listener {
   public:
     explicit AudioPluginAudioProcessorEditor(AudioPluginAudioProcessor&);
     ~AudioPluginAudioProcessorEditor() override;
@@ -12,11 +13,16 @@ class AudioPluginAudioProcessorEditor final : public juce::AudioProcessorEditor,
     //==============================================================================
     void paint(juce::Graphics&) override;
     void resized() override;
+
+    void sliderValueChanged(juce::Slider* slider) override;
+
+    // Gain Control Variables
     void setupGainControl(juce::Slider& slider, juce::Label& label,
                           double minRange, double maxRange, double initialValue,
                           const juce::String& labelText);
     void setupGainMeter(juce::Slider& slider, double minRange, double maxRange);
     void resizeGainControls();
+    void setMeterSliders(AudioPluginAudioProcessor* processor);
 
   private:
     // This reference is provided as a quick way for your editor to

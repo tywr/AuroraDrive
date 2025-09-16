@@ -8,21 +8,22 @@ using namespace juce;
 AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor(
     AudioPluginAudioProcessor& p)
     : AudioProcessorEditor(&p), processorRef(p) {
-    juce::ignoreUnused(processorRef);
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
+
     setSize(600, 600);
 
+    juce::ignoreUnused(processorRef);
+
     processorRef.addChangeListener(this);
+    inGainSlider.addListener(this);
+    outGainSlider.addListener(this);
 
     getLookAndFeel().setColour(juce::Slider::thumbColourId,
                                juce::Colours::lightgreen);
 
-    setupGainControl(inGainSlider, inGainLabel, -100.0, 60.0, 24.0, "Input");
-    setupGainControl(outGainSlider, outGainLabel, -100.0, 20.0, -18.0,
-                     "Output");
-    setupGainMeter(inGainMeterSlider, -100.0, 6.0);
-    setupGainMeter(outGainMeterSlider, -100.0, 6.0);
+    setupGainControl(inGainSlider, inGainLabel, -100.0, 12.0, 0.0, "Input");
+    setupGainControl(outGainSlider, outGainLabel, -100.0, 12.0, 0.0, "Output");
+    setupGainMeter(inGainMeterSlider, -60, 6.0);
+    setupGainMeter(outGainMeterSlider, -60, 6.0);
 }
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor() {}
@@ -37,19 +38,29 @@ void AudioPluginAudioProcessorEditor::paint(juce::Graphics& g) {
 void AudioPluginAudioProcessorEditor::changeListenerCallback(
     juce::ChangeBroadcaster* source) {
     if (source == static_cast<juce::ChangeBroadcaster*>(&processorRef)) {
-        // Cast the source to your processor type to access its methods
         auto* processor = static_cast<AudioPluginAudioProcessor*>(source);
+        setMeterSliders(processor);
+    }
+}
 
-        float inputLevel = processor->getInputLevel();
-        float outputLevel = processor->getOutputLevel();
+void AudioPluginAudioProcessorEditor::setMeterSliders(
+    AudioPluginAudioProcessor* p) {
+    float decay_factor = 0.9f;
+    float smoothedInputLevel = p->getSmoothedInputLevel();
+    float smoothedOutputLevel = p->getSmoothedOutputLevel();
 
-        inGainMeterSlider.setValue(juce::Decibels::gainToDecibels(inputLevel));
-        outGainMeterSlider.setValue(
-            juce::Decibels::gainToDecibels(outputLevel));
+    inGainMeterSlider.setValue(
+        juce::Decibels::gainToDecibels(smoothedInputLevel));
+    outGainMeterSlider.setValue(
+        juce::Decibels::gainToDecibels(smoothedOutputLevel));
+    repaint();
+}
 
-        DBG("Input Level: " << inGainMeterSlider.getValue() << "dB");
-
-        repaint();
+void AudioPluginAudioProcessorEditor::sliderValueChanged(juce::Slider* slider) {
+    if (slider == &inGainSlider) {
+        processorRef.setInGain(static_cast<float>(inGainSlider.getValue()));
+    } else if (slider == &outGainSlider) {
+        processorRef.setOutGain(static_cast<float>(outGainSlider.getValue()));
     }
 }
 
@@ -86,7 +97,7 @@ void AudioPluginAudioProcessorEditor::resizeGainControls() {
     auto content_area = bounds.reduced(padding);
     auto gain_width = content_area.getWidth() / 5;
     auto gain_height = content_area.getHeight() / 5;
-    auto gain_meter_width = gain_width / 5;
+    auto gain_meter_width = gain_width / 10;
     auto label_height = 25;
 
     auto in_gain_area =
