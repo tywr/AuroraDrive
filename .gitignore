@@ -1,6 +1,9 @@
 modules/
+builds/
 jumake_build/
 build/
 compile_commands.json
 .jumake
 .cache/clangd/index
+CMakeFiles
+CMakeCache.txt
