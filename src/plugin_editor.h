@@ -8,7 +8,8 @@ class PluginEditor final : public juce::AudioProcessorEditor,
                            public juce::ChangeListener,
                            public juce::Slider::Listener {
   public:
-    explicit PluginEditor(PluginAudioProcessor&);
+    explicit PluginEditor(PluginAudioProcessor&,
+                          juce::AudioProcessorValueTreeState&);
     ~PluginEditor() override;
 
     //==============================================================================
@@ -26,6 +27,7 @@ class PluginEditor final : public juce::AudioProcessorEditor,
 
   private:
     PluginAudioProcessor& processorRef;
+    juce::AudioProcessorValueTreeState& parameters;
     Header header;
 
     void changeListenerCallback(juce::ChangeBroadcaster* source) override;

@@ -13,13 +13,17 @@ PluginAudioProcessor::PluginAudioProcessor()
               .withOutput("Output", juce::AudioChannelSet::stereo(), true)
 #endif
               ),
-      parameters(*this, nullptr, juce::Identifier("PluginParameters"),
-                 {std::make_unique<juce::AudioParameterFloat>(
-                      "input_gain", "Input Gain", 0.0f, 1.0f, 0.5f),
-                  std::make_unique<juce::AudioParameterFloat>(
-                      "output_gain", "Output Gain", 0.0f, 1.0f, 0.5f)}) {
-    inputGainParameter = parameters.getRawParameterValue("input_gain");
-    outputGainParameter = parameters.getRawParameterValue("output_gain");
+      parameters(
+          *this, nullptr, juce::Identifier("PluginParameters"),
+          {std::make_unique<juce::AudioParameterFloat>(
+               "input_gain_db", "Input Gain dB",
+               juce::NormalisableRange<float>(-48.0f, 6.0f, 0.01f, 3.0f), 0.0f),
+           std::make_unique<juce::AudioParameterFloat>(
+               "output_gain_db", "Output Gain dB",
+               juce::NormalisableRange<float>(-48.0f, 6.0f, 0.01f, 3.0f),
+               0.0f)}) {
+    inputGainParameter = parameters.getRawParameterValue("input_gain_db");
+    outputGainParameter = parameters.getRawParameterValue("output_gain_db");
 }
 
 PluginAudioProcessor::~PluginAudioProcessor() {}
@@ -83,8 +87,10 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate,
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
     juce::ignoreUnused(sampleRate, samplesPerBlock);
-    previousInputGain = inputGainParameter->load();
-    previousOutputGain = outputGainParameter->load();
+    previousInputGainLinear =
+        juce::Decibels::decibelsToGain(inputGainParameter->load());
+    previousOutputGainLinear =
+        juce::Decibels::decibelsToGain(outputGainParameter->load());
 }
 
 void PluginAudioProcessor::releaseResources() {
@@ -133,13 +139,15 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
     inputLevel.setValue(smoothedInput);
 
     // Apply input gain with smoothing
-    auto currentInputGain = inputGainParameter->load();
-    if (juce::approximatelyEqual(currentInputGain, previousInputGain)) {
-        buffer.applyGain(currentInputGain);
+    auto currentInputGainLinear =
+        juce::Decibels::decibelsToGain(inputGainParameter->load());
+    if (juce::approximatelyEqual(currentInputGainLinear,
+                                 previousInputGainLinear)) {
+        buffer.applyGain(currentInputGainLinear);
     } else {
-        buffer.applyGainRamp(0, buffer.getNumSamples(), previousInputGain,
-                             currentInputGain);
-        previousInputGain = currentInputGain;
+        buffer.applyGainRamp(0, buffer.getNumSamples(), previousInputGainLinear,
+                             currentInputGainLinear);
+        previousInputGainLinear = currentInputGainLinear;
     }
 
     // Main processing goes here
@@ -155,13 +163,15 @@ void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
     outputLevel.setValue(smoothedOutput);
 
     // Apply output gain with smoothing
-    auto currentOutputGain = outputGainParameter->load();
-    if (juce::approximatelyEqual(currentOutputGain, previousOutputGain)) {
-        buffer.applyGain(currentOutputGain);
+    auto currentOutputGainLinear =
+        juce::Decibels::decibelsToGain(outputGainParameter->load());
+    if (juce::approximatelyEqual(currentOutputGainLinear,
+                                 previousOutputGainLinear)) {
+        buffer.applyGain(currentOutputGainLinear);
     } else {
-        buffer.applyGainRamp(0, buffer.getNumSamples(), previousOutputGain,
-                             currentOutputGain);
-        previousOutputGain = currentOutputGain;
+        buffer.applyGainRamp(0, buffer.getNumSamples(),
+                             previousOutputGainLinear, currentOutputGainLinear);
+        previousOutputGainLinear = currentOutputGainLinear;
     }
 }
 
@@ -177,7 +187,7 @@ bool PluginAudioProcessor::hasEditor() const {
 }
 
 juce::AudioProcessorEditor* PluginAudioProcessor::createEditor() {
-    return new PluginEditor(*this);
+    return new PluginEditor(*this, parameters);
 }
 
 //==============================================================================

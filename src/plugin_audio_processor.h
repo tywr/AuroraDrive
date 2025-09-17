@@ -47,8 +47,8 @@ class PluginAudioProcessor final : public juce::AudioProcessor,
 
   private:
     juce::AudioProcessorValueTreeState parameters;
-    float previousInputGain;
-    float previousOutputGain;
+    float previousInputGainLinear;
+    float previousOutputGainLinear;
     std::atomic<float>* inputGainParameter = nullptr;
     std::atomic<float>* outputGainParameter = nullptr;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginAudioProcessor)

@@ -5,9 +5,10 @@
 using namespace juce;
 
 //==============================================================================
-PluginEditor::PluginEditor(PluginAudioProcessor& p)
-    : AudioProcessorEditor(&p), processorRef(p),
-      header(processorRef.inputLevel, processorRef.outputLevel) {
+PluginEditor::PluginEditor(PluginAudioProcessor& p,
+                           juce::AudioProcessorValueTreeState& params)
+    : AudioProcessorEditor(&p), processorRef(p), parameters(params),
+      header(params, processorRef.inputLevel, processorRef.outputLevel) {
 
     setSize(600, 600);
 
