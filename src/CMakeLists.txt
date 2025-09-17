@@ -27,7 +27,8 @@ target_sources(${PROJECT_NAME}
     PRIVATE
         plugin_editor.cpp
         plugin_audio_processor.cpp
-        meter.cpp)
+        meter.cpp
+        header.cpp)
 
 
 target_compile_definitions(${PROJECT_NAME}

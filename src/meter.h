@@ -10,7 +10,6 @@ class Meter : public juce::Component, public juce::Value::Listener {
     void paint(juce::Graphics&) override;
     void resized() override;
     void valueChanged(juce::Value& v) override;
-    double decayRate = 0.99;
     double getCurrentValue() { return currentValue; }
 
   private:

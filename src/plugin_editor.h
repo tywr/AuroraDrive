@@ -1,6 +1,6 @@
 #pragma once
 
-#include "meter.h"
+#include "header.h"
 #include "plugin_audio_processor.h"
 
 //==============================================================================
@@ -26,8 +26,7 @@ class PluginEditor final : public juce::AudioProcessorEditor,
 
   private:
     PluginAudioProcessor& processorRef;
-    Meter inputMeter;
-    Meter outputMeter;
+    Header header;
 
     void changeListenerCallback(juce::ChangeBroadcaster* source) override;
 

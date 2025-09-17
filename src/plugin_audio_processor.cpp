@@ -12,7 +12,14 @@ PluginAudioProcessor::PluginAudioProcessor()
 #endif
               .withOutput("Output", juce::AudioChannelSet::stereo(), true)
 #endif
-      ) {
+              ),
+      parameters(*this, nullptr, juce::Identifier("PluginParameters"),
+                 {std::make_unique<juce::AudioParameterFloat>(
+                      "input_gain", "Input Gain", 0.0f, 1.0f, 0.5f),
+                  std::make_unique<juce::AudioParameterFloat>(
+                      "output_gain", "Output Gain", 0.0f, 1.0f, 0.5f)}) {
+    inputGainParameter = parameters.getRawParameterValue("input_gain");
+    outputGainParameter = parameters.getRawParameterValue("output_gain");
 }
 
 PluginAudioProcessor::~PluginAudioProcessor() {}
@@ -76,6 +83,8 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate,
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
     juce::ignoreUnused(sampleRate, samplesPerBlock);
+    previousInputGain = inputGainParameter->load();
+    previousOutputGain = outputGainParameter->load();
 }
 
 void PluginAudioProcessor::releaseResources() {
@@ -110,34 +119,50 @@ bool PluginAudioProcessor::isBusesLayoutSupported(
 void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
                                         juce::MidiBuffer& midiMessages) {
     juce::ignoreUnused(midiMessages);
-
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
 
+    // Set inputLevel value for metering
     double smoothedInput =
         smoothLevel(buffer.getRMSLevel(0, 0, buffer.getNumSamples()),
                     inputLevel.getValue());
     inputLevel.setValue(smoothedInput);
 
+    // Apply input gain with smoothing
+    auto currentInputGain = inputGainParameter->load();
+    if (juce::approximatelyEqual(currentInputGain, previousInputGain)) {
+        buffer.applyGain(currentInputGain);
+    } else {
+        buffer.applyGainRamp(0, buffer.getNumSamples(), previousInputGain,
+                             currentInputGain);
+        previousInputGain = currentInputGain;
+    }
+
+    // Main processing goes here
     for (int channel = 0; channel < totalNumInputChannels; ++channel) {
         auto* channelData = buffer.getWritePointer(channel);
         juce::ignoreUnused(channelData);
     }
 
+    // Set outputLevel value for metering
     double smoothedOutput =
         smoothLevel(buffer.getRMSLevel(0, 0, buffer.getNumSamples()),
                     outputLevel.getValue());
     outputLevel.setValue(smoothedOutput);
+
+    // Apply output gain with smoothing
+    auto currentOutputGain = outputGainParameter->load();
+    if (juce::approximatelyEqual(currentOutputGain, previousOutputGain)) {
+        buffer.applyGain(currentOutputGain);
+    } else {
+        buffer.applyGainRamp(0, buffer.getNumSamples(), previousOutputGain,
+                             currentOutputGain);
+        previousOutputGain = currentOutputGain;
+    }
 }
 
 double PluginAudioProcessor::smoothLevel(double newLevel, double currentLevel) {
@@ -157,18 +182,18 @@ juce::AudioProcessorEditor* PluginAudioProcessor::createEditor() {
 
 //==============================================================================
 void PluginAudioProcessor::getStateInformation(juce::MemoryBlock& destData) {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
-    juce::ignoreUnused(destData);
+    auto state = parameters.copyState();
+    std::unique_ptr<juce::XmlElement> xml(state.createXml());
+    copyXmlToBinary(*xml, destData);
 }
 
 void PluginAudioProcessor::setStateInformation(const void* data,
                                                int sizeInBytes) {
-    // You should use this method to restore your parameters from this memory
-    // block, whose contents will have been created by the getStateInformation()
-    // call.
-    juce::ignoreUnused(data, sizeInBytes);
+    std::unique_ptr<juce::XmlElement> xmlState(
+        getXmlFromBinary(data, sizeInBytes));
+    if (xmlState.get() != nullptr)
+        if (xmlState->hasTagName(parameters.state.getType()))
+            parameters.replaceState(juce::ValueTree::fromXml(*xmlState));
 }
 
 //==============================================================================

@@ -6,7 +6,6 @@
 class PluginAudioProcessor final : public juce::AudioProcessor,
                                    public juce::ChangeBroadcaster {
   public:
-    //==============================================================================
     PluginAudioProcessor();
     ~PluginAudioProcessor() override;
 
@@ -18,6 +17,7 @@ class PluginAudioProcessor final : public juce::AudioProcessor,
     void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
     using AudioProcessor::processBlock;
 
+    // Decay factor for level smoothing
     double decayFactor = 0.95f;
     juce::Value inputLevel;
     juce::Value outputLevel;
@@ -42,15 +42,14 @@ class PluginAudioProcessor final : public juce::AudioProcessor,
     void changeProgramName(int index, const juce::String& newName) override;
 
     //==============================================================================
-    void processInputLevels(juce::AudioBuffer<float>& buffer,
-                            float decay_factor = 0.95f);
-    void processOutputLevels(juce::AudioBuffer<float>& buffer,
-                             float decay_factor = 0.95f);
-
-    //==============================================================================
     void getStateInformation(juce::MemoryBlock& destData) override;
     void setStateInformation(const void* data, int sizeInBytes) override;
 
   private:
+    juce::AudioProcessorValueTreeState parameters;
+    float previousInputGain;
+    float previousOutputGain;
+    std::atomic<float>* inputGainParameter = nullptr;
+    std::atomic<float>* outputGainParameter = nullptr;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginAudioProcessor)
 };

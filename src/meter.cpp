@@ -8,6 +8,7 @@ Meter::Meter(juce::Value& v) : measuredValue(v) {
     slider.setValue(0.0);
     slider.setSliderStyle(juce::Slider::LinearVertical);
     slider.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+    slider.setSliderStyle(juce::Slider::LinearBarVertical);
     measuredValue.addListener(this);
     measuredValue.setValue(0);
     currentValue = static_cast<double>(measuredValue.getValue());

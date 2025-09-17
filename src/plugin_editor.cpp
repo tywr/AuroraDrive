@@ -7,23 +7,16 @@ using namespace juce;
 //==============================================================================
 PluginEditor::PluginEditor(PluginAudioProcessor& p)
     : AudioProcessorEditor(&p), processorRef(p),
-      inputMeter(processorRef.inputLevel),
-      outputMeter(processorRef.outputLevel) {
+      header(processorRef.inputLevel, processorRef.outputLevel) {
 
     setSize(600, 600);
 
-    addAndMakeVisible(inputMeter);
-    addAndMakeVisible(outputMeter);
+    addAndMakeVisible(header);
 
     juce::ignoreUnused(processorRef);
 
     getLookAndFeel().setColour(juce::Slider::thumbColourId,
                                juce::Colours::lightgreen);
-
-    // setupGainControl(inGainSlider, inGainLabel, -100.0, 12.0, 0.0, "Input");
-    // setupGainControl(outGainSlider, outGainLabel, -100.0, 12.0, 0.0,
-    // "Output"); setupGainMeter(inGainMeterSlider, -60, 6.0);
-    // setupGainMeter(outGainMeterSlider, -60, 6.0);
 }
 
 PluginEditor::~PluginEditor() {}
@@ -48,8 +41,8 @@ void PluginEditor::sliderValueChanged(juce::Slider* slider) {}
 
 void PluginEditor::resized() {
     auto bounds = getLocalBounds();
-    inputMeter.setBounds(bounds.removeFromLeft(50));
-    outputMeter.setBounds(bounds.removeFromRight(50));
+    const int header_height = 100;
+    header.setBounds(bounds.removeFromTop(header_height));
 }
 
 void PluginEditor::setupGainControl(juce::Slider& slider, juce::Label& label,
