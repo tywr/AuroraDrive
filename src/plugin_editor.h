@@ -1,14 +1,15 @@
 #pragma once
 
-#include "plugin_processor.h"
+#include "meter.h"
+#include "plugin_audio_processor.h"
 
 //==============================================================================
-class AudioPluginAudioProcessorEditor final : public juce::AudioProcessorEditor,
-                                              public juce::ChangeListener,
-                                              public juce::Slider::Listener {
+class PluginEditor final : public juce::AudioProcessorEditor,
+                           public juce::ChangeListener,
+                           public juce::Slider::Listener {
   public:
-    explicit AudioPluginAudioProcessorEditor(AudioPluginAudioProcessor&);
-    ~AudioPluginAudioProcessorEditor() override;
+    explicit PluginEditor(PluginAudioProcessor&);
+    ~PluginEditor() override;
 
     //==============================================================================
     void paint(juce::Graphics&) override;
@@ -16,18 +17,17 @@ class AudioPluginAudioProcessorEditor final : public juce::AudioProcessorEditor,
 
     void sliderValueChanged(juce::Slider* slider) override;
 
-    // Gain Control Variables
     void setupGainControl(juce::Slider& slider, juce::Label& label,
                           double minRange, double maxRange, double initialValue,
                           const juce::String& labelText);
     void setupGainMeter(juce::Slider& slider, double minRange, double maxRange);
     void resizeGainControls();
-    void setMeterSliders(AudioPluginAudioProcessor* processor);
+    void setMeterSliders(PluginAudioProcessor* processorRef);
 
   private:
-    // This reference is provided as a quick way for your editor to
-    // access the processor object that created it.
-    AudioPluginAudioProcessor& processorRef;
+    PluginAudioProcessor& processorRef;
+    Meter inputMeter;
+    Meter outputMeter;
 
     void changeListenerCallback(juce::ChangeBroadcaster* source) override;
 
@@ -41,6 +41,5 @@ class AudioPluginAudioProcessorEditor final : public juce::AudioProcessorEditor,
     juce::Slider inGainMeterSlider;
     juce::Slider outGainMeterSlider;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(
-        AudioPluginAudioProcessorEditor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginEditor)
 };

@@ -1,74 +1,61 @@
 #include "plugin_editor.h"
 
-#include "plugin_processor.h"
+#include "plugin_audio_processor.h"
 
 using namespace juce;
 
 //==============================================================================
-AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor(
-    AudioPluginAudioProcessor& p)
-    : AudioProcessorEditor(&p), processorRef(p) {
+PluginEditor::PluginEditor(PluginAudioProcessor& p)
+    : AudioProcessorEditor(&p), processorRef(p),
+      inputMeter(processorRef.inputLevel),
+      outputMeter(processorRef.outputLevel) {
 
     setSize(600, 600);
 
-    juce::ignoreUnused(processorRef);
+    addAndMakeVisible(inputMeter);
+    addAndMakeVisible(outputMeter);
 
-    processorRef.addChangeListener(this);
-    inGainSlider.addListener(this);
-    outGainSlider.addListener(this);
+    juce::ignoreUnused(processorRef);
 
     getLookAndFeel().setColour(juce::Slider::thumbColourId,
                                juce::Colours::lightgreen);
 
-    setupGainControl(inGainSlider, inGainLabel, -100.0, 12.0, 0.0, "Input");
-    setupGainControl(outGainSlider, outGainLabel, -100.0, 12.0, 0.0, "Output");
-    setupGainMeter(inGainMeterSlider, -60, 6.0);
-    setupGainMeter(outGainMeterSlider, -60, 6.0);
+    // setupGainControl(inGainSlider, inGainLabel, -100.0, 12.0, 0.0, "Input");
+    // setupGainControl(outGainSlider, outGainLabel, -100.0, 12.0, 0.0,
+    // "Output"); setupGainMeter(inGainMeterSlider, -60, 6.0);
+    // setupGainMeter(outGainMeterSlider, -60, 6.0);
 }
 
-AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor() {}
+PluginEditor::~PluginEditor() {}
 
 //==============================================================================
-void AudioPluginAudioProcessorEditor::paint(juce::Graphics& g) {
+void PluginEditor::paint(juce::Graphics& g) {
     // (Our component is opaque, so we must completely fill the background with
     // a solid colour)
     g.setFont(15.0f);
 }
 
-void AudioPluginAudioProcessorEditor::changeListenerCallback(
-    juce::ChangeBroadcaster* source) {
+void PluginEditor::changeListenerCallback(juce::ChangeBroadcaster* source) {
     if (source == static_cast<juce::ChangeBroadcaster*>(&processorRef)) {
-        auto* processor = static_cast<AudioPluginAudioProcessor*>(source);
+        auto* processor = static_cast<PluginAudioProcessor*>(source);
         setMeterSliders(processor);
     }
 }
 
-void AudioPluginAudioProcessorEditor::setMeterSliders(
-    AudioPluginAudioProcessor* p) {
-    float decay_factor = 0.9f;
-    float smoothedInputLevel = p->getSmoothedInputLevel();
-    float smoothedOutputLevel = p->getSmoothedOutputLevel();
+void PluginEditor::setMeterSliders(PluginAudioProcessor* p) {}
 
-    inGainMeterSlider.setValue(
-        juce::Decibels::gainToDecibels(smoothedInputLevel));
-    outGainMeterSlider.setValue(
-        juce::Decibels::gainToDecibels(smoothedOutputLevel));
-    repaint();
+void PluginEditor::sliderValueChanged(juce::Slider* slider) {}
+
+void PluginEditor::resized() {
+    auto bounds = getLocalBounds();
+    inputMeter.setBounds(bounds.removeFromLeft(50));
+    outputMeter.setBounds(bounds.removeFromRight(50));
 }
 
-void AudioPluginAudioProcessorEditor::sliderValueChanged(juce::Slider* slider) {
-    if (slider == &inGainSlider) {
-        processorRef.setInGain(static_cast<float>(inGainSlider.getValue()));
-    } else if (slider == &outGainSlider) {
-        processorRef.setOutGain(static_cast<float>(outGainSlider.getValue()));
-    }
-}
-
-void AudioPluginAudioProcessorEditor::resized() { resizeGainControls(); }
-
-void AudioPluginAudioProcessorEditor::setupGainControl(
-    juce::Slider& slider, juce::Label& label, double minRange, double maxRange,
-    double initialValue, const juce::String& labelText) {
+void PluginEditor::setupGainControl(juce::Slider& slider, juce::Label& label,
+                                    double minRange, double maxRange,
+                                    double initialValue,
+                                    const juce::String& labelText) {
     addAndMakeVisible(slider);
     addAndMakeVisible(label);
     slider.setRange(minRange, maxRange, 0.01);
@@ -80,9 +67,8 @@ void AudioPluginAudioProcessorEditor::setupGainControl(
     label.setJustificationType(juce::Justification::centred);
 }
 
-void AudioPluginAudioProcessorEditor::setupGainMeter(juce::Slider& slider,
-                                                     double min_range,
-                                                     double max_range) {
+void PluginEditor::setupGainMeter(juce::Slider& slider, double min_range,
+                                  double max_range) {
     addAndMakeVisible(slider);
     slider.setRange(min_range, max_range, 0.01);
     slider.setSliderStyle(juce::Slider::LinearBarVertical);
@@ -90,7 +76,7 @@ void AudioPluginAudioProcessorEditor::setupGainMeter(juce::Slider& slider,
     slider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
 }
 
-void AudioPluginAudioProcessorEditor::resizeGainControls() {
+void PluginEditor::resizeGainControls() {
     auto bounds = getLocalBounds();
     // Define a padding around the content.
     const int padding = 10;
