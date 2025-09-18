@@ -16,7 +16,7 @@ Meter::Meter(juce::Value& v) : measuredValue(v) {
 
 Meter::~Meter() { measuredValue.removeListener(this); }
 
-void Meter::paint(juce::Graphics& g) { g.fillAll(juce::Colours::black); }
+void Meter::paint(juce::Graphics& g) { g.fillAll(juce::Colours::white); }
 
 void Meter::resized() {
     auto bounds = getLocalBounds();

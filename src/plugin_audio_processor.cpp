@@ -20,6 +20,17 @@ PluginAudioProcessor::PluginAudioProcessor()
                juce::NormalisableRange<float>(-48.0f, 6.0f, 0.01f, 3.0f), 0.0f),
            std::make_unique<juce::AudioParameterFloat>(
                "output_gain_db", "Output Gain dB",
+               juce::NormalisableRange<float>(-48.0f, 6.0f, 0.01f, 3.0f), 0.0f),
+           std::make_unique<juce::AudioParameterBool>(
+               "compressor_bypass", "Compressor Bypass", false),
+           std::make_unique<juce::AudioParameterFloat>(
+               "compressor_mix", "Compressor Mix",
+               juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.5f),
+           std::make_unique<juce::AudioParameterFloat>(
+               "compressor_peak", "Compressor Peak",
+               juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.5f),
+           std::make_unique<juce::AudioParameterFloat>(
+               "compressor_gain_db", "Compressor Gain dB",
                juce::NormalisableRange<float>(-48.0f, 6.0f, 0.01f, 3.0f),
                0.0f)}) {
     inputGainParameter = parameters.getRawParameterValue("input_gain_db");

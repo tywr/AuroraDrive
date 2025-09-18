@@ -18,7 +18,7 @@ class PluginAudioProcessor final : public juce::AudioProcessor,
     using AudioProcessor::processBlock;
 
     // Decay factor for level smoothing
-    double decayFactor = 0.95f;
+    double decayFactor = 0.98f;
     juce::Value inputLevel;
     juce::Value outputLevel;
     double smoothLevel(double newLevel, double currentLevel);

@@ -8,10 +8,6 @@ Tabs::Tabs(juce::AudioProcessorValueTreeState& params)
     : juce::TabbedComponent(juce::TabbedButtonBar::TabsAtTop),
       parameters(params) {
     addTab("Compressor", juce::Colours::red, new CompressorGui(params), true);
-    addTab("Compressor2", juce::Colours::red, new CompressorGui(params), true);
-
-    // addAndMakeVisible(getTabbedButtonBar());
 }
 
 Tabs::~Tabs() {}
-
