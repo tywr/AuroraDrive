@@ -7,49 +7,67 @@ void Compressor::prepare(const juce::dsp::ProcessSpec& spec)
     processSpec = spec;
 }
 
+void Compressor::applyGain(juce::AudioBuffer<float>& buffer)
+{
+    if (juce::approximatelyEqual(gain, previousGain))
+    {
+        buffer.applyGain(gain);
+    }
+    else
+    {
+        buffer.applyGainRamp(0, buffer.getNumSamples(), previousGain, gain);
+        previousGain = gain;
+    }
+}
+
 void Compressor::process(juce::AudioBuffer<float>& buffer)
 {
+    if (bypass)
+    {
+        return;
+    }
     auto sampleRate = processSpec.sampleRate;
+
+    applyGain(buffer);
+
     for (int channel = 0; channel < buffer.getNumChannels(); ++channel)
     {
         auto* channelData = buffer.getWritePointer(channel);
-
         for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
         {
-            // 1. Level Detection
-            // Get the absolute value of the signal
-            float inputLevel = std::abs(channelData[sample]);
+            float envelope = static_cast<float>(std::abs(channelData[sample]));
+            float coef;
 
-            // 2. Envelope Follower
-            // Use a one-pole filter for attack and release smoothing
-            float smoothingCoefficient;
-            if (inputLevel > envelope)
+            if (envelope > smoothedLevel)
             {
-                // Attack phase: use a fast attack coefficient
-                smoothingCoefficient = std::exp(-1.0f / (sampleRate * attack));
+                coef =
+                    static_cast<float>(std::exp(-1.0f / (sampleRate * attack)));
             }
             else
             {
-                // Release phase: use a slow release coefficient
-                smoothingCoefficient = std::exp(-1.0f / (sampleRate * release));
+                if (smoothedLevel > peak)
+                {
+                    coef = static_cast<float>(
+                        std::exp(-1.0f / (sampleRate * release1))
+                    );
+                }
+                else
+                {
+                    coef = static_cast<float>(
+                        std::exp(-1.0f / (sampleRate * release2))
+                    );
+                }
             }
+            smoothedLevel = (coef * smoothedLevel) + ((1.0f - coef) * envelope);
 
-            envelope = (envelope * smoothingCoefficient) +
-                       (inputLevel * (1.0f - smoothingCoefficient));
-
-            // 3. Gain Computer
-            float gainReduction = 1.0f;
-            if (envelope > threshold)
+            if (smoothedLevel > peak)
             {
-                // Apply a gain reduction based on a linear
-                // threshold
-                float gainReductiondB = (threshold - envelope) * (1.0f - ratio);
-                gainReduction = juce::Decibels::decibelsToGain(gainReductiondB);
+                gainReductionDb = (peak - smoothedLevel) * (ratio - 1.0f);
             }
+            gainReduction = juce::Decibels::decibelsToGain(gainReductionDb);
 
-            // 4. Gain Application
-            // Apply the gain to the sample
-            channelData[sample] *= gainReduction;
+            channelData[sample] = (channelData[sample] * gainReduction * mix) +
+                                  (channelData[sample] * (1.0f - mix));
         }
     }
 }

@@ -43,6 +43,13 @@ PluginAudioProcessor::PluginAudioProcessor()
 {
     inputGainParameter = parameters.getRawParameterValue("input_gain_db");
     outputGainParameter = parameters.getRawParameterValue("output_gain_db");
+
+    parameters.addParameterListener("input_gain_db", this);
+    parameters.addParameterListener("output_gain_db", this);
+    parameters.addParameterListener("compressor_bypass", this);
+    parameters.addParameterListener("compressor_mix", this);
+    parameters.addParameterListener("compressor_peak", this);
+    parameters.addParameterListener("compressor_gain_db", this);
 }
 
 PluginAudioProcessor::~PluginAudioProcessor()
@@ -116,6 +123,29 @@ void PluginAudioProcessor::changeProgramName(
 {
     juce::ignoreUnused(index, newName);
 }
+//==============================================================================
+void PluginAudioProcessor::parameterChanged(
+    const juce::String& parameterID, float newValue
+)
+{
+    // Compressor
+    if (parameterID == "compressor_bypass")
+    {
+        compressor.setBypass((newValue < 0.5f) ? true : false);
+    }
+    else if (parameterID == "compressor_mix")
+    {
+        compressor.setMix(newValue);
+    }
+    else if (parameterID == "compressor_peak")
+    {
+        compressor.setPeak(newValue);
+    }
+    else if (parameterID == "compressor_gain_db")
+    {
+        compressor.setGain(juce::Decibels::decibelsToGain(newValue));
+    }
+}
 
 //==============================================================================
 void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
@@ -130,8 +160,8 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 
     juce::dsp::ProcessSpec spec;
     spec.sampleRate = sampleRate;
-    spec.maximumBlockSize = samplesPerBlock;
-    spec.numChannels = getTotalNumOutputChannels();
+    spec.maximumBlockSize = (juce::uint32)samplesPerBlock;
+    spec.numChannels = (juce::uint32)getTotalNumOutputChannels();
 
     compressor.prepare(spec);
 }
@@ -168,6 +198,10 @@ bool PluginAudioProcessor::isBusesLayoutSupported(
 #endif
 }
 
+//==============================================================================
+// Main Proces Block Function !
+//==============================================================================
+
 void PluginAudioProcessor::processBlock(
     juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages
 )
@@ -180,13 +214,46 @@ void PluginAudioProcessor::processBlock(
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
 
+    updateInputLevel(buffer);
+    applyInputGain(buffer);
+
+    for (int channel = 0; channel < totalNumInputChannels; ++channel)
+    {
+        auto* channelData = buffer.getWritePointer(channel);
+        juce::ignoreUnused(channelData);
+    }
+
+    compressor.process(buffer);
+    compressorGainReductionDb.setValue(compressor.getGainReductionDb());
+
+    applyOutputGain(buffer);
+    updateOutputLevel(buffer);
+}
+
+//==============================================================================
+// Process Block Helper functions
+//==============================================================================
+
+void PluginAudioProcessor::updateInputLevel(juce::AudioBuffer<float>& buffer)
+{
     // Set inputLevel value for metering
     double smoothedInput = smoothLevel(
         buffer.getRMSLevel(0, 0, buffer.getNumSamples()), inputLevel.getValue()
     );
     inputLevel.setValue(smoothedInput);
+}
 
-    // Apply input gain with smoothing
+void PluginAudioProcessor::updateOutputLevel(juce::AudioBuffer<float>& buffer)
+{
+    // Set outputLevel value for metering
+    double smoothedOutput = smoothLevel(
+        buffer.getRMSLevel(0, 0, buffer.getNumSamples()), outputLevel.getValue()
+    );
+    outputLevel.setValue(smoothedOutput);
+}
+
+void PluginAudioProcessor::applyInputGain(juce::AudioBuffer<float>& buffer)
+{
     auto currentInputGainLinear =
         juce::Decibels::decibelsToGain(inputGainParameter->load());
     if (juce::approximatelyEqual(
@@ -203,20 +270,10 @@ void PluginAudioProcessor::processBlock(
         );
         previousInputGainLinear = currentInputGainLinear;
     }
+}
 
-    // Main processing goes here
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer(channel);
-        juce::ignoreUnused(channelData);
-    }
-
-    // Set outputLevel value for metering
-    double smoothedOutput = smoothLevel(
-        buffer.getRMSLevel(0, 0, buffer.getNumSamples()), outputLevel.getValue()
-    );
-    outputLevel.setValue(smoothedOutput);
-
+void PluginAudioProcessor::applyOutputGain(juce::AudioBuffer<float>& buffer)
+{
     // Apply output gain with smoothing
     auto currentOutputGainLinear =
         juce::Decibels::decibelsToGain(outputGainParameter->load());
@@ -244,6 +301,8 @@ double PluginAudioProcessor::smoothLevel(double newLevel, double currentLevel)
         return decayFactor * currentLevel;
 }
 
+//==============================================================================
+
 bool PluginAudioProcessor::hasEditor() const
 {
     return true; // (change this to false if you choose to not supply an editor)
@@ -254,7 +313,6 @@ juce::AudioProcessorEditor* PluginAudioProcessor::createEditor()
     return new PluginEditor(*this, parameters);
 }
 
-//==============================================================================
 void PluginAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
     auto state = parameters.copyState();

@@ -1,9 +1,19 @@
 #include "compressor_gui.h"
+#include "meter.h"
 
-CompressorGui::CompressorGui(juce::AudioProcessorValueTreeState& params)
-    : parameters(params)
+CompressorGui::CompressorGui(
+    juce::AudioProcessorValueTreeState& params,
+    juce::Value& compressorGainReductionDb
+)
+    : parameters(params), gainReductionValue(compressorGainReductionDb)
 {
     setSize(600, 300);
+
+    addAndMakeVisible(gainReductionMeterSlider);
+    gainReductionMeterSlider.setRange(-30.0, 0.0, 0.01);
+    gainReductionMeterSlider.setSliderStyle(juce::Slider::LinearBar);
+    gainReductionValue.addListener(this);
+    gainReductionValue.setValue(0);
 
     addAndMakeVisible(bypassButton);
     bypassButton.setButtonText("Bypass");
@@ -57,6 +67,12 @@ CompressorGui::~CompressorGui()
 {
 }
 
+void CompressorGui::valueChanged(juce::Value& newValue)
+{
+    double value = static_cast<float>(newValue.getValue());
+    gainReductionMeterSlider.setValue(value);
+}
+
 void CompressorGui::paint(juce::Graphics& g)
 {
     g.fillAll(juce::Colours::red);
@@ -64,12 +80,15 @@ void CompressorGui::paint(juce::Graphics& g)
 
 void CompressorGui::resized()
 {
+    const int gain_reduction_meter_height = 40;
     const int xpadding = 100;
     const int ypadding = 100;
     const int bypass_padding = 30;
     const int bypass_width = 50;
 
     auto bounds = getLocalBounds();
+    auto gainReductionMeterBounds =
+        bounds.removeFromTop(gain_reduction_meter_height);
     auto bypassButtonBounds =
         bounds.removeFromBottom(bypass_width + 2 * bypass_padding);
     bounds.reduce(xpadding, ypadding);
@@ -78,7 +97,7 @@ void CompressorGui::resized()
     auto peakSliderBounds = bounds.removeFromLeft(bounds.getWidth() / 2);
     auto mixSliderBounds = bounds;
 
-    // Set the bounds for the sliders
+    gainReductionMeterSlider.setBounds(gainReductionMeterBounds);
     gainSlider.setBounds(gainSliderBounds);
     peakSlider.setBounds(peakSliderBounds);
     mixSlider.setBounds(mixSliderBounds);

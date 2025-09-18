@@ -9,17 +9,53 @@ class Compressor
     // Prepares compressor with a ProcessSpec-Object containing samplerate,
     void prepare(const juce::dsp::ProcessSpec& spec);
     void process(juce::AudioBuffer<float>& buffer);
+    void applyGain(juce::AudioBuffer<float>& buffer);
 
-    void setThreshold(float newThreshold);
-    void setRatio(float newRatio);
-    void setAttack(float newAttack);
-    void setRelease(float newRelease);
+    void setBypass(bool newBypass)
+    {
+        bypass = newBypass;
+    }
+    void setMix(float newMix)
+    {
+        mix = newMix;
+    }
+    void setPeak(float newPeak)
+    {
+        peak = newPeak;
+    }
+    void setGain(float newGain)
+    {
+        gain = newGain;
+    }
+
+    void setSmoothedLevel(float newLevel)
+    {
+        smoothedLevel = newLevel;
+    }
+
+    float getGainReductionDb()
+    {
+        return gainReductionDb;
+    }
 
   private:
     juce::dsp::ProcessSpec processSpec{-1, 0, 0};
-    float threshold = 0.0f;
-    float ratio = 1.0f;
+
+    // gui parameters
+    bool bypass = false;
+    float mix = 0.5f;
+    float peak = 0.5f;
+    float gain = 0.5f;
+
+    // internal state of compressor
+    float smoothedLevel = 0.0f;
+    float previousGain = 1.0f;
+    float gainReduction = 1.0f;
+    float gainReductionDb = 0.0f;
+
+    // hardcoded parameters
+    float ratio = 3.0f; // 3:1 compression ratio
     float attack = 0.01f;
-    float release = 0.1f;
-    float envelope = 0.0f;
+    float release1 = 0.06f;
+    float release2 = 0.5f;
 };

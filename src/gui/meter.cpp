@@ -7,7 +7,6 @@ Meter::Meter(juce::Value& v) : measuredValue(v)
     slider.setRange(-48.0, 6.0, 0.01);
     slider.setSkewFactor(3.0);
     slider.setValue(0.0);
-    slider.setSliderStyle(juce::Slider::LinearVertical);
     slider.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
     slider.setSliderStyle(juce::Slider::LinearBarVertical);
     measuredValue.addListener(this);

@@ -23,7 +23,6 @@ class PluginEditor final : public juce::AudioProcessorEditor
     );
     void setupGainMeter(juce::Slider& slider, double minRange, double maxRange);
     void resizeGainControls();
-    void setMeterSliders(PluginAudioProcessor* processorRef);
 
   private:
     PluginAudioProcessor& processorRef;

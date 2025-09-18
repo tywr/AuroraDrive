@@ -32,17 +32,21 @@ class BypassButtonLookAndFeel : public juce::LookAndFeel_V4
     }
 };
 
-class CompressorGui : public juce::Component
+class CompressorGui : public juce::Component, public juce::Value::Listener
 {
   public:
-    CompressorGui(juce::AudioProcessorValueTreeState&);
+    CompressorGui(juce::AudioProcessorValueTreeState&, juce::Value&);
     ~CompressorGui() override;
 
+    void valueChanged(juce::Value&) override;
     void paint(juce::Graphics&) override;
     void resized() override;
 
   private:
     juce::AudioProcessorValueTreeState& parameters;
+    juce::Value& gainReductionValue;
+
+    juce::Slider gainReductionMeterSlider;
 
     juce::ToggleButton bypassButton;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>
