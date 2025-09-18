@@ -5,10 +5,14 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
-class BypassButtonLookAndFeel : public juce::LookAndFeel_V4 {
+class BypassButtonLookAndFeel : public juce::LookAndFeel_V4
+{
   public:
-    void drawToggleButton(juce::Graphics& g, juce::ToggleButton& button,
-                          bool isMouseOverButton, bool isButtonDown) override {
+    void drawToggleButton(
+        juce::Graphics& g, juce::ToggleButton& button, bool isMouseOverButton,
+        bool isButtonDown
+    ) override
+    {
         auto bounds = button.getLocalBounds().toFloat();
         juce::Colour colour = juce::Colours::red; // Default color
 
@@ -28,7 +32,8 @@ class BypassButtonLookAndFeel : public juce::LookAndFeel_V4 {
     }
 };
 
-class CompressorGui : public juce::Component {
+class CompressorGui : public juce::Component
+{
   public:
     CompressorGui(juce::AudioProcessorValueTreeState&);
     ~CompressorGui() override;

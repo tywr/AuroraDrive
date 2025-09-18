@@ -1,14 +1,16 @@
 #include "compressor_gui.h"
 
 CompressorGui::CompressorGui(juce::AudioProcessorValueTreeState& params)
-    : parameters(params) {
+    : parameters(params)
+{
     setSize(600, 300);
 
     addAndMakeVisible(bypassButton);
     bypassButton.setButtonText("Bypass");
     bypassButtonAttachment =
         std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
-            parameters, "compressor_bypass", bypassButton);
+            parameters, "compressor_bypass", bypassButton
+        );
     bypassButton.setLookAndFeel(&bypassButtonLookAndFeel);
 
     addAndMakeVisible(gainSlider);
@@ -21,7 +23,8 @@ CompressorGui::CompressorGui(juce::AudioProcessorValueTreeState& params)
     gainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 50, 20);
     gainSliderAttachment =
         std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-            parameters, "compressor_gain_db", gainSlider);
+            parameters, "compressor_gain_db", gainSlider
+        );
 
     addAndMakeVisible(peakSlider);
     addAndMakeVisible(peakLabel);
@@ -33,7 +36,8 @@ CompressorGui::CompressorGui(juce::AudioProcessorValueTreeState& params)
     peakSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 50, 20);
     peakSliderAttachment =
         std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-            parameters, "compressor_peak", peakSlider);
+            parameters, "compressor_peak", peakSlider
+        );
 
     addAndMakeVisible(mixSlider);
     addAndMakeVisible(mixLabel);
@@ -45,14 +49,21 @@ CompressorGui::CompressorGui(juce::AudioProcessorValueTreeState& params)
     mixSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 50, 20);
     mixSliderAttachment =
         std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-            parameters, "compressor_mix", mixSlider);
+            parameters, "compressor_mix", mixSlider
+        );
 }
 
-CompressorGui::~CompressorGui() {}
+CompressorGui::~CompressorGui()
+{
+}
 
-void CompressorGui::paint(juce::Graphics& g) { g.fillAll(juce::Colours::red); }
+void CompressorGui::paint(juce::Graphics& g)
+{
+    g.fillAll(juce::Colours::red);
+}
 
-void CompressorGui::resized() {
+void CompressorGui::resized()
+{
     const int xpadding = 100;
     const int ypadding = 100;
     const int bypass_padding = 30;
@@ -73,5 +84,6 @@ void CompressorGui::resized() {
     mixSlider.setBounds(mixSliderBounds);
 
     bypassButton.setBounds(
-        bypassButtonBounds.withSizeKeepingCentre(bypass_width, bypass_width));
+        bypassButtonBounds.withSizeKeepingCentre(bypass_width, bypass_width)
+    );
 }

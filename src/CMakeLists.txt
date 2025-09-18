@@ -30,7 +30,8 @@ target_sources(${PROJECT_NAME}
         gui/meter.cpp
         gui/header.cpp
         gui/tabs.cpp
-        gui/compressor_gui.cpp)
+        gui/compressor_gui.cpp
+        dsp/compressor.cpp)
 
 
 target_compile_definitions(${PROJECT_NAME}

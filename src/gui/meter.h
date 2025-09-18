@@ -2,7 +2,8 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-class Meter : public juce::Component, public juce::Value::Listener {
+class Meter : public juce::Component, public juce::Value::Listener
+{
   public:
     Meter(juce::Value& v);
     ~Meter() override;
@@ -10,7 +11,10 @@ class Meter : public juce::Component, public juce::Value::Listener {
     void paint(juce::Graphics&) override;
     void resized() override;
     void valueChanged(juce::Value& v) override;
-    double getCurrentValue() { return currentValue; }
+    double getCurrentValue()
+    {
+        return currentValue;
+    }
 
   private:
     juce::Slider slider;

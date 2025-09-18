@@ -4,7 +4,8 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
-class Header : public juce::Component {
+class Header : public juce::Component
+{
   public:
     Header(juce::AudioProcessorValueTreeState&, juce::Value&, juce::Value&);
     ~Header() override;

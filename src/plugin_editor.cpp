@@ -5,11 +5,13 @@
 using namespace juce;
 
 //==============================================================================
-PluginEditor::PluginEditor(PluginAudioProcessor& p,
-                           juce::AudioProcessorValueTreeState& params)
+PluginEditor::PluginEditor(
+    PluginAudioProcessor& p, juce::AudioProcessorValueTreeState& params
+)
     : AudioProcessorEditor(&p), processorRef(p), parameters(params),
       header(params, processorRef.inputLevel, processorRef.outputLevel),
-      tabs(params) {
+      tabs(params)
+{
 
     setSize(600, 600);
 
@@ -18,31 +20,29 @@ PluginEditor::PluginEditor(PluginAudioProcessor& p,
 
     juce::ignoreUnused(processorRef);
 
-    getLookAndFeel().setColour(juce::Slider::thumbColourId,
-                               juce::Colours::lightgreen);
+    getLookAndFeel().setColour(
+        juce::Slider::thumbColourId, juce::Colours::lightgreen
+    );
 }
 
-PluginEditor::~PluginEditor() {}
+PluginEditor::~PluginEditor()
+{
+}
 
 //==============================================================================
-void PluginEditor::paint(juce::Graphics& g) {
+void PluginEditor::paint(juce::Graphics& g)
+{
     // (Our component is opaque, so we must completely fill the background with
     // a solid colour)
     g.setFont(15.0f);
 }
 
-void PluginEditor::changeListenerCallback(juce::ChangeBroadcaster* source) {
-    if (source == static_cast<juce::ChangeBroadcaster*>(&processorRef)) {
-        auto* processor = static_cast<PluginAudioProcessor*>(source);
-        setMeterSliders(processor);
-    }
+void PluginEditor::setMeterSliders(PluginAudioProcessor* p)
+{
 }
 
-void PluginEditor::setMeterSliders(PluginAudioProcessor* p) {}
-
-void PluginEditor::sliderValueChanged(juce::Slider* slider) {}
-
-void PluginEditor::resized() {
+void PluginEditor::resized()
+{
     const int header_height = 100;
     auto bounds = getLocalBounds();
     tabs.setBounds(bounds.removeFromBottom(getHeight() - header_height));

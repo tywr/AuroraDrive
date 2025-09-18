@@ -4,7 +4,8 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
-class Tabs : public juce::TabbedComponent {
+class Tabs : public juce::TabbedComponent
+{
   public:
     Tabs(juce::AudioProcessorValueTreeState&);
     ~Tabs() override;

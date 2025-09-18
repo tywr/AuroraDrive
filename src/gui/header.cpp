@@ -3,9 +3,12 @@
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
-Header::Header(juce::AudioProcessorValueTreeState& params, juce::Value& vin,
-               juce::Value& vout)
-    : parameters(params), inputMeter(vin), outputMeter(vout) {
+Header::Header(
+    juce::AudioProcessorValueTreeState& params, juce::Value& vin,
+    juce::Value& vout
+)
+    : parameters(params), inputMeter(vin), outputMeter(vout)
+{
 
     addAndMakeVisible(inputMeter);
     addAndMakeVisible(outputMeter);
@@ -17,23 +20,29 @@ Header::Header(juce::AudioProcessorValueTreeState& params, juce::Value& vin,
     inputGainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 50, 25);
     inputGainAttachment =
         std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-            parameters, "input_gain_db", inputGainSlider);
+            parameters, "input_gain_db", inputGainSlider
+        );
 
     outputGainSlider.setSkewFactor(3.0);
     outputGainSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     outputGainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 50, 25);
     outputGainAttachment =
         std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-            parameters, "output_gain_db", outputGainSlider);
+            parameters, "output_gain_db", outputGainSlider
+        );
 }
 
-Header::~Header() {}
+Header::~Header()
+{
+}
 
-void Header::paint(juce::Graphics& g) {
+void Header::paint(juce::Graphics& g)
+{
     g.fillAll(juce::Colours::green);
 }
 
-void Header::resized() {
+void Header::resized()
+{
     int padding = 10;
     auto bounds = getLocalBounds().reduced(padding);
     auto gain_width = bounds.getWidth() / 5;
