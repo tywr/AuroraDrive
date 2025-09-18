@@ -1,6 +1,7 @@
 #pragma once
 
-#include "header.h"
+#include "gui/header.h"
+#include "gui/tabs.h"
 #include "plugin_audio_processor.h"
 
 //==============================================================================
@@ -29,18 +30,9 @@ class PluginEditor final : public juce::AudioProcessorEditor,
     PluginAudioProcessor& processorRef;
     juce::AudioProcessorValueTreeState& parameters;
     Header header;
+    Tabs tabs;
 
     void changeListenerCallback(juce::ChangeBroadcaster* source) override;
-
-    // Gain Sliders
-    juce::Slider inGainSlider;
-    juce::Label inGainLabel;
-    juce::Slider outGainSlider;
-    juce::Label outGainLabel;
-
-    // Input and Output Meters
-    juce::Slider inGainMeterSlider;
-    juce::Slider outGainMeterSlider;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginEditor)
 };

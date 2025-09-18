@@ -27,8 +27,10 @@ target_sources(${PROJECT_NAME}
     PRIVATE
         plugin_editor.cpp
         plugin_audio_processor.cpp
-        meter.cpp
-        header.cpp)
+        gui/meter.cpp
+        gui/header.cpp
+        gui/tabs.cpp
+        gui/compressor_gui.cpp)
 
 
 target_compile_definitions(${PROJECT_NAME}

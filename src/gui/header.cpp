@@ -29,7 +29,9 @@ Header::Header(juce::AudioProcessorValueTreeState& params, juce::Value& vin,
 
 Header::~Header() {}
 
-void Header::paint(juce::Graphics& g) {}
+void Header::paint(juce::Graphics& g) {
+    g.fillAll(juce::Colours::green);
+}
 
 void Header::resized() {
     int padding = 10;
