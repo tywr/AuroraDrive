@@ -32,8 +32,8 @@ PluginAudioProcessor::PluginAudioProcessor()
                juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.5f
            ),
            std::make_unique<juce::AudioParameterFloat>(
-               "compressor_peak", "Compressor Peak",
-               juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.5f
+               "compressor_threshold", "Compressor Treshold",
+               juce::NormalisableRange<float>(-24.0f, 6.0f, 0.01f, 3.0f), 0.0f
            ),
            std::make_unique<juce::AudioParameterFloat>(
                "compressor_gain_db", "Compressor Gain dB",
@@ -48,7 +48,7 @@ PluginAudioProcessor::PluginAudioProcessor()
     parameters.addParameterListener("output_gain_db", this);
     parameters.addParameterListener("compressor_bypass", this);
     parameters.addParameterListener("compressor_mix", this);
-    parameters.addParameterListener("compressor_peak", this);
+    parameters.addParameterListener("compressor_threshold", this);
     parameters.addParameterListener("compressor_gain_db", this);
 }
 
@@ -137,9 +137,9 @@ void PluginAudioProcessor::parameterChanged(
     {
         compressor.setMix(newValue);
     }
-    else if (parameterID == "compressor_peak")
+    else if (parameterID == "compressor_threshold")
     {
-        compressor.setPeak(newValue);
+        compressor.setThreshold(juce::Decibels::decibelsToGain(newValue));
     }
     else if (parameterID == "compressor_gain_db")
     {

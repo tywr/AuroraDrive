@@ -14,18 +14,24 @@ Header::Header(
     addAndMakeVisible(outputMeter);
 
     addAndMakeVisible(inputGainSlider);
-    addAndMakeVisible(outputGainSlider);
     inputGainSlider.setSkewFactor(3.0);
     inputGainSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    inputGainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 50, 25);
+    inputGainSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 50, 25);
+    // inputGainSlider.setColour(
+    //     juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack
+    // );
     inputGainAttachment =
         std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
             parameters, "input_gain_db", inputGainSlider
         );
 
+    addAndMakeVisible(outputGainSlider);
     outputGainSlider.setSkewFactor(3.0);
     outputGainSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    outputGainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 50, 25);
+    outputGainSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 50, 25);
+    // outputGainSlider.setColour(
+    //     juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack
+    // );
     outputGainAttachment =
         std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
             parameters, "output_gain_db", outputGainSlider
@@ -36,27 +42,19 @@ Header::~Header()
 {
 }
 
-void Header::paint(juce::Graphics& g)
-{
-    g.fillAll(juce::Colours::green);
-}
-
 void Header::resized()
 {
-    int padding = 10;
+    int const padding = 10;
+    int const knob_padding = 3 * padding;
+    int const knob_size = getHeight() - padding * 2;
+    int const meter_width = 5;
+
     auto bounds = getLocalBounds().reduced(padding);
-    auto gain_width = bounds.getWidth() / 5;
-    auto meter_width = gain_width / 10;
-    auto label_height = 20;
 
-    auto in_area = bounds.removeFromLeft(gain_width);
-    auto in_meter_area = in_area.removeFromLeft(meter_width);
-
-    auto out_area = bounds.removeFromRight(gain_width);
-    auto out_meter_area = out_area.removeFromRight(meter_width);
-
-    inputMeter.setBounds(in_meter_area);
-    outputMeter.setBounds(out_meter_area);
-    inputGainSlider.setBounds(in_area);
-    outputGainSlider.setBounds(out_area);
+    inputMeter.setBounds(bounds.removeFromLeft(meter_width));
+    outputMeter.setBounds(bounds.removeFromRight(meter_width));
+    inputGainSlider.setBounds(bounds.removeFromLeft(knob_size + knob_padding));
+    outputGainSlider.setBounds(
+        bounds.removeFromRight(knob_size + knob_padding)
+    );
 }

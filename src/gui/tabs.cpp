@@ -1,5 +1,6 @@
 #include "tabs.h"
 #include "compressor_gui.h"
+#include "looks/colors.h"
 
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_gui_basics/juce_gui_basics.h>
@@ -12,7 +13,7 @@ Tabs::Tabs(
       parameters(params)
 {
     addTab(
-        "Compressor", juce::Colours::red,
+        "Compressor", AuroraColors::bg,
         new CompressorGui(params, compressorGainReductionDb), true
     );
 }

@@ -1,5 +1,6 @@
 #include "plugin_editor.h"
 
+#include "gui/looks/aurora.h"
 #include "plugin_audio_processor.h"
 
 using namespace juce;
@@ -13,8 +14,8 @@ PluginEditor::PluginEditor(
       tabs(params, processorRef.compressorGainReductionDb)
 {
 
-    setSize(600, 600);
-
+    setLookAndFeel(new AuroraLookAndFeel());
+    setSize(800, 600);
     addAndMakeVisible(header);
     addAndMakeVisible(tabs);
 
@@ -27,20 +28,20 @@ PluginEditor::PluginEditor(
 
 PluginEditor::~PluginEditor()
 {
+    setLookAndFeel(nullptr);
 }
 
 //==============================================================================
 void PluginEditor::paint(juce::Graphics& g)
 {
-    // (Our component is opaque, so we must completely fill the background with
-    // a solid colour)
-    g.setFont(15.0f);
+    g.setFont(18.0f);
 }
 
 void PluginEditor::resized()
 {
-    const int header_height = 100;
+    const float header_ratio = 0.15f;
+    const int header_height = static_cast<int>(getHeight() * header_ratio);
     auto bounds = getLocalBounds();
-    tabs.setBounds(bounds.removeFromBottom(getHeight() - header_height));
     header.setBounds(bounds.removeFromTop(header_height));
+    tabs.setBounds(bounds);
 }

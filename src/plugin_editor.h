@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gui/header.h"
+#include "gui/looks/aurora.h"
 #include "gui/tabs.h"
 #include "plugin_audio_processor.h"
 
@@ -29,6 +30,5 @@ class PluginEditor final : public juce::AudioProcessorEditor
     juce::AudioProcessorValueTreeState& parameters;
     Header header;
     Tabs tabs;
-
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginEditor)
 };

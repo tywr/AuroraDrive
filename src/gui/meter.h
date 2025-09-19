@@ -8,7 +8,6 @@ class Meter : public juce::Component, public juce::Value::Listener
     Meter(juce::Value& v);
     ~Meter() override;
 
-    void paint(juce::Graphics&) override;
     void resized() override;
     void valueChanged(juce::Value& v) override;
     double getCurrentValue()

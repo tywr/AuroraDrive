@@ -1,6 +1,7 @@
 #include "meter.h"
 #include <juce_audio_basics/juce_audio_basics.h>
 
+
 Meter::Meter(juce::Value& v) : measuredValue(v)
 {
     addAndMakeVisible(slider);
@@ -17,11 +18,6 @@ Meter::Meter(juce::Value& v) : measuredValue(v)
 Meter::~Meter()
 {
     measuredValue.removeListener(this);
-}
-
-void Meter::paint(juce::Graphics& g)
-{
-    g.fillAll(juce::Colours::white);
 }
 
 void Meter::resized()

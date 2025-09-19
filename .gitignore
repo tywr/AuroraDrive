@@ -8,3 +8,5 @@ compile_commands.json
 CMakeFiles
 CMakeCache.txt
 .DS_Store
+bin
+fonts

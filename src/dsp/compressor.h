@@ -10,6 +10,7 @@ class Compressor
     void prepare(const juce::dsp::ProcessSpec& spec);
     void process(juce::AudioBuffer<float>& buffer);
     void applyGain(juce::AudioBuffer<float>& buffer);
+    void computeGainReductionOptometric(float envelope, float sampleRate);
 
     void setBypass(bool newBypass)
     {
@@ -19,10 +20,11 @@ class Compressor
     {
         mix = newMix;
     }
-    void setPeak(float newPeak)
+    void setThreshold(float newThreshold)
     {
-        peak = newPeak;
+        threshold = newThreshold;
     }
+
     void setGain(float newGain)
     {
         gain = newGain;
@@ -44,7 +46,7 @@ class Compressor
     // gui parameters
     bool bypass = false;
     float mix = 0.5f;
-    float peak = 0.5f;
+    float threshold = 0.5f;
     float gain = 0.5f;
 
     // internal state of compressor

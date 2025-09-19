@@ -27,6 +27,7 @@ target_sources(${PROJECT_NAME}
     PRIVATE
         plugin_editor.cpp
         plugin_audio_processor.cpp
+        gui/looks/aurora.cpp
         gui/meter.cpp
         gui/header.cpp
         gui/tabs.cpp
