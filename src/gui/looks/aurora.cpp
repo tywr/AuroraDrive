@@ -41,6 +41,36 @@ void AuroraLookAndFeel::drawButtonBackground(
     g.drawEllipse(bounds.reduced(strokeWidth), strokeWidth);
 }
 
+void AuroraLookAndFeel::drawButtonText(
+    juce::Graphics& g, juce::TextButton& button,
+    bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown
+)
+{
+    auto bounds = button.getLocalBounds();
+    auto text = button.getButtonText();
+    juce::Colour colour;
+    if (button.getClickingTogglesState() && button.getToggleState())
+    {
+        colour = button.findColour(juce::TextButton::textColourOnId);
+    }
+    else
+    {
+        colour = button.findColour(juce::TextButton::textColourOffId);
+    }
+
+    if (shouldDrawButtonAsHighlighted)
+    {
+        colour = colour.brighter(0.2f);
+    }
+    else if (shouldDrawButtonAsDown)
+    {
+        colour = colour.darker(0.2f);
+    }
+    g.setFont(mainFont);
+    g.setColour(colour);
+    g.drawFittedText(text, bounds, juce::Justification::centred, 1);
+}
+
 void AuroraLookAndFeel::drawToggleButton(
     juce::Graphics& g, juce::ToggleButton& button, bool isMouseOverButton,
     bool isButtonDown

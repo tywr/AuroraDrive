@@ -44,9 +44,15 @@ PluginAudioProcessor::PluginAudioProcessor()
            std::make_unique<juce::AudioParameterFloat>(
                "compressor_gain_db", "Compressor Gain dB",
                juce::NormalisableRange<float>(0.0f, 24.0f, 0.01f, 1.0f), 0.0f
+           ),
+           std::make_unique<juce::AudioParameterFloat>(
+               "ir_mix", "Impulse Response Mix",
+               juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.5f
            )}
       )
 {
+    parameters.state.setProperty("ir_filepath", juce::String(""), nullptr);
+
     inputGainParameter = parameters.getRawParameterValue("input_gain_db");
     outputGainParameter = parameters.getRawParameterValue("output_gain_db");
 
@@ -57,6 +63,8 @@ PluginAudioProcessor::PluginAudioProcessor()
     parameters.addParameterListener("compressor_threshold", this);
     parameters.addParameterListener("compressor_gain_db", this);
     parameters.addParameterListener("compressor_type", this);
+    parameters.addParameterListener("ir_mix", this);
+    parameters.addParameterListener("ir_filepath", this);
 }
 
 PluginAudioProcessor::~PluginAudioProcessor()

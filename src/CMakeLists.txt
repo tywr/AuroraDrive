@@ -32,6 +32,7 @@ target_sources(${PROJECT_NAME}
         gui/header.cpp
         gui/tabs.cpp
         gui/compressor_gui.cpp
+        gui/ir.cpp
         dsp/compressor.cpp)
 
 

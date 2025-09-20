@@ -40,6 +40,11 @@ class AuroraLookAndFeel : public juce::LookAndFeel_V4
         bool isButtonDown
     ) override;
 
+    void drawButtonText(
+        juce::Graphics&, juce::TextButton&, bool shouldDrawButtonAsHighlighted,
+        bool shouldDrawButtonAsDown
+    ) override;
+
     void drawRotarySlider(
         juce::Graphics& g, int x, int y, int width, int height, float sliderPos,
         float rotaryStartAngle, float rotaryEndAngle, juce::Slider& slider
