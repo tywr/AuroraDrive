@@ -14,6 +14,21 @@ class AuroraLookAndFeel : public juce::LookAndFeel_V4
   public:
     AuroraLookAndFeel();
 
+    juce::LookAndFeel_V4::ColourScheme getColourScheme() const
+    {
+        return juce::LookAndFeel_V4::ColourScheme(
+            AuroraColors::bg,     // windowBackground
+            AuroraColors::grey3,  // widgetBackground
+            AuroraColors::grey2,  // menuBackground
+            AuroraColors::bg,     // outline
+            AuroraColors::grey3,  // defaultText
+            AuroraColors::bg,     // defaultFill
+            AuroraColors::white2, // highlightedText
+            AuroraColors::blue0,  // highlightedFill
+            AuroraColors::white0  // menuText
+        );
+    }
+
     void drawToggleButton(
         juce::Graphics& g, juce::ToggleButton& button, bool isMouseOverButton,
         bool isButtonDown
@@ -36,20 +51,13 @@ class AuroraLookAndFeel : public juce::LookAndFeel_V4
         const juce::Slider::SliderStyle style, juce::Slider& slider
     ) override;
 
-    juce::LookAndFeel_V4::ColourScheme getColourScheme() const
-    {
-        return juce::LookAndFeel_V4::ColourScheme(
-            AuroraColors::bg,     // windowBackground
-            AuroraColors::grey3,  // widgetBackground
-            AuroraColors::grey2,  // menuBackground
-            AuroraColors::grey2,  // outline
-            AuroraColors::grey3,  // defaultText
-            AuroraColors::bg,     // defaultFill
-            AuroraColors::white2, // highlightedText
-            AuroraColors::blue0,  // highlightedFill
-            AuroraColors::white0  // menuText
-        );
-    }
+    void drawTabbedButtonBarBackground(
+        juce::TabbedButtonBar& buttonBar, juce::Graphics& g
+    ) override;
+
+    void drawTabButton(
+        juce::TabBarButton&, juce::Graphics&, bool isMouseOver, bool isMouseDown
+    ) override;
 
     juce::Font getSliderPopupFont(juce::Slider&) override
     {

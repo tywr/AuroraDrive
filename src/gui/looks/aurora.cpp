@@ -128,3 +128,44 @@ void AuroraLookAndFeel::drawLinearSlider(
     g.setColour(slider.findColour(juce::Slider::trackColourId));
     g.fillRect(filledTrack);
 }
+
+void AuroraLookAndFeel::drawTabbedButtonBarBackground(
+    juce::TabbedButtonBar& buttonBar, juce::Graphics& g
+)
+{
+    g.fillAll(AuroraColors::bg);
+}
+
+void AuroraLookAndFeel::drawTabButton(
+    juce::TabBarButton& button, juce::Graphics& g, bool isMouseOver,
+    bool isMouseDown
+)
+{
+    const juce::String text = button.getButtonText();
+    const juce::Rectangle<int> bounds = button.getLocalBounds().reduced(10);
+    const bool isActive = button.isFrontTab();
+
+    g.setColour(AuroraColors::bg);
+    g.fillRect(bounds);
+
+    juce::Colour colour;
+    if (isActive)
+    {
+        colour = AuroraColors::white0;
+    }
+    else
+    {
+        colour = AuroraColors::grey2;
+    }
+    if (isMouseOver)
+    {
+        colour = colour.brighter(0.2f);
+    }
+    else if (isMouseDown)
+    {
+        colour = colour.darker(0.2f);
+    }
+    g.setFont(mainFont);
+    g.setColour(colour);
+    g.drawFittedText(text, bounds, juce::Justification::centred, 1);
+}

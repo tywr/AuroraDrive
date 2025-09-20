@@ -13,9 +13,13 @@ Tabs::Tabs(
       parameters(params)
 {
     addTab(
-        "Compressor", AuroraColors::bg,
+        "COMP", AuroraColors::bg,
         new CompressorGui(params, compressorGainReductionDb), true
     );
+    addTab("OVERDRIVE", AuroraColors::bg, new juce::Component(), true);
+    addTab("CHORUS", AuroraColors::bg, new juce::Component(), true);
+    addTab("AMP", AuroraColors::bg, new juce::Component(), true);
+    setTabBarDepth(60);
 }
 
 Tabs::~Tabs()
