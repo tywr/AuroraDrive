@@ -10,8 +10,7 @@ class Compressor
     void prepare(const juce::dsp::ProcessSpec& spec);
     void process(juce::AudioBuffer<float>& buffer);
     void applyGain(juce::AudioBuffer<float>& buffer);
-    void computeEnvelope(float inputSample, float sampleRate);
-    void computeGainReductionOptometric(float sampleRate);
+    void computeGainReductionOptometric(float sample, float sampleRate);
 
     void setBypass(bool newBypass)
     {
@@ -58,8 +57,10 @@ class Compressor
 
     // hardcoded parameters
     float gainSmoothingTime = 0.05f;
-    float ratio = 3.0f; // 3:1 compression ratio
+    float ratio = 3.8f; // 3.8:1 compression ratio
     float attack = 0.01f;
     float release1 = 0.06f;
     float release2 = 0.5f;
+    float saturationAmount = 0.2f;
+    float saturationMix = 0.05f;
 };
