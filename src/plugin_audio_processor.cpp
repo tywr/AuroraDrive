@@ -45,9 +45,16 @@ PluginAudioProcessor::PluginAudioProcessor()
                "compressor_gain_db", "Compressor Gain dB",
                juce::NormalisableRange<float>(0.0f, 24.0f, 0.01f, 1.0f), 0.0f
            ),
+           std::make_unique<juce::AudioParameterBool>(
+               "ir_bypass", "Impulse Response Bypass", false
+           ),
            std::make_unique<juce::AudioParameterFloat>(
                "ir_mix", "Impulse Response Mix",
                juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.5f
+           ),
+           std::make_unique<juce::AudioParameterFloat>(
+               "ir_gain_db", "Impulse Response Gain dB",
+               juce::NormalisableRange<float>(-12.0f, 12.0f, 0.01f, 1.0f), 0.0f
            )}
       )
 {
@@ -63,8 +70,10 @@ PluginAudioProcessor::PluginAudioProcessor()
     parameters.addParameterListener("compressor_threshold", this);
     parameters.addParameterListener("compressor_gain_db", this);
     parameters.addParameterListener("compressor_type", this);
+    parameters.addParameterListener("ir_bypass", this);
     parameters.addParameterListener("ir_mix", this);
     parameters.addParameterListener("ir_filepath", this);
+    parameters.addParameterListener("ir_gain_db", this);
 }
 
 PluginAudioProcessor::~PluginAudioProcessor()
@@ -164,6 +173,26 @@ void PluginAudioProcessor::parameterChanged(
     {
         compressor.setTypeFromIndex(static_cast<int>(newValue));
     }
+    else if (parameterID == "ir_bypass")
+    {
+        irConvolver.setBypass((newValue < 0.5f) ? true : false);
+    }
+    else if (parameterID == "ir_mix")
+    {
+        irConvolver.setMix(newValue);
+    }
+    else if (parameterID == "ir_gain_db")
+    {
+        irConvolver.setGain(juce::Decibels::decibelsToGain(newValue));
+    }
+    else if (parameterID == "ir_filepath")
+    {
+        // Load IR from the new filepath
+        juce::String newFilepath =
+            parameters.state.getProperty("ir_filepath").toString();
+        irConvolver.setFilepath(newFilepath);
+        irConvolver.loadIR();
+    }
 }
 
 //==============================================================================
@@ -185,8 +214,6 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
     compressor.prepare(spec);
 
     // Set all initial values from compressor
-    DBG("Curren Index "
-        << parameters.getRawParameterValue("compressor_type")->load());
     compressor.setBypass(
         parameters.getRawParameterValue("compressor_bypass")->load() < 0.5f
     );
@@ -208,6 +235,17 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
             parameters.getRawParameterValue("compressor_type")->load()
         )
     );
+
+    // Set all initial values for IR convolution
+    irConvolver.prepare(spec);
+    irConvolver.setBypass(
+        parameters.getRawParameterValue("ir_bypass")->load() < 0.5f
+    );
+    irConvolver.setMix(parameters.getRawParameterValue("ir_mix")->load());
+    irConvolver.setFilepath(
+        parameters.state.getProperty("ir_filepath").toString()
+    );
+    irConvolver.loadIR();
 }
 
 void PluginAudioProcessor::releaseResources()
@@ -269,6 +307,9 @@ void PluginAudioProcessor::processBlock(
 
     compressor.process(buffer);
     compressorGainReductionDb.setValue(compressor.getGainReductionDb());
+
+    irConvolver.process(buffer);
+
     applyOutputGain(buffer);
     updateOutputLevel(buffer);
 }

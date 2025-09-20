@@ -119,6 +119,7 @@ CompressorGui::CompressorGui(
         std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
             parameters, "compressor_mix", mixSlider
         );
+    switchCompressorColour();
 }
 
 CompressorGui::~CompressorGui()

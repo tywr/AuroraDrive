@@ -10,9 +10,9 @@ class Compressor
     void prepare(const juce::dsp::ProcessSpec& spec);
     void process(juce::AudioBuffer<float>& buffer);
     void applyGain(juce::AudioBuffer<float>& buffer);
-    void computeGainReductionOptometric(float sample, float sampleRate);
-    void computeGainReductionFet(float sample, float sampleRate);
-    void computeGainReductionVca(float sample, float sampleRate);
+    void computeGainReductionOptometric(float& sample, float sampleRate);
+    void computeGainReductionFet(float& sample, float sampleRate);
+    void computeGainReductionVca(float& sample, float sampleRate);
 
     void setBypass(bool newBypass)
     {
@@ -79,7 +79,7 @@ class Compressor
         float release = 0.1f;
         float saturationAmount = 0.4f;
         float saturationMix = 0.15f;
-        float gainSmoothingTime = 0.001f;
+        float gainSmoothingTime = 0.01f;
     } fetParams;
 
     struct
@@ -89,7 +89,7 @@ class Compressor
         float release = 0.4f;
         float saturationAmount = 0.2f;
         float saturationMix = 0.05f;
-        float gainSmoothingTime = 0.001f;
+        float gainSmoothingTime = 0.01f;
         float kneeWidth = 2.0f;
     } vcaParams;
 };

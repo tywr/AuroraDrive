@@ -1,6 +1,8 @@
 #pragma once
 
 #include "dsp/compressor.h"
+#include "dsp/ir.h"
+#include <juce_dsp/juce_dsp.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
 //==============================================================================
@@ -57,6 +59,7 @@ class PluginAudioProcessor final
   private:
     juce::AudioProcessorValueTreeState parameters;
     Compressor compressor;
+    IRConvolver irConvolver;
     float previousInputGainLinear;
     float previousOutputGainLinear;
     std::atomic<float>* inputGainParameter = nullptr;

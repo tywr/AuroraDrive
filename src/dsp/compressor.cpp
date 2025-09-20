@@ -20,7 +20,7 @@ void Compressor::applyGain(juce::AudioBuffer<float>& buffer)
     }
 }
 
-void Compressor::computeGainReductionOptometric(float sample, float sampleRate)
+void Compressor::computeGainReductionOptometric(float& sample, float sampleRate)
 {
     // Optometric Compressor
     //
@@ -75,7 +75,7 @@ void Compressor::computeGainReductionOptometric(float sample, float sampleRate)
                           optoParams.saturationMix;
 }
 
-void Compressor::computeGainReductionFet(float sample, float sampleRate)
+void Compressor::computeGainReductionFet(float& sample, float sampleRate)
 {
     // FET-style peak envelope processing (much faster)
     float absSample = std::abs(sample);
@@ -134,7 +134,7 @@ void Compressor::computeGainReductionFet(float sample, float sampleRate)
                           fetParams.saturationMix;
 }
 
-void Compressor::computeGainReductionVca(float sample, float sampleRate)
+void Compressor::computeGainReductionVca(float& sample, float sampleRate)
 {
     float absSample = std::abs(sample);
 

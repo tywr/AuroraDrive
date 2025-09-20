@@ -1,4 +1,4 @@
-#include "ir.h"
+#include "ir_gui.h"
 #include "looks/colors.h"
 
 #include <juce_audio_formats/juce_audio_formats.h>
@@ -32,6 +32,10 @@ IRLoader::IRLoader(juce::AudioProcessorValueTreeState& params)
     statusLabel.setJustificationType(juce::Justification::centred);
 
     addAndMakeVisible(irMixSlider);
+    addAndMakeVisible(irMixLabel);
+    irMixLabel.setText("MIX", juce::dontSendNotification);
+    irMixLabel.setJustificationType(juce::Justification::centred);
+    irMixLabel.attachToComponent(&irMixSlider, false);
     irMixSlider.setRange(0.0, 1.0, 0.01);
     irMixSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     irMixSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 100, 20);
@@ -46,7 +50,29 @@ IRLoader::IRLoader(juce::AudioProcessorValueTreeState& params)
     );
     irMixSliderAttachment =
         std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-            parameters, "compressor_mix", irMixSlider
+            parameters, "ir_mix", irMixSlider
+        );
+
+    addAndMakeVisible(gainSlider);
+    addAndMakeVisible(gainLabel);
+    gainLabel.setText("GAIN", juce::dontSendNotification);
+    gainLabel.setJustificationType(juce::Justification::centred);
+    gainLabel.attachToComponent(&gainSlider, false);
+    gainSlider.setRange(0.0, 1.0, 0.01);
+    gainSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    gainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 100, 20);
+    gainSlider.setColour(
+        juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack
+    );
+    gainSlider.setColour(
+        juce::Slider::textBoxTextColourId, AuroraColors::grey3
+    );
+    gainSlider.setColour(
+        juce::Slider::rotarySliderFillColourId, AuroraColors::white0
+    );
+    gainSliderAttachment =
+        std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+            parameters, "ir_gain_db", gainSlider
         );
 
     // Refresh the status of the IR loader
@@ -71,8 +97,8 @@ void IRLoader::resized()
     const int ypadding = 50;
     const int load_button_height = 30;
     const int button_size = 50;
-    const int knob_padding = 60;
     const int label_padding = 20;
+    const int inner_knob_padding = 60;
     auto bounds = getLocalBounds().reduced(xpadding, ypadding);
 
     loadButton.setBounds(bounds.removeFromTop(load_button_height));
@@ -84,7 +110,14 @@ void IRLoader::resized()
                               .withTrimmedLeft(label_padding));
     bypassLabel.setBounds(bottom_bounds.withTrimmedRight(label_padding));
 
-    irMixSlider.setBounds(bounds.reduced(knob_padding));
+    const int knob_size = bounds.getWidth() / 3;
+    bounds.removeFromLeft(knob_size / 2);
+    bounds.removeFromRight(knob_size / 2);
+
+    gainSlider.setBounds(
+        bounds.removeFromLeft(knob_size).reduced(inner_knob_padding)
+    );
+    irMixSlider.setBounds(bounds.reduced(inner_knob_padding));
 }
 
 void IRLoader::switchColour()
@@ -111,7 +144,12 @@ void IRLoader::refreshStatus()
         irMixSlider.setColour(
             juce::Slider::rotarySliderFillColourId, AuroraColors::grey3
         );
-        bypassButton.setColour(juce::ToggleButton::tickColourId, AuroraColors::grey3);
+        gainSlider.setColour(
+            juce::Slider::rotarySliderFillColourId, AuroraColors::grey3
+        );
+        bypassButton.setColour(
+            juce::ToggleButton::tickColourId, AuroraColors::grey3
+        );
     }
     else if (file.existsAsFile())
     {
@@ -119,9 +157,8 @@ void IRLoader::refreshStatus()
             "LOADED " + file.getFileName(), juce::dontSendNotification
         );
         irMixSlider.setColour(juce::Slider::rotarySliderFillColourId, iRColour);
-        bypassButton.setColour(
-            juce::ToggleButton::tickColourId, iRColour
-        );
+        gainSlider.setColour(juce::Slider::rotarySliderFillColourId, iRColour);
+        bypassButton.setColour(juce::ToggleButton::tickColourId, iRColour);
     }
     repaint();
 }

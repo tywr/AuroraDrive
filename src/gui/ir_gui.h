@@ -26,9 +26,16 @@ class IRLoader : public juce::Component
     juce::TextButton loadButton;
     juce::Label statusLabel;
     std::unique_ptr<juce::FileChooser> chooser;
+
     juce::Slider irMixSlider;
+    juce::Label irMixLabel;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>
         irMixSliderAttachment;
+
+    juce::Slider gainSlider;
+    juce::Label gainLabel;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>
+        gainSliderAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IRLoader)
 };

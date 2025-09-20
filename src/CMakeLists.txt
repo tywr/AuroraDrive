@@ -32,8 +32,9 @@ target_sources(${PROJECT_NAME}
         gui/header.cpp
         gui/tabs.cpp
         gui/compressor_gui.cpp
-        gui/ir.cpp
-        dsp/compressor.cpp)
+        gui/ir_gui.cpp
+        dsp/compressor.cpp
+        dsp/ir.cpp)
 
 
 target_compile_definitions(${PROJECT_NAME}
@@ -48,6 +49,7 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
         # AudioPluginData           # If we'd created a binary data target, we'd link to it here
         juce::juce_audio_utils
+        juce::juce_dsp
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
