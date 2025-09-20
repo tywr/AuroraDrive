@@ -20,41 +20,60 @@ void Compressor::applyGain(juce::AudioBuffer<float>& buffer)
     }
 }
 
-void Compressor::computeGainReductionOptometric(
-    float envelope, float sampleRate
-)
+void Compressor::computeGainReductionOptometric(float sampleRate)
 {
-    float coef;
-    if (envelope > smoothedLevel)
+    float rawGainReduction;
+    float rawGainReductionDb;
+    if (envelopeLevel > threshold)
     {
-        coef = static_cast<float>(std::exp(-1.0f / (sampleRate * attack)));
+        float overThreshold = juce::Decibels::gainToDecibels(envelopeLevel) -
+                              juce::Decibels::gainToDecibels(threshold);
+        rawGainReductionDb = -overThreshold * (1.0f - 1.0f / ratio);
     }
     else
     {
-        if (smoothedLevel > threshold)
+        rawGainReductionDb = 0.0f; // No compression when below threshold
+    }
+
+    rawGainReduction = juce::Decibels::decibelsToGain(rawGainReductionDb);
+
+    float gainSmoothingCoef =
+        std::exp(-1.0f / (sampleRate * gainSmoothingTime));
+
+    // Actual gain reduction applied to the signal
+    gainReduction = (gainSmoothingCoef * gainReduction) +
+                    ((1.0f - gainSmoothingCoef) * rawGainReduction);
+    gainReductionDb = juce::Decibels::gainToDecibels(gainReduction);
+}
+
+void Compressor::computeEnvelope(float inputSample, float sampleRate)
+{
+    float absSample = std::abs(inputSample);
+
+    float coef;
+    if (absSample > envelopeLevel)
+    {
+        coef = std::exp(-1.0f / (sampleRate * attack));
+    }
+    else
+    {
+        if (envelopeLevel > threshold)
         {
-            coef =
-                static_cast<float>(std::exp(-1.0f / (sampleRate * release1)));
+            coef = std::exp(-1.0f / (sampleRate * release1));
         }
         else
         {
-            coef =
-                static_cast<float>(std::exp(-1.0f / (sampleRate * release2)));
+            coef = std::exp(-1.0f / (sampleRate * release2));
         }
     }
-    smoothedLevel = (coef * smoothedLevel) + ((1.0f - coef) * envelope);
-
-    if (smoothedLevel > threshold)
-    {
-        gainReductionDb = (threshold - smoothedLevel) * (ratio - 1.0f);
-    }
-    gainReduction = juce::Decibels::decibelsToGain(gainReductionDb);
+    envelopeLevel = (coef * envelopeLevel) + ((1.0f - coef) * absSample);
 }
 
 void Compressor::process(juce::AudioBuffer<float>& buffer)
 {
     if (bypass)
     {
+        peakGainReductionDb = 0.0f;
         return;
     }
     float sampleRate = static_cast<float>(processSpec.sampleRate);
@@ -66,8 +85,8 @@ void Compressor::process(juce::AudioBuffer<float>& buffer)
         auto* channelData = buffer.getWritePointer(channel);
         for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
         {
-            float envelope = static_cast<float>(std::abs(channelData[sample]));
-            computeGainReductionOptometric(envelope, sampleRate);
+            computeEnvelope(channelData[sample], sampleRate);
+            computeGainReductionOptometric(sampleRate);
             channelData[sample] = (channelData[sample] * gainReduction * mix) +
                                   (channelData[sample] * (1.0f - mix));
         }

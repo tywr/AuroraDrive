@@ -11,8 +11,8 @@ CompressorGui::CompressorGui(
     setSize(600, 300);
 
     addAndMakeVisible(gainReductionMeterSlider);
-    gainReductionMeterSlider.setRange(0.0, 24.0, 0.01);
-    gainReductionMeterSlider.setSkewFactor(0.75);
+    gainReductionMeterSlider.setRange(0.0, 20.0, 0.05);
+    gainReductionMeterSlider.setSkewFactor(0.5); // Skew for 3dB in the middle
     gainReductionMeterSlider.setSliderStyle(juce::Slider::LinearBar);
     gainReductionMeterSlider.setTextBoxStyle(
         juce::Slider::NoTextBox, false, 0, 0
@@ -51,7 +51,7 @@ CompressorGui::CompressorGui(
 
     addAndMakeVisible(thresholdSlider);
     addAndMakeVisible(thresholdLabel);
-    thresholdLabel.setText("THRESHOLD", juce::dontSendNotification);
+    thresholdLabel.setText("THR", juce::dontSendNotification);
     thresholdLabel.attachToComponent(&thresholdSlider, false);
     thresholdLabel.setJustificationType(juce::Justification::centred);
     thresholdSlider.setRange(0.0, 1.0, 0.01);

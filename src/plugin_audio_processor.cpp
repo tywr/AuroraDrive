@@ -18,11 +18,11 @@ PluginAudioProcessor::PluginAudioProcessor()
           *this, nullptr, juce::Identifier("PluginParameters"),
           {std::make_unique<juce::AudioParameterFloat>(
                "input_gain_db", "Input Gain dB",
-               juce::NormalisableRange<float>(-48.0f, 6.0f, 0.01f, 3.0f), 0.0f
+               juce::NormalisableRange<float>(-48.0f, 6.0f, 0.01f, 0.9f), 0.0f
            ),
            std::make_unique<juce::AudioParameterFloat>(
                "output_gain_db", "Output Gain dB",
-               juce::NormalisableRange<float>(-48.0f, 6.0f, 0.01f, 3.0f), 0.0f
+               juce::NormalisableRange<float>(-48.0f, 6.0f, 0.01f, 0.9f), 0.0f
            ),
            std::make_unique<juce::AudioParameterBool>(
                "compressor_bypass", "Compressor Bypass", false
@@ -33,11 +33,11 @@ PluginAudioProcessor::PluginAudioProcessor()
            ),
            std::make_unique<juce::AudioParameterFloat>(
                "compressor_threshold", "Compressor Treshold",
-               juce::NormalisableRange<float>(-24.0f, 6.0f, 0.01f, 3.0f), 0.0f
+               juce::NormalisableRange<float>(-60.0f, 0.0f, 0.01f, 3.0f), -12.0f
            ),
            std::make_unique<juce::AudioParameterFloat>(
                "compressor_gain_db", "Compressor Gain dB",
-               juce::NormalisableRange<float>(-48.0f, 6.0f, 0.01f, 3.0f), 0.0f
+               juce::NormalisableRange<float>(0.0f, 24.0f, 0.01f, 1.0f), 0.0f
            )}
       )
 {
@@ -214,8 +214,8 @@ void PluginAudioProcessor::processBlock(
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
 
-    updateInputLevel(buffer);
     applyInputGain(buffer);
+    updateInputLevel(buffer);
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
@@ -225,7 +225,6 @@ void PluginAudioProcessor::processBlock(
 
     compressor.process(buffer);
     compressorGainReductionDb.setValue(compressor.getGainReductionDb());
-
     applyOutputGain(buffer);
     updateOutputLevel(buffer);
 }
@@ -237,19 +236,20 @@ void PluginAudioProcessor::processBlock(
 void PluginAudioProcessor::updateInputLevel(juce::AudioBuffer<float>& buffer)
 {
     // Set inputLevel value for metering
-    double smoothedInput = smoothLevel(
-        buffer.getRMSLevel(0, 0, buffer.getNumSamples()), inputLevel.getValue()
+    double peakInput = smoothLevel(
+        buffer.getMagnitude(0, 0, buffer.getNumSamples()), inputLevel.getValue()
     );
-    inputLevel.setValue(smoothedInput);
+    inputLevel.setValue(peakInput);
 }
 
 void PluginAudioProcessor::updateOutputLevel(juce::AudioBuffer<float>& buffer)
 {
     // Set outputLevel value for metering
-    double smoothedOutput = smoothLevel(
-        buffer.getRMSLevel(0, 0, buffer.getNumSamples()), outputLevel.getValue()
+    double peakOutput = smoothLevel(
+        buffer.getMagnitude(0, 0, buffer.getNumSamples()),
+        outputLevel.getValue()
     );
-    outputLevel.setValue(smoothedOutput);
+    outputLevel.setValue(peakOutput);
 }
 
 void PluginAudioProcessor::applyInputGain(juce::AudioBuffer<float>& buffer)

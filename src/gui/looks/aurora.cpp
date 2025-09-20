@@ -93,16 +93,13 @@ void AuroraLookAndFeel::drawLinearSlider(
     juce::Rectangle<float> filledTrack;
     if (style == juce::Slider::LinearBar)
     {
-        DBG("minSliderPos: " << minSliderPos);
-        DBG("maxSliderPos: " << maxSliderPos);
-        DBG("sliderPos: " << sliderPos);
-        DBG("x: " << x);
-        DBG("y: " << y);
         filledTrack = juce::Rectangle<float>(x, y, sliderPos, height);
     }
     else if (style == juce::Slider::LinearBarVertical)
     {
-        filledTrack = juce::Rectangle<float>(x, y, width, sliderPos);
+        // revert to always display from bottom to top
+        auto deltaY = sliderPos - y;
+        filledTrack = juce::Rectangle<float>(x, y + deltaY, width, height);
     }
     g.setColour(slider.findColour(juce::Slider::trackColourId));
     g.fillRect(filledTrack);
