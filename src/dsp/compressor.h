@@ -11,6 +11,8 @@ class Compressor
     void process(juce::AudioBuffer<float>& buffer);
     void applyGain(juce::AudioBuffer<float>& buffer);
     void computeGainReductionOptometric(float sample, float sampleRate);
+    void computeGainReductionFet(float sample, float sampleRate);
+    void computeGainReductionVca(float sample, float sampleRate);
 
     void setBypass(bool newBypass)
     {
@@ -30,6 +32,12 @@ class Compressor
         gain = newGain;
     }
 
+    void setTypeFromIndex(int index)
+    {
+        // 0 = OPTO, 1 = FET, 2 = VCA
+        type = index;
+    }
+
     float getGainReductionDb()
     {
         return gainReductionDb;
@@ -40,10 +48,11 @@ class Compressor
     int debugCounter = 0;
 
     // gui parameters
-    bool bypass = false;
-    float mix = 0.5f;
-    float threshold = 0.5f;
-    float gain = 0.5f;
+    int type;
+    bool bypass;
+    float mix;
+    float threshold;
+    float gain;
 
     // internal state of compressor
     float envelopeLevel = 1.0f;
@@ -51,16 +60,36 @@ class Compressor
     float gainReductionDb = 0.0f;
     float gainReduction = 1.0f;
 
-    // metering value
-    float peakGainReductionDb = 0.0f;
-    float peakDecay = 0.99f;
+    // hardcoded parameters for optometric compressor
+    struct
+    {
+        float ratio = 3.8f;
+        float attack = 0.01f;
+        float release1 = 0.06f;
+        float release2 = 0.5f;
+        float saturationAmount = 0.2f;
+        float saturationMix = 0.05f;
+        float gainSmoothingTime = 0.05f;
+    } optoParams;
 
-    // hardcoded parameters
-    float gainSmoothingTime = 0.05f;
-    float ratio = 3.8f; // 3.8:1 compression ratio
-    float attack = 0.01f;
-    float release1 = 0.06f;
-    float release2 = 0.5f;
-    float saturationAmount = 0.2f;
-    float saturationMix = 0.05f;
+    struct
+    {
+        float ratio = 4.0f;
+        float attack = 0.0003f;
+        float release = 0.1f;
+        float saturationAmount = 0.4f;
+        float saturationMix = 0.15f;
+        float gainSmoothingTime = 0.001f;
+    } fetParams;
+
+    struct
+    {
+        float ratio = 4.0f;
+        float attack = 0.005f;
+        float release = 0.4f;
+        float saturationAmount = 0.2f;
+        float saturationMix = 0.05f;
+        float gainSmoothingTime = 0.001f;
+        float kneeWidth = 2.0f;
+    } vcaParams;
 };

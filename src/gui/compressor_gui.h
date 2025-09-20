@@ -6,6 +6,7 @@
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
+#include <unordered_map>
 
 class CompressorGui : public juce::Component, public juce::Value::Listener
 {
@@ -16,14 +17,28 @@ class CompressorGui : public juce::Component, public juce::Value::Listener
     void valueChanged(juce::Value&) override;
     void resized() override;
 
+    void switchCompressorColour();
+
   private:
     juce::AudioProcessorValueTreeState& parameters;
     juce::Value& gainReductionValue;
 
-    juce::Colour compressorColour = AuroraColors::blue1;
+    juce::TextButton compressorSwitcherButton;
+    juce::StringArray compressorChoices = {"OPTO", "FET", "VCA"};
+    const std::unordered_map<std::string, juce::Colour>
+        compressorColourMapping = {
+            {"OPTO", AuroraColors::blue1        },
+            {"FET",  AuroraColors::aurora_orange},
+            {"VCA",  AuroraColors::white0       }
+    };
+    juce::Colour const defaultCompressorColour = AuroraColors::grey3;
+
+    juce::Label compressorTypeLabel;
+    std::unique_ptr<juce::ParameterAttachment> compressorTypeLabelAttachment;
 
     juce::Slider gainReductionMeterSlider;
 
+    juce::Label bypassLabel;
     juce::ToggleButton bypassButton;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>
         bypassButtonAttachment;

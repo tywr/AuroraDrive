@@ -12,11 +12,15 @@ class Header : public juce::Component
     ~Header() override;
 
     void resized() override;
+    void paint(juce::Graphics&) override;
 
   private:
     juce::AudioProcessorValueTreeState& parameters;
     Meter inputMeter;
     Meter outputMeter;
+
+    juce::Label inputLabel;
+    juce::Label outputLabel;
 
     juce::Slider inputGainSlider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>

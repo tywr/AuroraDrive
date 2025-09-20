@@ -24,6 +24,12 @@ PluginAudioProcessor::PluginAudioProcessor()
                "output_gain_db", "Output Gain dB",
                juce::NormalisableRange<float>(-48.0f, 6.0f, 0.01f, 0.9f), 0.0f
            ),
+           std::make_unique<juce::AudioParameterChoice>(
+               "compressor_type",                       // Parameter ID
+               "Compressor Type",                       // Display name
+               juce::StringArray{"OPTO", "FET", "VCA"}, // Choice options
+               0
+           ),
            std::make_unique<juce::AudioParameterBool>(
                "compressor_bypass", "Compressor Bypass", false
            ),
@@ -50,6 +56,7 @@ PluginAudioProcessor::PluginAudioProcessor()
     parameters.addParameterListener("compressor_mix", this);
     parameters.addParameterListener("compressor_threshold", this);
     parameters.addParameterListener("compressor_gain_db", this);
+    parameters.addParameterListener("compressor_type", this);
 }
 
 PluginAudioProcessor::~PluginAudioProcessor()
@@ -145,6 +152,10 @@ void PluginAudioProcessor::parameterChanged(
     {
         compressor.setGain(juce::Decibels::decibelsToGain(newValue));
     }
+    else if (parameterID == "compressor_type")
+    {
+        compressor.setTypeFromIndex(static_cast<int>(newValue));
+    }
 }
 
 //==============================================================================
@@ -164,6 +175,31 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
     spec.numChannels = (juce::uint32)getTotalNumOutputChannels();
 
     compressor.prepare(spec);
+
+    // Set all initial values from compressor
+    DBG("Curren Index "
+        << parameters.getRawParameterValue("compressor_type")->load());
+    compressor.setBypass(
+        parameters.getRawParameterValue("compressor_bypass")->load() < 0.5f
+    );
+    compressor.setMix(
+        parameters.getRawParameterValue("compressor_mix")->load()
+    );
+    compressor.setThreshold(
+        juce::Decibels::decibelsToGain(
+            parameters.getRawParameterValue("compressor_threshold")->load()
+        )
+    );
+    compressor.setGain(
+        juce::Decibels::decibelsToGain(
+            parameters.getRawParameterValue("compressor_gain_db")->load()
+        )
+    );
+    compressor.setTypeFromIndex(
+        static_cast<int>(
+            parameters.getRawParameterValue("compressor_type")->load()
+        )
+    );
 }
 
 void PluginAudioProcessor::releaseResources()

@@ -6,12 +6,39 @@
 AuroraLookAndFeel::AuroraLookAndFeel()
 {
     setColourScheme(getColourScheme());
-    setColour(
-        juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack
-    );
-    setColour(
-        juce::Slider::rotarySliderFillColourId, AuroraColors::aurora_green
-    );
+}
+
+void AuroraLookAndFeel::drawButtonBackground(
+    juce::Graphics& g, juce::Button& button,
+    const juce::Colour& backgroundColour, bool isMouseOverButton,
+    bool isButtonDown
+)
+{
+    auto bounds = button.getLocalBounds().toFloat();
+
+    // Get appropriate colour based on button state
+    juce::Colour colour = backgroundColour;
+
+    // For toggle-style behavior, check if it's a TextButton with toggle state
+    auto* textButton = dynamic_cast<juce::TextButton*>(&button);
+    if (textButton && textButton->getClickingTogglesState() &&
+        textButton->getToggleState())
+    {
+        colour = button.findColour(juce::TextButton::buttonOnColourId);
+    }
+    else
+    {
+        colour = button.findColour(juce::TextButton::buttonColourId);
+    }
+
+    // Apply interaction states
+    if (isButtonDown)
+        colour = colour.darker(0.2f);
+    else if (isMouseOverButton)
+        colour = colour.brighter(0.2f);
+
+    g.setColour(colour);
+    g.drawEllipse(bounds.reduced(strokeWidth), strokeWidth);
 }
 
 void AuroraLookAndFeel::drawToggleButton(
@@ -20,21 +47,18 @@ void AuroraLookAndFeel::drawToggleButton(
 )
 {
     auto bounds = button.getLocalBounds().toFloat();
-    juce::Colour colour = juce::Colours::red; // Default color
-
+    juce::Colour colour =
+        button.findColour(juce::ToggleButton::tickDisabledColourId);
     if (button.getToggleState())
-        colour = juce::Colours::green; // Color for the "on" state
+        colour = button.findColour(juce::ToggleButton::tickColourId);
 
     if (isButtonDown)
-        colour = colour.darker(0.2f);
+        colour = button.findColour(juce::ToggleButton::tickDisabledColourId);
     else if (isMouseOverButton)
         colour = colour.brighter(0.2f);
 
     g.setColour(colour);
-    g.fillEllipse(bounds);
-
-    g.setColour(juce::Colours::black);
-    g.drawEllipse(bounds, 1.0f);
+    g.drawEllipse(bounds.reduced(strokeWidth), strokeWidth);
 }
 
 void AuroraLookAndFeel::drawRotarySlider(
@@ -47,7 +71,7 @@ void AuroraLookAndFeel::drawRotarySlider(
     auto radius = fmin(bounds.getWidth(), bounds.getHeight()) / 2.0f;
     const auto toAngle =
         rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
-    auto lineW = fmin(6.0f, radius * 0.5f);
+    auto lineW = fmin(strokeWidth, radius * 0.5f);
     auto arcRadius = radius - lineW * 0.5f;
 
     juce::Path backgroundArc;
@@ -56,7 +80,7 @@ void AuroraLookAndFeel::drawRotarySlider(
         rotaryStartAngle, rotaryEndAngle, true
     );
 
-    g.setColour(slider.findColour(juce::Slider::rotarySliderOutlineColourId));
+    g.setColour(AuroraColors::grey0);
     g.strokePath(
         backgroundArc,
         juce::PathStrokeType(
@@ -88,7 +112,7 @@ void AuroraLookAndFeel::drawLinearSlider(
     const juce::Slider::SliderStyle style, juce::Slider& slider
 )
 {
-    g.fillAll(slider.findColour(juce::Slider::backgroundColourId));
+    g.fillAll(AuroraColors::grey0);
 
     juce::Rectangle<float> filledTrack;
     if (style == juce::Slider::LinearBar)

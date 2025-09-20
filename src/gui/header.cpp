@@ -1,5 +1,6 @@
 #include "header.h"
 
+#include "looks/colors.h"
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
@@ -12,6 +13,14 @@ Header::Header(
 
     addAndMakeVisible(inputMeter);
     addAndMakeVisible(outputMeter);
+
+    addAndMakeVisible(inputLabel);
+    inputLabel.setText("IN", juce::dontSendNotification);
+    inputLabel.setJustificationType(juce::Justification::left);
+
+    addAndMakeVisible(outputLabel);
+    outputLabel.setText("OUT", juce::dontSendNotification);
+    outputLabel.setJustificationType(juce::Justification::right);
 
     addAndMakeVisible(inputGainSlider);
     inputGainSlider.setSkewFactor(3.0);
@@ -42,12 +51,18 @@ Header::~Header()
 {
 }
 
+void Header::paint(juce::Graphics& g)
+{
+    g.fillAll(AuroraColors::bg);
+}
+
 void Header::resized()
 {
     int const padding = 10;
     int const knob_padding = 3 * padding;
     int const knob_size = getHeight() - padding * 2;
-    int const meter_width = 5;
+    int const meter_width = 6;
+    int const label_padding = 5;
 
     auto bounds = getLocalBounds().reduced(padding);
 
@@ -57,4 +72,10 @@ void Header::resized()
     outputGainSlider.setBounds(
         bounds.removeFromRight(knob_size + knob_padding)
     );
+    auto label_bounds =
+        bounds.withTrimmedLeft(label_padding).withTrimmedRight(label_padding);
+    inputLabel.setBounds(
+        label_bounds.removeFromLeft(label_bounds.getWidth() / 2)
+    );
+    outputLabel.setBounds(label_bounds);
 }

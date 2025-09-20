@@ -6,6 +6,7 @@
 class AuroraLookAndFeel : public juce::LookAndFeel_V4
 {
   private:
+    float strokeWidth = 6.0f;
     juce::Font mainFont =
         juce::Font(juce::FontOptions("Oxanium", 18.0f, juce::Font::plain))
             .withExtraKerningFactor(0.2f);
@@ -15,6 +16,12 @@ class AuroraLookAndFeel : public juce::LookAndFeel_V4
 
     void drawToggleButton(
         juce::Graphics& g, juce::ToggleButton& button, bool isMouseOverButton,
+        bool isButtonDown
+    ) override;
+
+    void drawButtonBackground(
+        juce::Graphics& g, juce::Button& button,
+        const juce::Colour& backgroundColour, bool isMouseOverButton,
         bool isButtonDown
     ) override;
 
@@ -35,7 +42,7 @@ class AuroraLookAndFeel : public juce::LookAndFeel_V4
             AuroraColors::bg,     // windowBackground
             AuroraColors::grey3,  // widgetBackground
             AuroraColors::grey2,  // menuBackground
-            AuroraColors::grey3,  // outline
+            AuroraColors::grey2,  // outline
             AuroraColors::grey3,  // defaultText
             AuroraColors::bg,     // defaultFill
             AuroraColors::white2, // highlightedText

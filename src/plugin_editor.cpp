@@ -39,7 +39,7 @@ void PluginEditor::paint(juce::Graphics& g)
 
 void PluginEditor::resized()
 {
-    const float header_ratio = 0.15f;
+    const float header_ratio = 0.1f;
     const int header_height = static_cast<int>(getHeight() * header_ratio);
     auto bounds = getLocalBounds();
     header.setBounds(bounds.removeFromTop(header_height));
