@@ -33,3 +33,8 @@ void Meter::valueChanged(juce::Value& newValue)
     );
     slider.setValue(dbValue);
 }
+
+void Meter::setSliderColour(juce::Colour c)
+{
+    slider.setColour(juce::Slider::trackColourId, c);
+}

@@ -13,6 +13,8 @@ Header::Header(
 
     addAndMakeVisible(inputMeter);
     addAndMakeVisible(outputMeter);
+    inputMeter.setSliderColour(headerColour);
+    outputMeter.setSliderColour(headerColour);
 
     addAndMakeVisible(inputLabel);
     inputLabel.setText("IN", juce::dontSendNotification);
@@ -26,9 +28,9 @@ Header::Header(
     inputGainSlider.setSkewFactor(3.0);
     inputGainSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     inputGainSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 50, 25);
-    // inputGainSlider.setColour(
-    //     juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack
-    // );
+    inputGainSlider.setColour(
+        juce::Slider::rotarySliderFillColourId, headerColour
+    );
     inputGainAttachment =
         std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
             parameters, "input_gain_db", inputGainSlider
@@ -38,9 +40,9 @@ Header::Header(
     outputGainSlider.setSkewFactor(3.0);
     outputGainSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     outputGainSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 50, 25);
-    // outputGainSlider.setColour(
-    //     juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack
-    // );
+    outputGainSlider.setColour(
+        juce::Slider::rotarySliderFillColourId, headerColour
+    );
     outputGainAttachment =
         std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
             parameters, "output_gain_db", outputGainSlider

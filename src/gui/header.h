@@ -19,6 +19,7 @@ class Header : public juce::Component
     Meter inputMeter;
     Meter outputMeter;
 
+    juce::Colour headerColour = AuroraColors::white0;
     juce::Label inputLabel;
     juce::Label outputLabel;
 

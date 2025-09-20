@@ -14,6 +14,7 @@ class Meter : public juce::Component, public juce::Value::Listener
     {
         return currentValue;
     }
+    void setSliderColour(juce::Colour c);
 
   private:
     juce::Slider slider;
