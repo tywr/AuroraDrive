@@ -60,7 +60,7 @@ PluginAudioProcessor::PluginAudioProcessor()
            ),
            std::make_unique<juce::AudioParameterFloat>(
                "overdrive_drive_db", "Overdrive Drive Gain dB",
-               juce::NormalisableRange<float>(0.0f, 24.0f, 0.01f, 1.0f), 0.0f
+               juce::NormalisableRange<float>(-12.0, 12.0f, 0.01f, 1.0f), 0.0f
            ),
            std::make_unique<juce::AudioParameterFloat>(
                "overdrive_character", "Overdrive Character",

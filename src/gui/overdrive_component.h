@@ -7,11 +7,19 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <unordered_map>
 
-class OverdriveGui : public juce::Component
+struct Knob
+{
+    juce::Slider* slider;
+    juce::Label* label;
+    juce::String parameter_id;
+    juce::String label_text;
+};
+
+class OverdriveComponent : public juce::Component
 {
   public:
-    OverdriveGui(juce::AudioProcessorValueTreeState&);
-    ~OverdriveGui() override;
+    OverdriveComponent(juce::AudioProcessorValueTreeState&);
+    ~OverdriveComponent() override;
 
     void resized() override;
     void switchColour();
@@ -56,19 +64,16 @@ class OverdriveGui : public juce::Component
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>
         mix_slider_attachment;
 
-    std::vector<juce::Slider*> sliders{
-        &drive_slider, &level_slider, &character_slider, &mix_slider
-    };
-    std::vector<juce::Label*> labels{
-        &drive_label, &level_label, &character_label, &mix_label
-    };
-    std::vector<std::string> label_texts{"DRIVE", "LEVEL", "CHAR", "MIX"};
-    std::vector<std::string> parameter_ids{
-        "overdrive_drive_db", "overdrive_level_db", "overdrive_character",
-        "overdrive_mix"
-    };
     std::vector<
         std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>>
         slider_attachments;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(OverdriveGui);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(OverdriveComponent);
+
+    // Define knobs for easy looping
+    std::vector<Knob> knobs = {
+        {&drive_slider,     &drive_label,     "overdrive_drive_db",  "DRIVE"},
+        {&level_slider,     &level_label,     "overdrive_level_db",  "LEVEL"},
+        {&character_slider, &character_label, "overdrive_character", "CHAR" },
+        {&mix_slider,       &mix_label,       "overdrive_mix",       "MIX"  }
+    };
 };

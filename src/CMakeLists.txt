@@ -32,7 +32,7 @@ target_sources(${PROJECT_NAME}
         gui/header.cpp
         gui/tabs.cpp
         gui/compressor_gui.cpp
-        gui/overdrive_gui.cpp
+        gui/overdrive_component.cpp
         gui/ir_gui.cpp
         dsp/compressor.cpp
         dsp/overdrive.cpp
