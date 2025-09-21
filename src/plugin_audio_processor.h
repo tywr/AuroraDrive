@@ -2,8 +2,9 @@
 
 #include "dsp/compressor.h"
 #include "dsp/ir.h"
-#include <juce_dsp/juce_dsp.h>
+#include "dsp/overdrive.h"
 #include <juce_audio_processors/juce_audio_processors.h>
+#include <juce_dsp/juce_dsp.h>
 
 //==============================================================================
 class PluginAudioProcessor final
@@ -59,6 +60,7 @@ class PluginAudioProcessor final
   private:
     juce::AudioProcessorValueTreeState parameters;
     Compressor compressor;
+    Overdrive overdrive;
     IRConvolver irConvolver;
     float previousInputGainLinear;
     float previousOutputGainLinear;

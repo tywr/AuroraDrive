@@ -26,4 +26,4 @@ juce::Colour const aurora_green = juce::Colour(163, 190, 140);
 juce::Colour const aurora_violet = juce::Colour(180, 142, 173);
 juce::Colour const aurora_orange = juce::Colour(208, 135, 112);
 
-} // namespace AuroraColors
+}

@@ -27,9 +27,9 @@ class CompressorGui : public juce::Component, public juce::Value::Listener
     juce::StringArray compressorChoices = {"OPTO", "FET", "VCA"};
     const std::unordered_map<std::string, juce::Colour>
         compressorColourMapping = {
-            {"OPTO", AuroraColors::blue1        },
-            {"FET",  AuroraColors::aurora_orange},
-            {"VCA",  AuroraColors::white0       }
+            {"OPTO", AuroraColors::white0       },
+            {"FET",  AuroraColors::blue3        },
+            {"VCA",  AuroraColors::aurora_orange}
     };
     juce::Colour const defaultCompressorColour = AuroraColors::grey3;
 

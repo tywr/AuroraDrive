@@ -131,6 +131,7 @@ void IRLoader::switchColour()
         iRColour = AuroraColors::grey3;
     }
     irMixSlider.setColour(juce::Slider::rotarySliderFillColourId, iRColour);
+    gainSlider.setColour(juce::Slider::rotarySliderFillColourId, iRColour);
     repaint();
 }
 

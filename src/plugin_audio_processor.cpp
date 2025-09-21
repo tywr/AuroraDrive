@@ -45,6 +45,31 @@ PluginAudioProcessor::PluginAudioProcessor()
                "compressor_gain_db", "Compressor Gain dB",
                juce::NormalisableRange<float>(0.0f, 24.0f, 0.01f, 1.0f), 0.0f
            ),
+           std::make_unique<juce::AudioParameterChoice>(
+               "overdrive_type",                        // Parameter ID
+               "Overdrive Type",                        // Display name
+               juce::StringArray{"HELIOS", "BOREALIS"}, // Choice options
+               0
+           ),
+           std::make_unique<juce::AudioParameterBool>(
+               "overdrive_bypass", "Overdrive Bypass", false
+           ),
+           std::make_unique<juce::AudioParameterFloat>(
+               "overdrive_level_db", "Overdrive Level dB",
+               juce::NormalisableRange<float>(-12.0f, 12.0f, 0.01f, 1.0f), 0.0f
+           ),
+           std::make_unique<juce::AudioParameterFloat>(
+               "overdrive_drive_db", "Overdrive Drive Gain dB",
+               juce::NormalisableRange<float>(0.0f, 24.0f, 0.01f, 1.0f), 0.0f
+           ),
+           std::make_unique<juce::AudioParameterFloat>(
+               "overdrive_character", "Overdrive Character",
+               juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.5f
+           ),
+           std::make_unique<juce::AudioParameterFloat>(
+               "overdrive_mix", "Overdrive Mix",
+               juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.5f
+           ),
            std::make_unique<juce::AudioParameterBool>(
                "ir_bypass", "Impulse Response Bypass", false
            ),
@@ -70,6 +95,12 @@ PluginAudioProcessor::PluginAudioProcessor()
     parameters.addParameterListener("compressor_threshold", this);
     parameters.addParameterListener("compressor_gain_db", this);
     parameters.addParameterListener("compressor_type", this);
+    parameters.addParameterListener("overdrive_type", this);
+    parameters.addParameterListener("overdrive_bypass", this);
+    parameters.addParameterListener("overdrive_level_db", this);
+    parameters.addParameterListener("overdrive_drive_db", this);
+    parameters.addParameterListener("overdrive_character", this);
+    parameters.addParameterListener("overdrive_mix", this);
     parameters.addParameterListener("ir_bypass", this);
     parameters.addParameterListener("ir_mix", this);
     parameters.addParameterListener("ir_filepath", this);
@@ -152,7 +183,6 @@ void PluginAudioProcessor::parameterChanged(
     const juce::String& parameterID, float newValue
 )
 {
-    // Compressor
     if (parameterID == "compressor_bypass")
     {
         compressor.setBypass((newValue < 0.5f) ? true : false);
@@ -173,6 +203,32 @@ void PluginAudioProcessor::parameterChanged(
     {
         compressor.setTypeFromIndex(static_cast<int>(newValue));
     }
+    // Overdrive
+    if (parameterID == "overdrive_bypass")
+    {
+        overdrive.setBypass((newValue < 0.5f) ? true : false);
+    }
+    if (parameterID == "overdrive_type")
+    {
+        overdrive.setTypeFromIndex(static_cast<int>(newValue));
+    }
+    else if (parameterID == "overdrive_mix")
+    {
+        overdrive.setMix(newValue);
+    }
+    else if (parameterID == "overdrive_level_db")
+    {
+        overdrive.setLevel(juce::Decibels::decibelsToGain(newValue));
+    }
+    else if (parameterID == "overdrive_drive_db")
+    {
+        overdrive.setDrive(juce::Decibels::decibelsToGain(newValue));
+    }
+    else if (parameterID == "overdrive_character")
+    {
+        overdrive.setCharacter(newValue);
+    }
+    // Impulse Response Convolver
     else if (parameterID == "ir_bypass")
     {
         irConvolver.setBypass((newValue < 0.5f) ? true : false);
@@ -233,6 +289,31 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
     compressor.setTypeFromIndex(
         static_cast<int>(
             parameters.getRawParameterValue("compressor_type")->load()
+        )
+    );
+
+    // Set all initial values from overdrive
+    overdrive.prepare(spec);
+    overdrive.setBypass(
+        parameters.getRawParameterValue("overdrive_bypass")->load() < 0.5f
+    );
+    overdrive.setMix(parameters.getRawParameterValue("overdrive_mix")->load());
+    overdrive.setLevel(
+        juce::Decibels::decibelsToGain(
+            parameters.getRawParameterValue("overdrive_level_db")->load()
+        )
+    );
+    overdrive.setDrive(
+        juce::Decibels::decibelsToGain(
+            parameters.getRawParameterValue("overdrive_drive_db")->load()
+        )
+    );
+    overdrive.setCharacter(
+        parameters.getRawParameterValue("overdrive_character")->load()
+    );
+    overdrive.setTypeFromIndex(
+        static_cast<int>(
+            parameters.getRawParameterValue("overdrive_type")->load()
         )
     );
 
@@ -307,6 +388,8 @@ void PluginAudioProcessor::processBlock(
 
     compressor.process(buffer);
     compressorGainReductionDb.setValue(compressor.getGainReductionDb());
+
+    overdrive.process(buffer);
 
     irConvolver.process(buffer);
 

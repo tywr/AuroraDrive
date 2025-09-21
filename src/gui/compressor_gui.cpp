@@ -8,7 +8,7 @@ CompressorGui::CompressorGui(
 )
     : parameters(params), gainReductionValue(compressorGainReductionDb)
 {
-    setSize(600, 300);
+    // setSize(600, 300);
 
     addAndMakeVisible(gainReductionMeterSlider);
     gainReductionMeterSlider.setRange(0.0, 20.0, 0.05);
