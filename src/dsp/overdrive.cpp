@@ -2,6 +2,21 @@
 
 #include <juce_dsp/juce_dsp.h>
 
+void Overdrive::applyGain(
+    juce::AudioBuffer<float>& buffer, float& previous_gain, float& gain
+)
+{
+    if (juce::approximatelyEqual(gain, previous_gain))
+    {
+        buffer.applyGain(gain);
+    }
+    else
+    {
+        buffer.applyGainRamp(0, buffer.getNumSamples(), previous_gain, gain);
+        previous_gain = gain;
+    }
+}
+
 void Overdrive::prepare(const juce::dsp::ProcessSpec& spec)
 {
     processSpec = spec;
@@ -30,25 +45,25 @@ void Overdrive::prepare(const juce::dsp::ProcessSpec& spec)
 void Overdrive::applyOverdriveHelios(float& sample, float sampleRate)
 {
     juce::ignoreUnused(sampleRate);
+
+    // Apply high-pass filter before distortion
     high_pass_filter.processSample(sample);
 
-    float driven_sample = sample * drive;
-    float soft_clipped = std::tanh(driven_sample);
-    float hard_clipped;
-    if (driven_sample > 0.0f)
+    // Apply triod overdrive
+    float current = sample;
+    for (int i = 0; i < 3; ++i)
     {
-        hard_clipped = 1.0f - std::exp(-driven_sample);
-    }
-    else
-    {
-        hard_clipped = -1.0f + std::exp(driven_sample);
+        current = (helios_params.t_gain * current) /
+                  (1.0f + std::pow(
+                              std::abs(helios_params.t_gain * current),
+                              helios_params.t_sat
+                          ));
+        current = current / (1.0f + std::abs(current) / helios_params.t_knee);
     }
 
-    float combined_clipped =
-        (soft_clipped * (1.0f - character)) + (hard_clipped * character);
-
-    sample = (sample * (1.0f - mix)) + (combined_clipped * mix);
-    sample = low_pass_filter.processSample(sample);
+    // Apply mix and low pass filter
+    sample = current * mix + sample * (1 - mix);
+    low_pass_filter.processSample(sample);
 }
 
 void Overdrive::process(juce::AudioBuffer<float>& buffer)
@@ -57,6 +72,7 @@ void Overdrive::process(juce::AudioBuffer<float>& buffer)
     {
         return;
     }
+    applyGain(buffer, previous_drive, drive);
     float sampleRate = static_cast<float>(processSpec.sampleRate);
 
     for (int channel = 0; channel < buffer.getNumChannels(); ++channel)
@@ -74,4 +90,5 @@ void Overdrive::process(juce::AudioBuffer<float>& buffer)
             }
         }
     }
+    applyGain(buffer, previous_level, level);
 }

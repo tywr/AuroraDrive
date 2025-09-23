@@ -31,11 +31,13 @@ OverdriveComponent::OverdriveComponent(
         *parameters.getParameter("overdrive_type"),
         [this](float newValue)
         {
+            auto choices =
+                parameters.getParameter("overdrive_type")->getAllValueStrings();
             int index = static_cast<int>(newValue);
-            if (index >= 0 && index < overdrive_choices.size())
+            if (index >= 0 && index < choices.size())
             {
                 type_label.setText(
-                    overdrive_choices[index], juce::dontSendNotification
+                    choices[index], juce::dontSendNotification
                 );
             }
             switchColour();

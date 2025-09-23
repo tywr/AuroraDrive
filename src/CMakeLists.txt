@@ -34,6 +34,7 @@ target_sources(${PROJECT_NAME}
         gui/compressor_gui.cpp
         gui/overdrive_component.cpp
         gui/ir_gui.cpp
+        dsp/maths/toms917.cpp
         dsp/compressor.cpp
         dsp/overdrive.cpp
         dsp/ir.cpp)

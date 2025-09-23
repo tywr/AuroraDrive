@@ -28,7 +28,6 @@ class OverdriveComponent : public juce::Component
     juce::AudioProcessorValueTreeState& parameters;
 
     juce::TextButton switcher_button;
-    juce::StringArray overdrive_choices = {"HELIOS", "BOREALIS"};
     const std::unordered_map<std::string, juce::Colour>
         overdrive_colour_mapping = {
             {"HELIOS",   AuroraColors::aurora_orange},
