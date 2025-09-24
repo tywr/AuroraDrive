@@ -2,20 +2,18 @@ import numpy as np
 
 
 class Triode:
-    # Constants
-    Ri = 1e6
-    Ci = 100e-9
-    Ro = 1e6
-    Co = 10e-9
-
-    def __init__(self, fs, kp, kp2, kpg, E, Rp, Rk, Ck, Rg):
+    def __init__(self, fs, kp, kp2, kpg, E, Ci, Co, Ck, Ri, Ro, Rp, Rk, Rg):
         self.kp = kp
         self.kp2 = kp2
         self.kpg = kpg
         self.E = E
+        self.Ci = Ci
+        self.Co = Co
+        self.Ck = Ck
+        self.Ri = Ri
+        self.Ro = Ro
         self.Rp = Rp
         self.Rk = Rk
-        self.Ck = Ck
         self.Rg = Rg
         self.wVi_R = 1e-6
         self.wCi_R = 1 / (2 * fs * self.Ci)
@@ -133,22 +131,41 @@ if __name__ == "__main__":
 
     # Example usage
     fs = 44100
-    freq = 100
-    N = 3 * fs // freq
-    t = np.linspace(0, 3 / freq, N)
+    freq = 80
+    T = 3 / freq
+    N = int(T * fs)
+    t = np.linspace(0, T, N)
     y = 2.5 * np.sin(2 * np.pi * freq * t)
 
     kp = 1.014e-5
     kp2 = 5.498e-8
     kpg = 1.076e-5
 
-    E = 250.0
-    Rp = 100e3
-    Rk = 1e3
+    E = 250
+    Ri = 1e6
+    Rg = 20e3
     Ck = 10e-6
-    Rg = 100e3
+    Co = 10e-9
+    Rp = 100e3
+    Ro = 1e6
+    Rk = 1e3
+    Ci = 100e-9
 
-    triode = Triode(fs=fs, kp=kp, kp2=kp2, kpg=kpg, E=E, Rp=Rp, Rk=Rk, Ck=Ck, Rg=Rg)
+    triode = Triode(
+        fs=fs,
+        kp=kp,
+        kp2=kp2,
+        kpg=kpg,
+        E=E,
+        Ci=Ci,
+        Co=Co,
+        Ck=Ck,
+        Ri=Ri,
+        Ro=Ro,
+        Rp=Rp,
+        Rk=Rk,
+        Rg=Rg,
+    )
 
     yout = triode.process(y)
 
