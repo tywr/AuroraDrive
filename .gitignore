@@ -10,3 +10,4 @@ CMakeCache.txt
 .DS_Store
 bin
 fonts
+scripts/__pycache__
