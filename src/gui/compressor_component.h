@@ -1,6 +1,6 @@
 #pragma once
 
-#include "compressor_gui.h"
+#include "compressor_component.h"
 #include "looks/aurora.h"
 #include "looks/colors.h"
 #include <juce_audio_basics/juce_audio_basics.h>
@@ -8,20 +8,18 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <unordered_map>
 
-class CompressorGui : public juce::Component, public juce::Value::Listener
+class CompressorComponent : public juce::Component
 {
   public:
-    CompressorGui(juce::AudioProcessorValueTreeState&, juce::Value&);
-    ~CompressorGui() override;
+    CompressorComponent(juce::AudioProcessorValueTreeState&);
+    ~CompressorComponent() override;
 
-    void valueChanged(juce::Value&) override;
     void resized() override;
 
     void switchCompressorColour();
 
   private:
     juce::AudioProcessorValueTreeState& parameters;
-    juce::Value& gainReductionValue;
 
     juce::TextButton compressorSwitcherButton;
     juce::StringArray compressorChoices = {"OPTO", "FET", "VCA"};
@@ -35,8 +33,6 @@ class CompressorGui : public juce::Component, public juce::Value::Listener
 
     juce::Label compressorTypeLabel;
     std::unique_ptr<juce::ParameterAttachment> compressorTypeLabelAttachment;
-
-    juce::Slider gainReductionMeterSlider;
 
     juce::Label bypassLabel;
     juce::ToggleButton bypassButton;
@@ -58,5 +54,5 @@ class CompressorGui : public juce::Component, public juce::Value::Listener
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>
         mixSliderAttachment;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CompressorGui)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CompressorComponent)
 };

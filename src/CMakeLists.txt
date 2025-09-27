@@ -31,13 +31,15 @@ target_sources(${PROJECT_NAME}
         gui/meter.cpp
         gui/header.cpp
         gui/tabs.cpp
-        gui/compressor_gui.cpp
+        gui/compressor_component.cpp
         gui/overdrive_component.cpp
         gui/ir_gui.cpp
+        gui/preamp_component.cpp
         dsp/maths/toms917.cpp
         dsp/compressor.cpp
         dsp/overdrive.cpp
-        dsp/ir.cpp)
+        dsp/ir.cpp
+        )
 
 
 target_compile_definitions(${PROJECT_NAME}

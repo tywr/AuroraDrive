@@ -1,24 +1,13 @@
-#include "compressor_gui.h"
+#include "compressor_component.h"
 #include "looks/colors.h"
 #include "meter.h"
 
-CompressorGui::CompressorGui(
-    juce::AudioProcessorValueTreeState& params,
-    juce::Value& compressorGainReductionDb
+CompressorComponent::CompressorComponent(
+    juce::AudioProcessorValueTreeState& params
 )
-    : parameters(params), gainReductionValue(compressorGainReductionDb)
+    : parameters(params)
 {
     // setSize(600, 300);
-
-    addAndMakeVisible(gainReductionMeterSlider);
-    gainReductionMeterSlider.setRange(0.0, 20.0, 0.05);
-    gainReductionMeterSlider.setSkewFactor(0.5); // Skew for 3dB in the middle
-    gainReductionMeterSlider.setSliderStyle(juce::Slider::LinearBar);
-    gainReductionMeterSlider.setTextBoxStyle(
-        juce::Slider::NoTextBox, false, 0, 0
-    );
-    gainReductionValue.addListener(this);
-    gainReductionValue.setValue(0);
 
     addAndMakeVisible(compressorSwitcherButton);
     compressorSwitcherButton.onClick = [this]()
@@ -122,17 +111,11 @@ CompressorGui::CompressorGui(
     switchCompressorColour();
 }
 
-CompressorGui::~CompressorGui()
+CompressorComponent::~CompressorComponent()
 {
 }
 
-void CompressorGui::valueChanged(juce::Value& newValue)
-{
-    double value = static_cast<float>(newValue.getValue());
-    gainReductionMeterSlider.setValue(-1.0 * value);
-}
-
-void CompressorGui::resized()
+void CompressorComponent::resized()
 {
     const int xpadding = 50;
     const int ypadding = 50;
@@ -146,10 +129,6 @@ void CompressorGui::resized()
     const int inner_knob_padding = 60;
 
     auto bounds = getLocalBounds().reduced(xpadding, ypadding);
-
-    gainReductionMeterSlider.setBounds(
-        bounds.removeFromTop(compressor_meter_height)
-    );
 
     auto bottom_bounds = bounds.removeFromBottom(button_height);
     bypassButton.setBounds(bottom_bounds.removeFromRight(button_size));
@@ -179,7 +158,7 @@ void CompressorGui::resized()
     switchCompressorColour();
 }
 
-void CompressorGui::switchCompressorColour()
+void CompressorComponent::switchCompressorColour()
 {
     juce::Colour compressorColour = defaultCompressorColour;
     auto currentType = compressorTypeLabel.getText();
@@ -204,9 +183,6 @@ void CompressorGui::switchCompressorColour()
             juce::TextButton::buttonColourId, AuroraColors::grey0
         );
     }
-    gainReductionMeterSlider.setColour(
-        juce::Slider::trackColourId, compressorColour
-    );
     gainSlider.setColour(
         juce::Slider::rotarySliderFillColourId, compressorColour
     );
