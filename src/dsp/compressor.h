@@ -7,9 +7,9 @@ class Compressor
 {
   public:
     // Prepares compressor with a ProcessSpec-Object containing samplerate,
+    void applyLevel(juce::AudioBuffer<float>& buffer);
     void prepare(const juce::dsp::ProcessSpec& spec);
     void process(juce::AudioBuffer<float>& buffer);
-    void applyGain(juce::AudioBuffer<float>& buffer);
     void computeGainReductionOptometric(float& sample, float sampleRate);
     void computeGainReductionFet(float& sample, float sampleRate);
     void computeGainReductionVca(float& sample, float sampleRate);
@@ -27,9 +27,9 @@ class Compressor
         threshold = newThreshold;
     }
 
-    void setGain(float newGain)
+    void setLevel(float newLevel)
     {
-        gain = newGain;
+        level = newLevel;
     }
 
     void setTypeFromIndex(int index)
@@ -52,11 +52,11 @@ class Compressor
     bool bypass;
     float mix;
     float threshold;
-    float gain;
+    float level;
 
     // internal state of compressor
     float envelopeLevel = 1.0f;
-    float previousGain = 1.0f;
+    float previous_level = 1.0f;
     float gainReductionDb = 0.0f;
     float gainReduction = 1.0f;
 

@@ -15,44 +15,20 @@ class CompressorComponent : public juce::Component
     ~CompressorComponent() override;
 
     void resized() override;
-
-    void switchCompressorColour();
+    void paint(juce::Graphics&) override;
 
   private:
     juce::AudioProcessorValueTreeState& parameters;
 
-    juce::TextButton compressorSwitcherButton;
-    juce::StringArray compressorChoices = {"OPTO", "FET", "VCA"};
-    const std::unordered_map<std::string, juce::Colour>
-        compressorColourMapping = {
-            {"OPTO", AuroraColors::white0       },
-            {"FET",  AuroraColors::blue3        },
-            {"VCA",  AuroraColors::aurora_orange}
-    };
-    juce::Colour const defaultCompressorColour = AuroraColors::grey3;
-
-    juce::Label compressorTypeLabel;
-    std::unique_ptr<juce::ParameterAttachment> compressorTypeLabelAttachment;
-
-    juce::Label bypassLabel;
-    juce::ToggleButton bypassButton;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>
-        bypassButtonAttachment;
-
-    juce::Slider gainSlider;
-    juce::Label gainLabel;
+    juce::Slider level_slider;
+    juce::Label level_label;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>
-        gainSliderAttachment;
+        level_slider_attachment;
 
-    juce::Slider thresholdSlider;
-    juce::Label thresholdLabel;
+    juce::Slider threshold_slider;
+    juce::Label threshold_label;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>
-        thresholdSliderAttachment;
-
-    juce::Slider mixSlider;
-    juce::Label mixLabel;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>
-        mixSliderAttachment;
+        threshold_slider_attachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CompressorComponent)
 };

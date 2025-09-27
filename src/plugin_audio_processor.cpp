@@ -34,15 +34,11 @@ PluginAudioProcessor::PluginAudioProcessor()
                "compressor_bypass", "Compressor Bypass", false
            ),
            std::make_unique<juce::AudioParameterFloat>(
-               "compressor_mix", "Compressor Mix",
-               juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.5f
-           ),
-           std::make_unique<juce::AudioParameterFloat>(
                "compressor_threshold", "Compressor Treshold",
                juce::NormalisableRange<float>(-60.0f, 0.0f, 0.01f, 3.0f), -12.0f
            ),
            std::make_unique<juce::AudioParameterFloat>(
-               "compressor_gain_db", "Compressor Gain dB",
+               "compressor_level_db", "Compressor Gain dB",
                juce::NormalisableRange<float>(0.0f, 24.0f, 0.01f, 1.0f), 0.0f
            ),
            std::make_unique<juce::AudioParameterChoice>(
@@ -91,9 +87,8 @@ PluginAudioProcessor::PluginAudioProcessor()
     parameters.addParameterListener("input_gain_db", this);
     parameters.addParameterListener("output_gain_db", this);
     parameters.addParameterListener("compressor_bypass", this);
-    parameters.addParameterListener("compressor_mix", this);
     parameters.addParameterListener("compressor_threshold", this);
-    parameters.addParameterListener("compressor_gain_db", this);
+    parameters.addParameterListener("compressor_level_db", this);
     parameters.addParameterListener("compressor_type", this);
     parameters.addParameterListener("overdrive_type", this);
     parameters.addParameterListener("overdrive_bypass", this);
@@ -187,17 +182,13 @@ void PluginAudioProcessor::parameterChanged(
     {
         compressor.setBypass((newValue < 0.5f) ? true : false);
     }
-    else if (parameterID == "compressor_mix")
-    {
-        compressor.setMix(newValue);
-    }
     else if (parameterID == "compressor_threshold")
     {
         compressor.setThreshold(juce::Decibels::decibelsToGain(newValue));
     }
-    else if (parameterID == "compressor_gain_db")
+    else if (parameterID == "compressor_level_db")
     {
-        compressor.setGain(juce::Decibels::decibelsToGain(newValue));
+        compressor.setLevel(juce::Decibels::decibelsToGain(newValue));
     }
     else if (parameterID == "compressor_type")
     {
@@ -273,17 +264,14 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
     compressor.setBypass(
         parameters.getRawParameterValue("compressor_bypass")->load() < 0.5f
     );
-    compressor.setMix(
-        parameters.getRawParameterValue("compressor_mix")->load()
-    );
     compressor.setThreshold(
         juce::Decibels::decibelsToGain(
             parameters.getRawParameterValue("compressor_threshold")->load()
         )
     );
-    compressor.setGain(
+    compressor.setLevel(
         juce::Decibels::decibelsToGain(
-            parameters.getRawParameterValue("compressor_gain_db")->load()
+            parameters.getRawParameterValue("compressor_level_db")->load()
         )
     );
     compressor.setTypeFromIndex(

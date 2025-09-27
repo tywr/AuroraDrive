@@ -1,4 +1,5 @@
 #include "compressor_component.h"
+#include "dimensions.h"
 #include "looks/colors.h"
 #include "meter.h"
 
@@ -7,191 +8,65 @@ CompressorComponent::CompressorComponent(
 )
     : parameters(params)
 {
-    // setSize(600, 300);
-
-    addAndMakeVisible(compressorSwitcherButton);
-    compressorSwitcherButton.onClick = [this]()
-    {
-        static int index = 0;
-        index = (index + 1) % compressorChoices.size();
-        parameters.getParameter("compressor_type")
-            ->setValueNotifyingHost(
-                index / (float)(compressorChoices.size() - 1)
-            );
-    };
-
-    addAndMakeVisible(compressorTypeLabel);
-    compressorTypeLabel.setJustificationType(juce::Justification::left);
-    compressorTypeLabel.setText(
-        parameters.getParameter("compressor_type")->getCurrentValueAsText(),
-        juce::dontSendNotification
-    );
-    compressorTypeLabelAttachment = std::make_unique<juce::ParameterAttachment>(
-        *parameters.getParameter("compressor_type"),
-        [this](float newValue)
-        {
-            // Convert parameter value to display text
-            int index = static_cast<int>(newValue);
-            if (index >= 0 && index < compressorChoices.size())
-            {
-                compressorTypeLabel.setText(
-                    compressorChoices[index], juce::dontSendNotification
-                );
-            }
-            switchCompressorColour();
-        }
-    );
-
-    addAndMakeVisible(bypassLabel);
-    bypassLabel.setText("BYPASS", juce::dontSendNotification);
-    bypassLabel.setJustificationType(juce::Justification::right);
-
-    addAndMakeVisible(bypassButton);
-    bypassButton.setButtonText("BYPASS");
-    bypassButtonAttachment =
-        std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
-            parameters, "compressor_bypass", bypassButton
-        );
-    bypassButton.onClick = [this]() { switchCompressorColour(); };
-
-    addAndMakeVisible(gainSlider);
-    addAndMakeVisible(gainLabel);
-    gainLabel.setText("GAIN", juce::dontSendNotification);
-    gainLabel.setJustificationType(juce::Justification::centred);
-    gainLabel.attachToComponent(&gainSlider, false);
-    gainSlider.setRange(0.0, 1.0, 0.01);
-    gainSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    gainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 100, 20);
-    gainSlider.setColour(
+    addAndMakeVisible(level_slider);
+    addAndMakeVisible(level_label);
+    level_label.setText("LVL", juce::dontSendNotification);
+    level_label.setJustificationType(juce::Justification::centred);
+    level_label.attachToComponent(&level_slider, false);
+    level_slider.setRange(0.0, 1.0, 0.01);
+    level_slider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    level_slider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 100, 20);
+    level_slider.setColour(
         juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack
     );
-    gainSlider.setColour(
+    level_slider.setColour(
         juce::Slider::textBoxTextColourId, AuroraColors::grey3
     );
-    gainSliderAttachment =
+    level_slider_attachment =
         std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-            parameters, "compressor_gain_db", gainSlider
+            parameters, "compressor_level_db", level_slider
         );
 
-    addAndMakeVisible(thresholdSlider);
-    addAndMakeVisible(thresholdLabel);
-    thresholdLabel.setText("THR", juce::dontSendNotification);
-    thresholdLabel.attachToComponent(&thresholdSlider, false);
-    thresholdLabel.setJustificationType(juce::Justification::centred);
-    thresholdSlider.setRange(0.0, 1.0, 0.01);
-    thresholdSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    thresholdSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 100, 20);
-    thresholdSlider.setColour(
+    addAndMakeVisible(threshold_slider);
+    addAndMakeVisible(threshold_label);
+    threshold_label.setText("THR", juce::dontSendNotification);
+    threshold_label.attachToComponent(&threshold_slider, false);
+    threshold_label.setJustificationType(juce::Justification::centred);
+    threshold_slider.setRange(0.0, 1.0, 0.01);
+    threshold_slider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    threshold_slider.setTextBoxStyle(
+        juce::Slider::TextBoxBelow, false, 100, 20
+    );
+    threshold_slider.setColour(
         juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack
     );
-    thresholdSlider.setColour(
+    threshold_slider.setColour(
         juce::Slider::textBoxTextColourId, AuroraColors::grey3
     );
-    thresholdSliderAttachment =
+    threshold_slider_attachment =
         std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-            parameters, "compressor_threshold", thresholdSlider
+            parameters, "compressor_threshold", threshold_slider
         );
-
-    addAndMakeVisible(mixSlider);
-    addAndMakeVisible(mixLabel);
-    mixLabel.setText("MIX", juce::dontSendNotification);
-    mixLabel.attachToComponent(&mixSlider, false);
-    mixLabel.setJustificationType(juce::Justification::centred);
-    mixSlider.setRange(0.0, 1.0, 0.01);
-    mixSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    mixSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 100, 20);
-    mixSlider.setColour(
-        juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack
-    );
-    mixSlider.setColour(juce::Slider::textBoxTextColourId, AuroraColors::grey3);
-    mixSliderAttachment =
-        std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-            parameters, "compressor_mix", mixSlider
-        );
-    switchCompressorColour();
 }
 
 CompressorComponent::~CompressorComponent()
 {
 }
 
-void CompressorComponent::resized()
+void CompressorComponent::paint(juce::Graphics& g)
 {
-    const int xpadding = 50;
-    const int ypadding = 50;
-    const int compressor_meter_height = 6;
-    const int button_padding = 30;
-    const int button_height = 50;
-    const int button_size = 50;
-    const int label_padding = 20;
-
-    const int outer_knob_padding = 20;
-    const int inner_knob_padding = 60;
-
-    auto bounds = getLocalBounds().reduced(xpadding, ypadding);
-
-    auto bottom_bounds = bounds.removeFromBottom(button_height);
-    bypassButton.setBounds(bottom_bounds.removeFromRight(button_size));
-    compressorSwitcherButton.setBounds(
-        bottom_bounds.removeFromLeft(button_size)
-    );
-    compressorTypeLabel.setBounds(
-        bottom_bounds.removeFromLeft(bottom_bounds.getWidth() / 2)
-            .withTrimmedLeft(label_padding)
-    );
-    bypassLabel.setBounds(bottom_bounds.withTrimmedRight(label_padding));
-
-    auto knob_bounds = bounds.withTrimmedBottom(outer_knob_padding)
-                           .withTrimmedTop(outer_knob_padding);
-
-    const int knob_size = knob_bounds.getWidth() / 3;
-
-    gainSlider.setBounds(
-        knob_bounds.removeFromLeft(knob_size).reduced(inner_knob_padding)
-    );
-    thresholdSlider.setBounds(
-        knob_bounds.removeFromLeft(knob_size).reduced(inner_knob_padding)
-    );
-    mixSlider.setBounds(knob_bounds.reduced(inner_knob_padding));
-
-    // Don't forget to set compressor colour based on updated label value
-    switchCompressorColour();
+    g.fillAll(AuroraColors::bg);
 }
 
-void CompressorComponent::switchCompressorColour()
+void CompressorComponent::resized()
 {
-    juce::Colour compressorColour = defaultCompressorColour;
-    auto currentType = compressorTypeLabel.getText();
-    if (bypassButton.getToggleState())
-    {
-        if (compressorColourMapping.find(currentType.toStdString()) !=
-            compressorColourMapping.end())
-        {
-            compressorColour =
-                compressorColourMapping.at(currentType.toStdString());
-        }
-        bypassButton.setColour(
-            juce::ToggleButton::tickColourId, compressorColour
-        );
-        compressorSwitcherButton.setColour(
-            juce::TextButton::buttonColourId, compressorColour
-        );
-    }
-    else
-    {
-        compressorSwitcherButton.setColour(
-            juce::TextButton::buttonColourId, AuroraColors::grey0
-        );
-    }
-    gainSlider.setColour(
-        juce::Slider::rotarySliderFillColourId, compressorColour
-    );
-    thresholdSlider.setColour(
-        juce::Slider::rotarySliderFillColourId, compressorColour
-    );
-    mixSlider.setColour(
-        juce::Slider::rotarySliderFillColourId, compressorColour
-    );
+    auto bounds = getLocalBounds();
 
-    repaint();
+    bounds.removeFromTop(GuiDimensions::PREAMP_SIDE_TOP_PADDING);
+    threshold_slider.setBounds(
+        bounds.removeFromTop(GuiDimensions::PREAMP_SIDE_KNOB_HEIGHT)
+    );
+    level_slider.setBounds(
+        bounds.removeFromBottom(GuiDimensions::PREAMP_SIDE_KNOB_HEIGHT)
+    );
 }

@@ -2,22 +2,22 @@
 
 #include <juce_dsp/juce_dsp.h>
 
-void Compressor::prepare(const juce::dsp::ProcessSpec& spec)
+void Compressor::applyLevel(juce::AudioBuffer<float>& buffer)
 {
-    processSpec = spec;
-}
-
-void Compressor::applyGain(juce::AudioBuffer<float>& buffer)
-{
-    if (juce::approximatelyEqual(gain, previousGain))
+    if (juce::approximatelyEqual(level, previous_level))
     {
-        buffer.applyGain(gain);
+        buffer.applyGain(level);
     }
     else
     {
-        buffer.applyGainRamp(0, buffer.getNumSamples(), previousGain, gain);
-        previousGain = gain;
+        buffer.applyGainRamp(0, buffer.getNumSamples(), previous_level, level);
+        previous_level = level;
     }
+}
+
+void Compressor::prepare(const juce::dsp::ProcessSpec& spec)
+{
+    processSpec = spec;
 }
 
 void Compressor::computeGainReductionOptometric(float& sample, float sampleRate)
@@ -206,8 +206,6 @@ void Compressor::process(juce::AudioBuffer<float>& buffer)
     }
     float sampleRate = static_cast<float>(processSpec.sampleRate);
 
-    applyGain(buffer);
-
     for (int channel = 0; channel < buffer.getNumChannels(); ++channel)
     {
         auto* channelData = buffer.getWritePointer(channel);
@@ -227,4 +225,6 @@ void Compressor::process(juce::AudioBuffer<float>& buffer)
             }
         }
     }
+    // apply level
+    applyLevel(buffer);
 }
