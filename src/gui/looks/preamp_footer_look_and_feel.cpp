@@ -23,10 +23,10 @@ void PreampFooterLookAndFeel::drawLinearSlider(
     const juce::Slider::SliderStyle style, juce::Slider& slider
 )
 {
-    const int numberOfDots = 7;
-    const float dotRadius = 3.0f; // Adjust for desired dot size
+    const int numberOfDots = 15;
+    const float dotRadius = 4.0f; // Adjust for desired dot size
     const float dotDiameter = dotRadius * 2.0f;
-    const float dotSpacing = width / 7.0f;
+    const float dotSpacing = 1.0f * width / numberOfDots;
 
     const float totalDotDisplayWidth =
         (numberOfDots * dotDiameter) +
@@ -43,15 +43,12 @@ void PreampFooterLookAndFeel::drawLinearSlider(
 
     if (style == juce::Slider::LinearHorizontal)
     {
-        float startX =
-            x + (width - totalDotDisplayWidth) *
-                   0.5f;
+        float startX = x + (width - totalDotDisplayWidth) * 0.5f;
         float dotY = y + (height - dotDiameter) * 0.5f;
 
         for (int i = 0; i < numberOfDots; ++i)
         {
-            float currentDotX =
-                startX + i * dotSpacing;
+            float currentDotX = startX + i * dotSpacing;
 
             if (i < dotsToLight)
                 g.setColour(highlightColour);
