@@ -41,7 +41,7 @@ OverdriveComponent::~OverdriveComponent()
 
 void OverdriveComponent::paint(juce::Graphics& g)
 {
-    g.fillAll(AuroraColors::bg);
+    // g.fillAll(AuroraColors::bg);
 }
 
 void OverdriveComponent::resized()

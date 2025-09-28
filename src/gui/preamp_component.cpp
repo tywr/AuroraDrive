@@ -30,7 +30,12 @@ PreAmpComponent::~PreAmpComponent()
 
 void PreAmpComponent::paint(juce::Graphics& g)
 {
-    g.fillAll(AuroraColors::bg);
+    // g.fillAll(AuroraColors::bg0);
+    juce::Rectangle<float> bounds = getLocalBounds().toFloat().reduced(
+        GuiDimensions::TAB_INNER_X_PADDING, GuiDimensions::TAB_INNER_Y_PADDING
+    );
+    g.setColour(AuroraColors::bg1);
+    g.fillRoundedRectangle(bounds, 15.0f);
 }
 
 void PreAmpComponent::resized()
