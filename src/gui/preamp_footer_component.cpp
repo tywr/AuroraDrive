@@ -29,7 +29,7 @@ PreampFooterComponent::PreampFooterComponent(
             parameters, "overdrive_bypass", overdrive_bypass_button
         );
 
-    gain_reduction_slider.setRange(0, 15.0f, 1.0f);
+    gain_reduction_slider.setRange(0, 15.0f, 0.5f);
     gain_reduction_slider.setSkewFactor(1.0);
     gain_reduction_slider.setValue(0.0);
     gain_reduction_slider.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);

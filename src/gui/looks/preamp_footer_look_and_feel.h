@@ -15,6 +15,10 @@ class PreampFooterLookAndFeel : public BaseLookAndFeel
   public:
     PreampFooterLookAndFeel();
     void drawLabel(juce::Graphics&, juce::Label&) override;
+    void drawToggleButton(
+        juce::Graphics& g, juce::ToggleButton& button, bool isMouseOverButton,
+        bool isButtonDown
+    );
     void drawLinearSlider(
         juce::Graphics& g, int x, int y, int width, int height, float sliderPos,
         float minSliderPos, float maxSliderPos,
