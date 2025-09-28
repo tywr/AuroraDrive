@@ -38,6 +38,10 @@ PluginAudioProcessor::PluginAudioProcessor()
                juce::NormalisableRange<float>(-60.0f, 0.0f, 0.01f, 3.0f), -12.0f
            ),
            std::make_unique<juce::AudioParameterFloat>(
+               "compressor_ratio", "Compressor Ratio",
+               juce::NormalisableRange<float>(1.0f, 20.0f, 0.01f, 3.0f), 4.0f
+           ),
+           std::make_unique<juce::AudioParameterFloat>(
                "compressor_level_db", "Compressor Gain dB",
                juce::NormalisableRange<float>(0.0f, 24.0f, 0.01f, 1.0f), 0.0f
            ),
@@ -88,6 +92,7 @@ PluginAudioProcessor::PluginAudioProcessor()
     parameters.addParameterListener("output_gain_db", this);
     parameters.addParameterListener("compressor_bypass", this);
     parameters.addParameterListener("compressor_threshold", this);
+    parameters.addParameterListener("compressor_ratio", this);
     parameters.addParameterListener("compressor_level_db", this);
     parameters.addParameterListener("compressor_type", this);
     parameters.addParameterListener("overdrive_type", this);
@@ -182,6 +187,10 @@ void PluginAudioProcessor::parameterChanged(
     {
         compressor.setBypass((newValue < 0.5f) ? true : false);
     }
+    else if (parameterID == "compressor_ratio")
+    {
+        compressor.setRatio(newValue);
+    }
     else if (parameterID == "compressor_threshold")
     {
         compressor.setThreshold(juce::Decibels::decibelsToGain(newValue));
@@ -263,6 +272,9 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
     // Set all initial values from compressor
     compressor.setBypass(
         parameters.getRawParameterValue("compressor_bypass")->load() < 0.5f
+    );
+    compressor.setRatio(
+        parameters.getRawParameterValue("compressor_ratio")->load()
     );
     compressor.setThreshold(
         juce::Decibels::decibelsToGain(

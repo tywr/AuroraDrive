@@ -1,6 +1,7 @@
 #include "header.h"
 
 #include "compressor_left_component.h"
+#include "compressor_right_component.h"
 #include "dimensions.h"
 #include "looks/colors.h"
 #include "overdrive_component.h"

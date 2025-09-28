@@ -52,7 +52,7 @@ void Compressor::computeGainReductionOptometric(float& sample, float sampleRate)
     {
         float overThreshold = juce::Decibels::gainToDecibels(envelopeLevel) -
                               juce::Decibels::gainToDecibels(threshold);
-        rawGainReductionDb = -overThreshold * (1.0f - 1.0f / optoParams.ratio);
+        rawGainReductionDb = -overThreshold * (1.0f - 1.0f / ratio);
     }
     else
     {
@@ -98,7 +98,7 @@ void Compressor::computeGainReductionFet(float& sample, float sampleRate)
     {
         float overThreshold = juce::Decibels::gainToDecibels(envelopeLevel) -
                               juce::Decibels::gainToDecibels(threshold);
-        rawGainReductionDb = -overThreshold * (1.0f - 1.0f / fetParams.ratio);
+        rawGainReductionDb = -overThreshold * (1.0f - 1.0f / ratio);
 
         rawGainReductionDb = std::max(rawGainReductionDb, -40.0f);
     }
@@ -168,7 +168,7 @@ void Compressor::computeGainReductionVca(float& sample, float sampleRate)
         float overThreshold = juce::Decibels::gainToDecibels(envelopeLevel) -
                               juce::Decibels::gainToDecibels(threshold);
 
-        rawGainReductionDb = -overThreshold * (1.0f - 1.0f / vcaParams.ratio);
+        rawGainReductionDb = -overThreshold * (1.0f - 1.0f / ratio);
 
         if (overThreshold < vcaParams.kneeWidth)
         {

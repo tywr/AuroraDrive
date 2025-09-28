@@ -14,6 +14,10 @@ class Compressor
     void computeGainReductionFet(float& sample, float sampleRate);
     void computeGainReductionVca(float& sample, float sampleRate);
 
+    void setRatio(float newRatio)
+    {
+        mix = newRatio;
+    }
     void setBypass(bool newBypass)
     {
         bypass = newBypass;
@@ -53,6 +57,7 @@ class Compressor
     float mix;
     float threshold;
     float level;
+    float ratio;
 
     // internal state of compressor
     float envelopeLevel = 1.0f;
@@ -63,7 +68,6 @@ class Compressor
     // hardcoded parameters for optometric compressor
     struct
     {
-        float ratio = 3.8f;
         float attack = 0.01f;
         float release1 = 0.06f;
         float release2 = 0.5f;
@@ -74,7 +78,6 @@ class Compressor
 
     struct
     {
-        float ratio = 4.0f;
         float attack = 0.0003f;
         float release = 0.1f;
         float saturationAmount = 0.4f;
@@ -84,7 +87,6 @@ class Compressor
 
     struct
     {
-        float ratio = 4.0f;
         float attack = 0.005f;
         float release = 0.4f;
         float saturationAmount = 0.2f;
