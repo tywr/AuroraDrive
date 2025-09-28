@@ -1,4 +1,4 @@
-#include "compressor_left_component.h"
+#include "compressor_right_component.h"
 #include "dimensions.h"
 #include "looks/colors.h"
 #include "looks/compressor_look_and_feel.h"
@@ -58,15 +58,21 @@ CompressorRightComponent::~CompressorRightComponent()
 
 void CompressorRightComponent::paint(juce::Graphics& g)
 {
-    g.fillAll(AuroraColors::bg);
+    // g.fillAll(AuroraColors::grey0);
 }
 
 void CompressorRightComponent::resized()
 {
     auto bounds = getLocalBounds();
+    const int knob_box_size = bounds.getHeight() / 2;
 
-    bounds.removeFromTop(GuiDimensions::PREAMP_SIDE_TOP_PADDING);
-    selection_slider.setBounds(
-        bounds.removeFromBottom(GuiDimensions::PREAMP_SIDE_KNOB_HEIGHT)
-    );
+    ratio_slider.setBounds(bounds.removeFromTop(knob_box_size)
+                               .withSizeKeepingCentre(
+                                   GuiDimensions::PREAMP_SIDE_KNOB_WIDTH,
+                                   GuiDimensions::PREAMP_SIDE_KNOB_HEIGHT
+                               ));
+    selection_slider.setBounds(bounds.withSizeKeepingCentre(
+        GuiDimensions::PREAMP_SIDE_KNOB_WIDTH,
+        GuiDimensions::PREAMP_SIDE_KNOB_HEIGHT
+    ));
 }

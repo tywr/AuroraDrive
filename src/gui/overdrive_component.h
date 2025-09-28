@@ -20,6 +20,7 @@ class OverdriveComponent : public juce::Component
     OverdriveComponent(juce::AudioProcessorValueTreeState&);
     ~OverdriveComponent() override;
 
+    void paint(juce::Graphics&) override;
     void resized() override;
     void switchColour();
 
@@ -33,14 +34,6 @@ class OverdriveComponent : public juce::Component
             {"BOREALIS", AuroraColors::blue2        }
     };
     juce::Colour const default_type_colour = AuroraColors::grey3;
-
-    juce::Label type_label;
-    std::unique_ptr<juce::ParameterAttachment> type_label_attachment;
-
-    juce::Label bypass_label;
-    juce::ToggleButton bypass_button;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>
-        bypass_button_attachment;
 
     juce::Slider drive_slider;
     juce::Label drive_label;

@@ -29,13 +29,18 @@ target_sources(${PROJECT_NAME}
         plugin_audio_processor.cpp
         gui/looks/base_look_and_feel.cpp
         gui/looks/compressor_look_and_feel.cpp
+        gui/looks/header_look_and_feel.cpp
+        gui/looks/overdrive_look_and_feel.cpp
+        gui/looks/preamp_footer_look_and_feel.cpp
         gui/meter.cpp
         gui/header.cpp
         gui/tabs.cpp
         gui/compressor_left_component.cpp
+        gui/compressor_right_component.cpp
         gui/overdrive_component.cpp
         gui/ir_gui.cpp
         gui/preamp_component.cpp
+        gui/preamp_footer_component.cpp
         dsp/maths/toms917.cpp
         dsp/compressor.cpp
         dsp/overdrive.cpp

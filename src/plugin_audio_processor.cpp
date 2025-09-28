@@ -39,7 +39,7 @@ PluginAudioProcessor::PluginAudioProcessor()
            ),
            std::make_unique<juce::AudioParameterFloat>(
                "compressor_ratio", "Compressor Ratio",
-               juce::NormalisableRange<float>(1.0f, 20.0f, 0.01f, 3.0f), 4.0f
+               juce::NormalisableRange<float>(1.0f, 20.0f, 0.01f, 0.3754f), 4.0f
            ),
            std::make_unique<juce::AudioParameterFloat>(
                "compressor_level_db", "Compressor Gain dB",

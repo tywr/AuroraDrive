@@ -1,6 +1,7 @@
 #include "header.h"
 
 #include "looks/colors.h"
+#include "looks/header_look_and_feel.h"
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
@@ -10,6 +11,7 @@ Header::Header(
 )
     : parameters(params), inputMeter(vin), outputMeter(vout)
 {
+    setLookAndFeel(new HeaderLookAndFeel());
 
     addAndMakeVisible(inputMeter);
     addAndMakeVisible(outputMeter);

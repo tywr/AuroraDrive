@@ -24,5 +24,10 @@ class CompressorRightComponent : public juce::Component
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>
         selection_slider_attachment;
 
+    juce::Slider ratio_slider;
+    juce::Label ratio_label;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>
+        ratio_slider_attachment;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CompressorRightComponent)
 };
