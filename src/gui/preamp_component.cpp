@@ -1,6 +1,6 @@
 #include "header.h"
 
-#include "compressor_component.h"
+#include "compressor_left_component.h"
 #include "dimensions.h"
 #include "looks/colors.h"
 #include "overdrive_component.h"
@@ -12,11 +12,11 @@ PreAmpComponent::PreAmpComponent(
     juce::AudioProcessorValueTreeState& params, juce::Value& value
 )
     : parameters(params), compressor_gain_reduction_decibels(value),
-      compressor_component(params), overdrive_component(params)
+      compressor_left_component(params), overdrive_component(params)
 {
 
     addAndMakeVisible(overdrive_component);
-    addAndMakeVisible(compressor_component);
+    addAndMakeVisible(compressor_left_component);
 }
 
 PreAmpComponent::~PreAmpComponent()
@@ -40,7 +40,7 @@ void PreAmpComponent::resized()
     );
 
     // Side buttons
-    compressor_component.setBounds(
+    compressor_left_component.setBounds(
         bounds.removeFromLeft(GuiDimensions::PREAMP_SIDE_WIDTH)
     );
     bounds.removeFromLeft(GuiDimensions::PREAMP_SIDE_WIDTH);

@@ -1,18 +1,17 @@
 #pragma once
 
-#include "compressor_component.h"
-#include "looks/aurora.h"
+#include "compressor_left_component.h"
 #include "looks/colors.h"
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <unordered_map>
 
-class CompressorComponent : public juce::Component
+class CompressorLeftComponent : public juce::Component
 {
   public:
-    CompressorComponent(juce::AudioProcessorValueTreeState&);
-    ~CompressorComponent() override;
+    CompressorLeftComponent(juce::AudioProcessorValueTreeState&);
+    ~CompressorLeftComponent() override;
 
     void resized() override;
     void paint(juce::Graphics&) override;
@@ -30,5 +29,5 @@ class CompressorComponent : public juce::Component
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>
         threshold_slider_attachment;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CompressorComponent)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CompressorLeftComponent)
 };

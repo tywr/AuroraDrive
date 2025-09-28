@@ -3,7 +3,7 @@
 #include "colors.h"
 #include <juce_gui_basics/juce_gui_basics.h>
 
-class AuroraLookAndFeel : public juce::LookAndFeel_V4
+class BaseLookAndFeel : public juce::LookAndFeel_V4
 {
   private:
     float strokeWidth = 6.0f;
@@ -12,7 +12,7 @@ class AuroraLookAndFeel : public juce::LookAndFeel_V4
             .withExtraKerningFactor(0.2f);
 
   public:
-    AuroraLookAndFeel();
+    BaseLookAndFeel();
 
     juce::LookAndFeel_V4::ColourScheme getColourScheme() const
     {

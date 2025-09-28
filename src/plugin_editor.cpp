@@ -1,6 +1,6 @@
 #include "plugin_editor.h"
 
-#include "gui/looks/aurora.h"
+#include "gui/looks/base_look_and_feel.h"
 #include "plugin_audio_processor.h"
 
 using namespace juce;
@@ -14,7 +14,7 @@ PluginEditor::PluginEditor(
       tabs(params, processorRef.compressorGainReductionDb)
 {
 
-    setLookAndFeel(new AuroraLookAndFeel());
+    setLookAndFeel(new BaseLookAndFeel());
     setSize(800, 600);
     addAndMakeVisible(header);
     addAndMakeVisible(tabs);

@@ -1,13 +1,15 @@
-#include "compressor_component.h"
+#include "compressor_left_component.h"
 #include "dimensions.h"
 #include "looks/colors.h"
+#include "looks/compressor_look_and_feel.h"
 #include "meter.h"
 
-CompressorComponent::CompressorComponent(
+CompressorLeftComponent::CompressorLeftComponent(
     juce::AudioProcessorValueTreeState& params
 )
     : parameters(params)
 {
+    setLookAndFeel(new CompressorLookAndFeel());
     addAndMakeVisible(level_slider);
     addAndMakeVisible(level_label);
     level_label.setText("LVL", juce::dontSendNotification);
@@ -49,16 +51,16 @@ CompressorComponent::CompressorComponent(
         );
 }
 
-CompressorComponent::~CompressorComponent()
+CompressorLeftComponent::~CompressorLeftComponent()
 {
 }
 
-void CompressorComponent::paint(juce::Graphics& g)
+void CompressorLeftComponent::paint(juce::Graphics& g)
 {
     g.fillAll(AuroraColors::bg);
 }
 
-void CompressorComponent::resized()
+void CompressorLeftComponent::resized()
 {
     auto bounds = getLocalBounds();
 

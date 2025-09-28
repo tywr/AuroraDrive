@@ -27,11 +27,12 @@ target_sources(${PROJECT_NAME}
     PRIVATE
         plugin_editor.cpp
         plugin_audio_processor.cpp
-        gui/looks/aurora.cpp
+        gui/looks/base_look_and_feel.cpp
+        gui/looks/compressor_look_and_feel.cpp
         gui/meter.cpp
         gui/header.cpp
         gui/tabs.cpp
-        gui/compressor_component.cpp
+        gui/compressor_left_component.cpp
         gui/overdrive_component.cpp
         gui/ir_gui.cpp
         gui/preamp_component.cpp

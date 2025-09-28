@@ -1,7 +1,6 @@
 #pragma once
 
 #include "gui/header.h"
-#include "gui/looks/aurora.h"
 #include "gui/tabs.h"
 #include "plugin_audio_processor.h"
 

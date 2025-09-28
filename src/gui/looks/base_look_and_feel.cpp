@@ -1,14 +1,14 @@
-#include "aurora.h"
+#include "base_look_and_feel.h"
 
 #include "colors.h"
 #include <juce_gui_basics/juce_gui_basics.h>
 
-AuroraLookAndFeel::AuroraLookAndFeel()
+BaseLookAndFeel::BaseLookAndFeel()
 {
     setColourScheme(getColourScheme());
 }
 
-void AuroraLookAndFeel::drawButtonBackground(
+void BaseLookAndFeel::drawButtonBackground(
     juce::Graphics& g, juce::Button& button,
     const juce::Colour& backgroundColour, bool isMouseOverButton,
     bool isButtonDown
@@ -41,7 +41,7 @@ void AuroraLookAndFeel::drawButtonBackground(
     g.drawEllipse(bounds.reduced(strokeWidth), strokeWidth);
 }
 
-void AuroraLookAndFeel::drawButtonText(
+void BaseLookAndFeel::drawButtonText(
     juce::Graphics& g, juce::TextButton& button,
     bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown
 )
@@ -71,7 +71,7 @@ void AuroraLookAndFeel::drawButtonText(
     g.drawFittedText(text, bounds, juce::Justification::centred, 1);
 }
 
-void AuroraLookAndFeel::drawToggleButton(
+void BaseLookAndFeel::drawToggleButton(
     juce::Graphics& g, juce::ToggleButton& button, bool isMouseOverButton,
     bool isButtonDown
 )
@@ -91,7 +91,7 @@ void AuroraLookAndFeel::drawToggleButton(
     g.drawEllipse(bounds.reduced(strokeWidth), strokeWidth);
 }
 
-void AuroraLookAndFeel::drawRotarySlider(
+void BaseLookAndFeel::drawRotarySlider(
     juce::Graphics& g, int x, int y, int width, int height, float sliderPos,
     float rotaryStartAngle, float rotaryEndAngle, juce::Slider& slider
 )
@@ -134,9 +134,22 @@ void AuroraLookAndFeel::drawRotarySlider(
                       )
         );
     }
+    const float markerLength = radius * 0.2f;
+    const float markerThickness = lineW * 0.5f;
+    const auto centre = bounds.getCentre();
+    juce::Point<float> markerStart =
+        centre.getPointOnCircumference(arcRadius - 2 * lineW, toAngle);
+    juce::Point<float> markerEnd = centre.getPointOnCircumference(
+        arcRadius - markerLength - 2 * lineW, toAngle
+    );
+    g.setColour(slider.findColour(juce::Slider::rotarySliderFillColourId));
+    g.drawLine(
+        markerStart.getX(), markerStart.getY(), markerEnd.getX(),
+        markerEnd.getY(), markerThickness
+    );
 }
 
-void AuroraLookAndFeel::drawLinearSlider(
+void BaseLookAndFeel::drawLinearSlider(
     juce::Graphics& g, int x, int y, int width, int height, float sliderPos,
     float minSliderPos, float maxSliderPos,
     const juce::Slider::SliderStyle style, juce::Slider& slider
@@ -159,14 +172,14 @@ void AuroraLookAndFeel::drawLinearSlider(
     g.fillRect(filledTrack);
 }
 
-void AuroraLookAndFeel::drawTabbedButtonBarBackground(
+void BaseLookAndFeel::drawTabbedButtonBarBackground(
     juce::TabbedButtonBar& buttonBar, juce::Graphics& g
 )
 {
     g.fillAll(AuroraColors::bg);
 }
 
-void AuroraLookAndFeel::drawTabButton(
+void BaseLookAndFeel::drawTabButton(
     juce::TabBarButton& button, juce::Graphics& g, bool isMouseOver,
     bool isMouseDown
 )
