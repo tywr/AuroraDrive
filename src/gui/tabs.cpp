@@ -1,4 +1,5 @@
 #include "tabs.h"
+#include "compressor/compressor_component.h"
 #include "ir_gui.h"
 #include "looks/colors.h"
 #include "preamp_component.h"
@@ -13,6 +14,10 @@ Tabs::Tabs(
     : juce::TabbedComponent(juce::TabbedButtonBar::TabsAtTop),
       parameters(params)
 {
+    addTab(
+        "COMP", AuroraColors::bg,
+        new CompressorComponent(params, compressorGainReductionDb), true
+    );
     addTab(
         "PREAMP", AuroraColors::bg,
         new PreAmpComponent(params, compressorGainReductionDb), true

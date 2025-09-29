@@ -16,7 +16,7 @@ class Compressor
 
     void setRatio(float newRatio)
     {
-        mix = newRatio;
+        ratio = newRatio;
     }
     void setBypass(bool newBypass)
     {

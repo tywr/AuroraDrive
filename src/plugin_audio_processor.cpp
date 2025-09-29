@@ -45,6 +45,10 @@ PluginAudioProcessor::PluginAudioProcessor()
                "compressor_level_db", "Compressor Gain dB",
                juce::NormalisableRange<float>(0.0f, 24.0f, 0.1f, 1.0f), 0.0f
            ),
+           std::make_unique<juce::AudioParameterFloat>(
+               "compressor_mix", "Compressor Mix",
+               juce::NormalisableRange<float>(0, 100, 1, 1.0f), 50
+           ),
            std::make_unique<juce::AudioParameterChoice>(
                "overdrive_type",                        // Parameter ID
                "Overdrive Type",                        // Display name
@@ -95,6 +99,7 @@ PluginAudioProcessor::PluginAudioProcessor()
     parameters.addParameterListener("compressor_ratio", this);
     parameters.addParameterListener("compressor_level_db", this);
     parameters.addParameterListener("compressor_type", this);
+    parameters.addParameterListener("compressor_mix", this);
     parameters.addParameterListener("overdrive_type", this);
     parameters.addParameterListener("overdrive_bypass", this);
     parameters.addParameterListener("overdrive_level_db", this);
@@ -202,6 +207,10 @@ void PluginAudioProcessor::parameterChanged(
     else if (parameterID == "compressor_type")
     {
         compressor.setTypeFromIndex(static_cast<int>(newValue));
+    }
+    else if (parameterID == "compressor_mix")
+    {
+        compressor.setMix(static_cast<int>(newValue) / 100.0f);
     }
     // Overdrive
     if (parameterID == "overdrive_bypass")
