@@ -49,7 +49,7 @@ void CompressorKnobsComponent::resized()
 
     auto bounds = getLocalBounds();
     auto label_bounds =
-        bounds.removeFromTop(GuiDimensions::OVERDRIVE_LABEL_HEIGHT);
+        bounds.removeFromTop(GuiDimensions::DEFAULT_LABEL_HEIGHT);
 
     const int knob_box_size = bounds.getWidth() / knobs.size();
 
@@ -57,13 +57,13 @@ void CompressorKnobsComponent::resized()
     {
         knob.label->setBounds(label_bounds.removeFromLeft(knob_box_size)
                                   .withSizeKeepingCentre(
-                                      GuiDimensions::OVERDRIVE_KNOB_WIDTH,
-                                      GuiDimensions::OVERDRIVE_LABEL_HEIGHT
+                                      GuiDimensions::DEFAULT_KNOB_WIDTH,
+                                      GuiDimensions::DEFAULT_LABEL_HEIGHT
                                   ));
         knob.slider->setBounds(bounds.removeFromLeft(knob_box_size)
                                    .withSizeKeepingCentre(
-                                       GuiDimensions::OVERDRIVE_KNOB_WIDTH,
-                                       GuiDimensions::OVERDRIVE_KNOB_HEIGHT
+                                       GuiDimensions::DEFAULT_KNOB_WIDTH,
+                                       GuiDimensions::DEFAULT_KNOB_HEIGHT
                                    ));
     }
     // Don't forget to set compressor colour based on updated label value

@@ -68,7 +68,7 @@ class CompressorKnobsComponent : public juce::Component
     // Define knobs for easy looping
     std::vector<CompressorKnob> knobs = {
         {&threshold_slider, &threshold_label, "compressor_threshold", "DRIVE"},
-        {&ratio_slider,     &ratio_label,     "compressor_ratio_db",  "RATIO"},
+        {&ratio_slider,     &ratio_label,     "compressor_ratio",     "RATIO"},
         {&mix_slider,       &mix_label,       "compressor_mix",       "MIX"  },
         {&level_slider,     &level_label,     "compressor_level_db",  "LEVEL"}
     };

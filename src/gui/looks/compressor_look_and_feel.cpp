@@ -3,6 +3,11 @@
 #include "colors.h"
 #include <juce_gui_basics/juce_gui_basics.h>
 
+CompressorLookAndFeel::CompressorLookAndFeel()
+{
+    setColourScheme(getColourScheme());
+}
+
 void CompressorLookAndFeel::drawRotarySlider(
     juce::Graphics& g, int x, int y, int width, int height, float sliderPos,
     float rotaryStartAngle, float rotaryEndAngle, juce::Slider& slider
@@ -13,7 +18,7 @@ void CompressorLookAndFeel::drawRotarySlider(
     auto radius = fmin(bounds.getWidth(), bounds.getHeight()) / 2.0f;
     const auto toAngle =
         rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
-    auto lineW = fmin(stroke_width, radius * 0.5f);
+    auto lineW = fmin(strokeWidth, radius * 0.5f);
     auto arcRadius = radius - lineW * 0.5f;
 
     juce::Path backgroundArc;
@@ -46,17 +51,18 @@ void CompressorLookAndFeel::drawRotarySlider(
                       )
         );
     }
-
-    const float dotRadius = lineW * 0.45f;
-    const float dotDiameter = dotRadius * 2.0f;
+    const float markerLength = radius * 0.2f;
+    const float markerThickness = lineW * 0.5f;
     const auto centre = bounds.getCentre();
-    juce::Point<float> dotPosition = centre.getPointOnCircumference(
-        arcRadius - 2 * lineW - dotRadius, toAngle
+    juce::Point<float> markerStart =
+        centre.getPointOnCircumference(arcRadius - 2 * lineW, toAngle);
+    juce::Point<float> markerEnd = centre.getPointOnCircumference(
+        arcRadius - markerLength - 2 * lineW, toAngle
     );
     g.setColour(slider.findColour(juce::Slider::rotarySliderFillColourId));
-    g.fillEllipse(
-        dotPosition.getX() - dotRadius, dotPosition.getY() - dotRadius,
-        dotDiameter, dotDiameter
+    g.drawLine(
+        markerStart.getX(), markerStart.getY(), markerEnd.getX(),
+        markerEnd.getY(), markerThickness
     );
 }
 

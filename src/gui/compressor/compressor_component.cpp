@@ -10,8 +10,7 @@ CompressorComponent::CompressorComponent(
     juce::AudioProcessorValueTreeState& params, juce::Value& value
 )
     : parameters(params), gain_reduction_decibels(value),
-      knobs_component(params),
-      footer_component(params, value)
+      knobs_component(params), footer_component(params, value)
 {
 
     addAndMakeVisible(knobs_component);
@@ -26,7 +25,8 @@ void CompressorComponent::paint(juce::Graphics& g)
 {
     // g.fillAll(AuroraColors::bg0);
     juce::Rectangle<float> bounds = getLocalBounds().toFloat().reduced(
-        GuiDimensions::TAB_INNER_X_PADDING, GuiDimensions::TAB_INNER_Y_PADDING
+        GuiDimensions::COMPRESSOR_OUTER_X_PADDING,
+        GuiDimensions::COMPRESSOR_OUTER_Y_PADDING
     );
     g.setColour(AuroraColors::bg1);
     g.fillRoundedRectangle(bounds, 15.0f);
@@ -35,9 +35,14 @@ void CompressorComponent::paint(juce::Graphics& g)
 void CompressorComponent::resized()
 {
     auto bounds = getLocalBounds().reduced(
-        GuiDimensions::TAB_INNER_X_PADDING, GuiDimensions::TAB_INNER_Y_PADDING
+        GuiDimensions::COMPRESSOR_OUTER_X_PADDING,
+        GuiDimensions::COMPRESSOR_OUTER_Y_PADDING
     );
-    footer_component.setBounds(
-        bounds.removeFromBottom(GuiDimensions::PREAMP_FOOTER_HEIGHT)
+    footer_component.setBounds(bounds.removeFromBottom(
+        GuiDimensions::COMPRESSOR_FOOTER_HEIGHT +
+        GuiDimensions::COMPRESSOR_GAIN_REDUCTION_HEIGHT
+    ));
+    knobs_component.setBounds(
+        bounds.removeFromTop(GuiDimensions::COMPRESSOR_KNOBS_BOX_HEIGHT)
     );
 }

@@ -77,7 +77,7 @@ void CompressorFooterLookAndFeel::drawLinearSlider(
     const juce::Slider::SliderStyle style, juce::Slider& slider
 )
 {
-    const int numberOfDots = 15;
+    const int numberOfDots = 20;
     const float dotRadius = 4.0f; // Adjust for desired dot size
     const float dotDiameter = dotRadius * 2.0f;
     const float dotSpacing = 1.0f * width / numberOfDots;

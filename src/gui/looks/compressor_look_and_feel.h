@@ -7,16 +7,16 @@
 class CompressorLookAndFeel : public BaseLookAndFeel
 {
   private:
-    float stroke_width = 3.0f;
+    float strokeWidth = 6.0f;
     juce::Font main_font =
-        juce::Font(juce::FontOptions("Oxanium", 10.0f, juce::Font::plain))
+        juce::Font(juce::FontOptions("Oxanium", 15.0f, juce::Font::plain))
             .withExtraKerningFactor(0.2f);
 
   public:
+    CompressorLookAndFeel();
+    void drawLabel(juce::Graphics&, juce::Label&) override;
     void drawRotarySlider(
         juce::Graphics& g, int x, int y, int width, int height, float sliderPos,
         float rotaryStartAngle, float rotaryEndAngle, juce::Slider& slider
     ) override;
-
-    void drawLabel(juce::Graphics&, juce::Label&) override;
 };

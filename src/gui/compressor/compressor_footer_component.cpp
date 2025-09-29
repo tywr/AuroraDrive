@@ -10,11 +10,8 @@ CompressorFooterComponent::CompressorFooterComponent(
     setLookAndFeel(new CompressorFooterLookAndFeel());
 
     addAndMakeVisible(compressor_bypass_button);
-    addAndMakeVisible(compressor_bypass_label);
     addAndMakeVisible(gain_reduction_slider);
 
-    compressor_bypass_label.setText("COMP", juce::dontSendNotification);
-    compressor_bypass_label.setJustificationType(juce::Justification::right);
     compressor_bypass_attachment =
         std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
             parameters, "compressor_bypass", compressor_bypass_button
@@ -47,14 +44,15 @@ void CompressorFooterComponent::paint(juce::Graphics& g)
 void CompressorFooterComponent::resized()
 {
     auto bounds = getLocalBounds();
-    compressor_bypass_label.setBounds(
-        bounds.removeFromLeft(GuiDimensions::PREAMP_FOOTER_LABEL_WIDTH)
-    );
     compressor_bypass_button.setBounds(
-        bounds.removeFromLeft(GuiDimensions::PREAMP_BYPASS_BUTTON_WIDTH)
+        bounds.removeFromBottom(GuiDimensions::COMPRESSOR_FOOTER_HEIGHT)
+            .withSizeKeepingCentre(
+                GuiDimensions::COMPRESSOR_BYPASS_BUTTON_WIDTH,
+                GuiDimensions::COMPRESSOR_BYPASS_BUTTON_HEIGHT
+            )
     );
     gain_reduction_slider.setBounds(bounds.withSizeKeepingCentre(
-        GuiDimensions::PREAMP_COMPRESSOR_SLIDER_WIDTH,
-        GuiDimensions::PREAMP_COMPRESSOR_SLIDER_HEIGHT
+        GuiDimensions::COMPRESSOR_GAIN_REDUCTION_WIDTH,
+        GuiDimensions::COMPRESSOR_GAIN_REDUCTION_HEIGHT
     ));
 }
