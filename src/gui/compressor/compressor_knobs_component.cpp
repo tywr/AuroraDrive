@@ -41,7 +41,6 @@ CompressorKnobsComponent::~CompressorKnobsComponent()
 
 void CompressorKnobsComponent::paint(juce::Graphics& g)
 {
-    // g.fillAll(AuroraColors::bg);
 }
 
 void CompressorKnobsComponent::resized()
@@ -66,30 +65,15 @@ void CompressorKnobsComponent::resized()
                                        GuiDimensions::DEFAULT_KNOB_HEIGHT
                                    ));
     }
-    // Don't forget to set compressor colour based on updated label value
-    switchColour();
 }
 
-void CompressorKnobsComponent::switchColour()
+void CompressorKnobsComponent::switchColour(
+    juce::Colour colour1, juce::Colour colour2
+)
 {
-    juce::Colour compressor_colour = default_type_colour;
-    auto current_type =
-        parameters.getParameter("compressor_type")->getCurrentValueAsText();
-    bool bypass =
-        parameters.getRawParameterValue("compressor_bypass")->load() < 0.5f;
-    {
-        if (compressor_colour_mapping.find(current_type.toStdString()) !=
-            compressor_colour_mapping.end())
-        {
-            compressor_colour =
-                compressor_colour_mapping.at(current_type.toStdString());
-        }
-    }
     for (CompressorKnob knob : knobs)
     {
-        knob.slider->setColour(
-            juce::Slider::rotarySliderFillColourId, compressor_colour
-        );
+        knob.slider->setColour(juce::Slider::rotarySliderFillColourId, colour1);
     }
     repaint();
 }

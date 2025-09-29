@@ -22,17 +22,11 @@ class CompressorKnobsComponent : public juce::Component
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void switchColour();
+    void switchColour(juce::Colour, juce::Colour);
 
   private:
     juce::AudioProcessorValueTreeState& parameters;
 
-    const std::unordered_map<std::string, juce::Colour>
-        compressor_colour_mapping = {
-            {"OPTO", AuroraColors::blue2        },
-            {"FET",  AuroraColors::aurora_orange},
-            {"VCA",  AuroraColors::aurora_orange},
-    };
     juce::Colour const default_type_colour = AuroraColors::grey3;
 
     juce::Slider threshold_slider;
@@ -45,10 +39,6 @@ class CompressorKnobsComponent : public juce::Component
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>
         ratio_slider_attachment;
 
-    juce::Slider type_slider;
-    juce::Label type_label;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>
-        type_slider_attachment;
 
     juce::Slider mix_slider;
     juce::Label mix_label;
@@ -67,7 +57,7 @@ class CompressorKnobsComponent : public juce::Component
 
     // Define knobs for easy looping
     std::vector<CompressorKnob> knobs = {
-        {&threshold_slider, &threshold_label, "compressor_threshold", "DRIVE"},
+        {&threshold_slider, &threshold_label, "compressor_threshold", "THR"  },
         {&ratio_slider,     &ratio_label,     "compressor_ratio",     "RATIO"},
         {&mix_slider,       &mix_label,       "compressor_mix",       "MIX"  },
         {&level_slider,     &level_label,     "compressor_level_db",  "LEVEL"}

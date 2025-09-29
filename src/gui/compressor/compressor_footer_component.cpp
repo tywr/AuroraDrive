@@ -9,13 +9,7 @@ CompressorFooterComponent::CompressorFooterComponent(
 {
     setLookAndFeel(new CompressorFooterLookAndFeel());
 
-    addAndMakeVisible(compressor_bypass_button);
     addAndMakeVisible(gain_reduction_slider);
-
-    compressor_bypass_attachment =
-        std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
-            parameters, "compressor_bypass", compressor_bypass_button
-        );
 
     gain_reduction_slider.setRange(0, 20.0f, 0.5f);
     gain_reduction_slider.setSkewFactor(1.0);
@@ -38,21 +32,23 @@ void CompressorFooterComponent::valueChanged(juce::Value& v)
 
 void CompressorFooterComponent::paint(juce::Graphics& g)
 {
-    // g.fillAll(AuroraColors::grey0);
 }
 
 void CompressorFooterComponent::resized()
 {
     auto bounds = getLocalBounds();
-    compressor_bypass_button.setBounds(
-        bounds.removeFromBottom(GuiDimensions::COMPRESSOR_FOOTER_HEIGHT)
-            .withSizeKeepingCentre(
-                GuiDimensions::COMPRESSOR_BYPASS_BUTTON_WIDTH,
-                GuiDimensions::COMPRESSOR_BYPASS_BUTTON_HEIGHT
-            )
-    );
     gain_reduction_slider.setBounds(bounds.withSizeKeepingCentre(
         GuiDimensions::COMPRESSOR_GAIN_REDUCTION_WIDTH,
         GuiDimensions::COMPRESSOR_GAIN_REDUCTION_HEIGHT
     ));
+}
+
+void CompressorFooterComponent::switchColour(
+    juce::Colour colour1, juce::Colour colour2
+)
+{
+    gain_reduction_slider.setColour(
+        juce::Slider::rotarySliderFillColourId, colour1
+    );
+    repaint();
 }

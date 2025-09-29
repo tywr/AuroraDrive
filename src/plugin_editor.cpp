@@ -15,7 +15,7 @@ PluginEditor::PluginEditor(
 {
 
     setLookAndFeel(new BaseLookAndFeel());
-    setSize(800, 600);
+    setSize(900, 650);
     addAndMakeVisible(header);
     addAndMakeVisible(tabs);
 

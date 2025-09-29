@@ -19,22 +19,12 @@ class CompressorFooterComponent : public juce::Component,
     void resized() override;
     void valueChanged(juce::Value& v) override;
     void paint(juce::Graphics&) override;
+    void switchColour(juce::Colour colour1, juce::Colour colour2);
 
   private:
     juce::AudioProcessorValueTreeState& parameters;
     juce::Value gain_reduction_value;
     juce::Slider gain_reduction_slider;
-
-    juce::Label compressor_bypass_label;
-    juce::Label overdrive_bypass_label;
-
-    juce::ToggleButton compressor_bypass_button;
-    juce::ToggleButton overdrive_bypass_button;
-
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>
-        compressor_bypass_attachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>
-        overdrive_bypass_attachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CompressorFooterComponent)
 };

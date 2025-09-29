@@ -18,11 +18,11 @@ Tabs::Tabs(
         "COMP", AuroraColors::bg,
         new CompressorComponent(params, compressorGainReductionDb), true
     );
-    addTab(
-        "PREAMP", AuroraColors::bg,
-        new PreAmpComponent(params, compressorGainReductionDb), true
-    );
-    addTab("CHORUS", AuroraColors::bg, new juce::Component(), true);
+    // addTab(
+    //     "PREAMP", AuroraColors::bg,
+    //     new PreAmpComponent(params, compressorGainReductionDb), true
+    // );
+    // addTab("CHORUS", AuroraColors::bg, new juce::Component(), true);
     addTab("IR", AuroraColors::bg, new IRLoader(params), true);
     setTabBarDepth(60);
 }

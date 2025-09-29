@@ -190,7 +190,7 @@ void PluginAudioProcessor::parameterChanged(
 {
     if (parameterID == "compressor_bypass")
     {
-        compressor.setBypass((newValue < 0.5f) ? true : false);
+        compressor.setBypass(newValue >= 0.5f);
     }
     else if (parameterID == "compressor_ratio")
     {
@@ -215,7 +215,7 @@ void PluginAudioProcessor::parameterChanged(
     // Overdrive
     if (parameterID == "overdrive_bypass")
     {
-        overdrive.setBypass((newValue < 0.5f) ? true : false);
+        overdrive.setBypass(newValue >= 0.5f);
     }
     if (parameterID == "overdrive_type")
     {
