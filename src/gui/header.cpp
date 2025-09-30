@@ -57,7 +57,7 @@ Header::~Header()
 
 void Header::paint(juce::Graphics& g)
 {
-    g.fillAll(AuroraColors::bg);
+    // g.fillAll(AuroraColors::bg);
 }
 
 void Header::resized()

@@ -210,7 +210,7 @@ void BaseLookAndFeel::drawTabbedButtonBarBackground(
     juce::TabbedButtonBar& buttonBar, juce::Graphics& g
 )
 {
-    g.fillAll(AuroraColors::bg);
+    // g.fillAll(AuroraColors::bg);
 }
 
 void BaseLookAndFeel::drawTabButton(
@@ -222,8 +222,8 @@ void BaseLookAndFeel::drawTabButton(
     const juce::Rectangle<int> bounds = button.getLocalBounds().reduced(10);
     const bool isActive = button.isFrontTab();
 
-    g.setColour(AuroraColors::bg);
-    g.fillRect(bounds);
+    // g.setColour(AuroraColors::bg);
+    // g.fillRect(bounds);
 
     juce::Colour colour;
     if (isActive)

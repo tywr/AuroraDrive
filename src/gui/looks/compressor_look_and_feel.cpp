@@ -3,11 +3,6 @@
 #include "colors.h"
 #include <juce_gui_basics/juce_gui_basics.h>
 
-CompressorLookAndFeel::CompressorLookAndFeel()
-{
-    setColourScheme(getColourScheme());
-}
-
 void CompressorLookAndFeel::drawRotarySlider(
     juce::Graphics& g, int x, int y, int width, int height, float sliderPos,
     float rotaryStartAngle, float rotaryEndAngle, juce::Slider& slider

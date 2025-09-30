@@ -9,6 +9,7 @@ class Tabs : public juce::TabbedComponent
   public:
     Tabs(juce::AudioProcessorValueTreeState&, juce::Value&);
     ~Tabs() override;
+    void paint(juce::Graphics&) override;
 
   private:
     juce::AudioProcessorValueTreeState& parameters;

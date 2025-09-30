@@ -2,6 +2,7 @@
 
 #include "gui/looks/base_look_and_feel.h"
 #include "plugin_audio_processor.h"
+#include <juce_core/juce_core.h>
 
 using namespace juce;
 
@@ -34,7 +35,27 @@ PluginEditor::~PluginEditor()
 //==============================================================================
 void PluginEditor::paint(juce::Graphics& g)
 {
-    g.setFont(18.0f);
+    g.fillAll(juce::Colours::black);
+
+    juce::Random random(12345);
+    const int gridSize = 30; // Space between potential dots
+
+    for (int x = 0; x < getWidth(); x += gridSize)
+    {
+        for (int y = 0; y < getHeight(); y += gridSize)
+        {
+            if (random.nextFloat() > 0.7f) // 30% chance of dot
+            {
+                float offsetX = random.nextFloat() * gridSize;
+                float offsetY = random.nextFloat() * gridSize;
+                float size = random.nextFloat() * 3.0f + 0.5f;
+                float alpha = random.nextFloat() * 0.5f + 0.05f;
+
+                g.setColour(juce::Colours::white.withAlpha(alpha));
+                g.fillEllipse(x + offsetX, y + offsetY, size, size);
+            }
+        }
+    }
 }
 
 void PluginEditor::resized()

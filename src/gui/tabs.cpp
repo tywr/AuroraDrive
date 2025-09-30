@@ -14,6 +14,14 @@ Tabs::Tabs(
     : juce::TabbedComponent(juce::TabbedButtonBar::TabsAtTop),
       parameters(params)
 {
+    setColour(
+        juce::TabbedComponent::backgroundColourId,
+        juce::Colours::transparentBlack
+    );
+    setColour(
+        juce::TabbedComponent::outlineColourId, juce::Colours::transparentBlack
+    );
+
     addTab(
         "COMP", AuroraColors::bg,
         new CompressorComponent(params, compressorGainReductionDb), true
@@ -29,4 +37,9 @@ Tabs::Tabs(
 
 Tabs::~Tabs()
 {
+}
+
+void Tabs::paint(juce::Graphics& g)
+{
+    juce::ignoreUnused(g);
 }

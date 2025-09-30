@@ -13,7 +13,6 @@ class CompressorLookAndFeel : public BaseLookAndFeel
             .withExtraKerningFactor(0.2f);
 
   public:
-    CompressorLookAndFeel();
     void drawLabel(juce::Graphics&, juce::Label&) override;
     void drawRotarySlider(
         juce::Graphics& g, int x, int y, int width, int height, float sliderPos,
