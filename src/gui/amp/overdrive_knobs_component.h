@@ -1,12 +1,12 @@
 #pragma once
 
-#include "looks/colors.h"
+#include "../colours.h"
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <unordered_map>
 
-struct Knob
+struct OverdriveKnob
 {
     juce::Slider* slider;
     juce::Label* label;
@@ -14,11 +14,11 @@ struct Knob
     juce::String label_text;
 };
 
-class OverdriveComponent : public juce::Component
+class OverdriveKnobsComponent : public juce::Component
 {
   public:
-    OverdriveComponent(juce::AudioProcessorValueTreeState&);
-    ~OverdriveComponent() override;
+    OverdriveKnobsComponent(juce::AudioProcessorValueTreeState&);
+    ~OverdriveKnobsComponent() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
@@ -26,14 +26,6 @@ class OverdriveComponent : public juce::Component
 
   private:
     juce::AudioProcessorValueTreeState& parameters;
-
-    juce::TextButton switcher_button;
-    const std::unordered_map<std::string, juce::Colour>
-        overdrive_colour_mapping = {
-            {"HELIOS",   AuroraColors::aurora_orange},
-            {"BOREALIS", AuroraColors::blue2        }
-    };
-    juce::Colour const default_type_colour = AuroraColors::grey3;
 
     juce::Slider drive_slider;
     juce::Label drive_label;
@@ -58,13 +50,14 @@ class OverdriveComponent : public juce::Component
     std::vector<
         std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>>
         slider_attachments;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(OverdriveComponent);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(OverdriveKnobsComponent);
 
     // Define knobs for easy looping
-    std::vector<Knob> knobs = {
-        {&drive_slider,     &drive_label,     "overdrive_drive_db",  "DRIVE"},
-        {&level_slider,     &level_label,     "overdrive_level_db",  "LEVEL"},
-        {&character_slider, &character_label, "overdrive_character", "CHAR" },
-        {&mix_slider,       &mix_label,       "overdrive_mix",       "MIX"  }
+    std::vector<OverdriveKnob> knobs = {
+        {&drive_slider,     &drive_label,     "overdrive_knobs_drive_db",  "DRIVE"},
+        {&level_slider,     &level_label,     "overdrive_knobs_level_db",  "LEVEL"},
+        {&character_slider, &character_label, "overdrive_knobs_character",
+         "CHAR"                                                                   },
+        {&mix_slider,       &mix_label,       "overdrive_knobs_mix",       "MIX"  }
     };
 };

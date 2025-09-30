@@ -30,22 +30,17 @@ target_sources(${PROJECT_NAME}
         gui/looks/base_look_and_feel.cpp
         gui/looks/compressor_look_and_feel.cpp
         gui/looks/header_look_and_feel.cpp
-        gui/looks/overdrive_look_and_feel.cpp
-        gui/looks/preamp_footer_look_and_feel.cpp
         gui/looks/compressor_meter_look_and_feel.cpp
         gui/looks/compressor_selector_look_and_feel.cpp
         gui/compressor/compressor_knobs_component.cpp
         gui/compressor/compressor_meter_component.cpp
         gui/compressor/compressor_component.cpp
+        gui/amp/amp_component.cpp
+        gui/amp/overdrive_knobs_component.cpp
         gui/meter.cpp
         gui/header.cpp
         gui/tabs.cpp
-        gui/compressor_left_component.cpp
-        gui/compressor_right_component.cpp
-        gui/overdrive_component.cpp
         gui/ir_gui.cpp
-        gui/preamp_component.cpp
-        gui/preamp_footer_component.cpp
         dsp/maths/toms917.cpp
         dsp/compressor.cpp
         dsp/overdrive.cpp

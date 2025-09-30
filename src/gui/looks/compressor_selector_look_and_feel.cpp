@@ -1,6 +1,5 @@
 #include "compressor_selector_look_and_feel.h"
 
-#include "colors.h"
 #include <juce_gui_basics/juce_gui_basics.h>
 
 void CompressorSelectorLookAndFeel::drawRotarySlider(

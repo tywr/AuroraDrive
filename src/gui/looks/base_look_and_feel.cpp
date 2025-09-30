@@ -1,6 +1,6 @@
 #include "base_look_and_feel.h"
 
-#include "colors.h"
+#include "../colours.h"
 #include <juce_gui_basics/juce_gui_basics.h>
 
 BaseLookAndFeel::BaseLookAndFeel()
@@ -144,7 +144,7 @@ void BaseLookAndFeel::drawRotarySlider(
         rotaryStartAngle, rotaryEndAngle, true
     );
 
-    g.setColour(AuroraColors::grey0);
+    g.setColour(ColourCodes::grey0);
     g.strokePath(
         backgroundArc,
         juce::PathStrokeType(
@@ -197,7 +197,7 @@ void BaseLookAndFeel::drawLinearSlider(
     const juce::Slider::SliderStyle style, juce::Slider& slider
 )
 {
-    g.fillAll(AuroraColors::grey0);
+    g.fillAll(ColourCodes::grey0);
 
     juce::Rectangle<float> filledTrack;
     if (style == juce::Slider::LinearBar)
@@ -218,7 +218,6 @@ void BaseLookAndFeel::drawTabbedButtonBarBackground(
     juce::TabbedButtonBar& buttonBar, juce::Graphics& g
 )
 {
-    // g.fillAll(AuroraColors::bg);
 }
 
 void BaseLookAndFeel::drawTabButton(
@@ -230,17 +229,16 @@ void BaseLookAndFeel::drawTabButton(
     const juce::Rectangle<int> bounds = button.getLocalBounds().reduced(10);
     const bool isActive = button.isFrontTab();
 
-    // g.setColour(AuroraColors::bg);
     // g.fillRect(bounds);
 
     juce::Colour colour;
     if (isActive)
     {
-        colour = AuroraColors::white0;
+        colour = ColourCodes::white0;
     }
     else
     {
-        colour = AuroraColors::grey2;
+        colour = ColourCodes::grey2;
     }
     if (isMouseOver)
     {

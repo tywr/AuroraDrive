@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../looks/colors.h"
+#include "../colours.h"
 #include "../looks/compressor_selector_look_and_feel.h"
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
@@ -28,7 +28,7 @@ class CompressorKnobsComponent : public juce::Component
   private:
     juce::AudioProcessorValueTreeState& parameters;
 
-    juce::Colour const default_type_colour = AuroraColors::grey3;
+    juce::Colour const default_type_colour = ColourCodes::grey3;
 
     CompressorSelectorLookAndFeel selector_look_and_feel;
 

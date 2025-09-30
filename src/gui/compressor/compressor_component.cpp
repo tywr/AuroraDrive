@@ -1,6 +1,6 @@
 #include "compressor_component.h"
 #include "../dimensions.h"
-#include "../looks/colors.h"
+#include "../colours.h"
 #include "compressor_knobs_component.h"
 #include "compressor_meter_component.h"
 #include <juce_audio_basics/juce_audio_basics.h>
@@ -53,12 +53,9 @@ void CompressorComponent::paint(juce::Graphics& g)
     float border_thickness = GuiDimensions::COMPRESSOR_BORDER_THICKNESS;
     float border_radius = GuiDimensions::COMPRESSOR_BORDER_RADIUS;
 
-    auto outer_bounds = getLocalBounds()
-                            .reduced(
-                                GuiDimensions::COMPRESSOR_OUTER_X_PADDING,
-                                GuiDimensions::COMPRESSOR_OUTER_Y_PADDING
-                            )
-                            .toFloat();
+    auto outer_bounds = getLocalBounds().withSizeKeepingCentre(
+        GuiDimensions::COMPRESSOR_WIDTH, GuiDimensions::COMPRESSOR_HEIGHT
+    ).toFloat();
     auto inner_bounds = outer_bounds.reduced(border_thickness).toFloat();
 
     g.setColour(GuiColours::COMPRESSOR_BG_COLOUR);
@@ -163,12 +160,9 @@ void CompressorComponent::paintStyling(
 
 void CompressorComponent::resized()
 {
-    auto bounds = getLocalBounds()
-                      .reduced(
-                          GuiDimensions::COMPRESSOR_OUTER_X_PADDING,
-                          GuiDimensions::COMPRESSOR_OUTER_Y_PADDING
-                      )
-                      .reduced(GuiDimensions::COMPRESSOR_BORDER_THICKNESS);
+    auto bounds = getLocalBounds().withSizeKeepingCentre(
+        GuiDimensions::COMPRESSOR_WIDTH, GuiDimensions::COMPRESSOR_HEIGHT
+    );
     bypass_button.setBounds(
         bounds.removeFromBottom(GuiDimensions::COMPRESSOR_FOOTER_HEIGHT)
             .withSizeKeepingCentre(

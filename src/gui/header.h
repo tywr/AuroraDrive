@@ -1,7 +1,7 @@
 #pragma once
 
+#include "colours.h"
 #include "meter.h"
-#include "looks/colors.h"
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
@@ -19,7 +19,7 @@ class Header : public juce::Component
     Meter inputMeter;
     Meter outputMeter;
 
-    juce::Colour headerColour = AuroraColors::white0;
+    juce::Colour headerColour = ColourCodes::white0;
     juce::Label inputLabel;
     juce::Label outputLabel;
 

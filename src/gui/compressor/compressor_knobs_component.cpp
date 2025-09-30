@@ -1,6 +1,6 @@
 #include "compressor_knobs_component.h"
 #include "../dimensions.h"
-#include "../looks/colors.h"
+#include "../colours.h"
 #include "../looks/compressor_look_and_feel.h"
 #include "../looks/compressor_selector_look_and_feel.h"
 
@@ -27,7 +27,7 @@ CompressorKnobsComponent::CompressorKnobsComponent(
             juce::Colours::transparentBlack
         );
         knob.label->setColour(
-            juce::Slider::textBoxTextColourId, AuroraColors::grey3
+            juce::Slider::textBoxTextColourId, ColourCodes::grey3
         );
         slider_attachments.push_back(
             std::make_unique<

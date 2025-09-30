@@ -1,6 +1,6 @@
 #include "compressor_meter_look_and_feel.h"
 
-#include "colors.h"
+#include "../colours.h"
 #include <juce_gui_basics/juce_gui_basics.h>
 
 CompressorMeterLookAndFeel::CompressorMeterLookAndFeel()
@@ -42,7 +42,7 @@ void CompressorMeterLookAndFeel::drawLinearSlider(
 
     const juce::Colour highlightColour =
         slider.findColour(juce::Slider::trackColourId);
-    const juce::Colour darkColour = AuroraColors::grey0;
+    const juce::Colour darkColour = ColourCodes::grey0;
 
     if (style == juce::Slider::LinearHorizontal)
     {

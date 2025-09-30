@@ -1,5 +1,5 @@
 #include "ir_gui.h"
-#include "looks/colors.h"
+#include "colours.h"
 
 #include <juce_audio_formats/juce_audio_formats.h>
 #include <juce_audio_processors/juce_audio_processors.h>
@@ -43,10 +43,10 @@ IRLoader::IRLoader(juce::AudioProcessorValueTreeState& params)
         juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack
     );
     irMixSlider.setColour(
-        juce::Slider::textBoxTextColourId, AuroraColors::grey3
+        juce::Slider::textBoxTextColourId, ColourCodes::grey3
     );
     irMixSlider.setColour(
-        juce::Slider::rotarySliderFillColourId, AuroraColors::white0
+        juce::Slider::rotarySliderFillColourId, ColourCodes::white0
     );
     irMixSliderAttachment =
         std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
@@ -65,10 +65,10 @@ IRLoader::IRLoader(juce::AudioProcessorValueTreeState& params)
         juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack
     );
     gainSlider.setColour(
-        juce::Slider::textBoxTextColourId, AuroraColors::grey3
+        juce::Slider::textBoxTextColourId, ColourCodes::grey3
     );
     gainSlider.setColour(
-        juce::Slider::rotarySliderFillColourId, AuroraColors::white0
+        juce::Slider::rotarySliderFillColourId, ColourCodes::white0
     );
     gainSliderAttachment =
         std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
@@ -124,11 +124,11 @@ void IRLoader::switchColour()
 {
     if (bypassButton.getToggleState())
     {
-        iRColour = AuroraColors::white0;
+        iRColour = ColourCodes::white0;
     }
     else
     {
-        iRColour = AuroraColors::grey3;
+        iRColour = ColourCodes::grey3;
     }
     irMixSlider.setColour(juce::Slider::rotarySliderFillColourId, iRColour);
     gainSlider.setColour(juce::Slider::rotarySliderFillColourId, iRColour);
@@ -143,13 +143,13 @@ void IRLoader::refreshStatus()
     {
         statusLabel.setText("NO FILE LOADED", juce::dontSendNotification);
         irMixSlider.setColour(
-            juce::Slider::rotarySliderFillColourId, AuroraColors::grey3
+            juce::Slider::rotarySliderFillColourId, ColourCodes::grey3
         );
         gainSlider.setColour(
-            juce::Slider::rotarySliderFillColourId, AuroraColors::grey3
+            juce::Slider::rotarySliderFillColourId, ColourCodes::grey3
         );
         bypassButton.setColour(
-            juce::ToggleButton::tickColourId, AuroraColors::grey3
+            juce::ToggleButton::tickColourId, ColourCodes::grey3
         );
     }
     else if (file.existsAsFile())

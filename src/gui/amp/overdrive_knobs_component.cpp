@@ -1,15 +1,12 @@
-#include "overdrive_component.h"
-#include "dimensions.h"
-#include "looks/colors.h"
-#include "looks/overdrive_look_and_feel.h"
+#include "overdrive_knobs_component.h"
+#include "../colours.h"
+#include "../dimensions.h"
 
-OverdriveComponent::OverdriveComponent(
+OverdriveKnobsComponent::OverdriveKnobsComponent(
     juce::AudioProcessorValueTreeState& params
 )
     : parameters(params)
 {
-    setLookAndFeel(new OverdriveLookAndFeel());
-
     for (auto knob : knobs)
     {
         addAndMakeVisible(knob.slider);
@@ -24,7 +21,7 @@ OverdriveComponent::OverdriveComponent(
             juce::Colours::transparentBlack
         );
         knob.label->setColour(
-            juce::Slider::textBoxTextColourId, AuroraColors::grey3
+            juce::Slider::textBoxTextColourId, ColourCodes::grey3
         );
         slider_attachments.push_back(
             std::make_unique<
@@ -35,16 +32,16 @@ OverdriveComponent::OverdriveComponent(
     }
 }
 
-OverdriveComponent::~OverdriveComponent()
+OverdriveKnobsComponent::~OverdriveKnobsComponent()
 {
 }
 
-void OverdriveComponent::paint(juce::Graphics& g)
+void OverdriveKnobsComponent::paint(juce::Graphics& g)
 {
     // g.fillAll(AuroraColors::bg);
 }
 
-void OverdriveComponent::resized()
+void OverdriveKnobsComponent::resized()
 {
 
     auto bounds = getLocalBounds();
@@ -53,7 +50,7 @@ void OverdriveComponent::resized()
 
     const int knob_box_size = bounds.getWidth() / knobs.size();
 
-    for (Knob knob : knobs)
+    for (auto knob : knobs)
     {
         knob.label->setBounds(label_bounds.removeFromLeft(knob_box_size)
                                   .withSizeKeepingCentre(
@@ -70,26 +67,7 @@ void OverdriveComponent::resized()
     switchColour();
 }
 
-void OverdriveComponent::switchColour()
+void OverdriveKnobsComponent::switchColour()
 {
-    juce::Colour overdrive_colour = default_type_colour;
-    auto current_type =
-        parameters.getParameter("overdrive_type")->getCurrentValueAsText();
-    bool bypass =
-        parameters.getRawParameterValue("overdrive_bypass")->load() < 0.5f;
-    {
-        if (overdrive_colour_mapping.find(current_type.toStdString()) !=
-            overdrive_colour_mapping.end())
-        {
-            overdrive_colour =
-                overdrive_colour_mapping.at(current_type.toStdString());
-        }
-    }
-    for (Knob knob : knobs)
-    {
-        knob.slider->setColour(
-            juce::Slider::rotarySliderFillColourId, overdrive_colour
-        );
-    }
     repaint();
 }

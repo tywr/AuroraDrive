@@ -1,6 +1,6 @@
 #include "compressor_look_and_feel.h"
 
-#include "colors.h"
+#include "../colours.h"
 #include <juce_gui_basics/juce_gui_basics.h>
 
 void CompressorLookAndFeel::drawRotarySlider(
@@ -22,7 +22,7 @@ void CompressorLookAndFeel::drawRotarySlider(
         rotaryStartAngle, rotaryEndAngle, true
     );
 
-    g.setColour(AuroraColors::grey0);
+    g.setColour(ColourCodes::grey0);
     g.strokePath(
         backgroundArc,
         juce::PathStrokeType(

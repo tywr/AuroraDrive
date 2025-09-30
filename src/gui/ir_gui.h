@@ -1,4 +1,4 @@
-#include "looks/colors.h"
+#include "colours.h"
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
@@ -17,7 +17,7 @@ class IRLoader : public juce::Component
     juce::AudioProcessorValueTreeState& parameters;
     void chooseFile();
     juce::String choosenFilePath;
-    juce::Colour iRColour = AuroraColors::white0;
+    juce::Colour iRColour = ColourCodes::white0;
 
     juce::ToggleButton bypassButton;
     juce::Label bypassLabel;

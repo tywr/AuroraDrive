@@ -1,6 +1,6 @@
 #pragma once
 
-#include "colors.h"
+#include "../colours.h"
 #include <juce_gui_basics/juce_gui_basics.h>
 
 class BaseLookAndFeel : public juce::LookAndFeel_V4
@@ -17,15 +17,15 @@ class BaseLookAndFeel : public juce::LookAndFeel_V4
     juce::LookAndFeel_V4::ColourScheme getColourScheme() const
     {
         return juce::LookAndFeel_V4::ColourScheme(
-            AuroraColors::bg,     // windowBackground
-            AuroraColors::grey3,  // widgetBackground
-            AuroraColors::grey2,  // menuBackground
-            AuroraColors::bg,     // outline
-            AuroraColors::grey3,  // defaultText
-            AuroraColors::bg,     // defaultFill
-            AuroraColors::white2, // highlightedText
-            AuroraColors::blue0,  // highlightedFill
-            AuroraColors::white0  // menuText
+            ColourCodes::bg,     // windowBackground
+            ColourCodes::grey3,  // widgetBackground
+            ColourCodes::grey2,  // menuBackground
+            ColourCodes::bg,     // outline
+            ColourCodes::grey3,  // defaultText
+            ColourCodes::bg,     // defaultFill
+            ColourCodes::white2, // highlightedText
+            ColourCodes::blue0,  // highlightedFill
+            ColourCodes::white0  // menuText
         );
     }
 

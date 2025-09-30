@@ -23,6 +23,7 @@ class CompressorComponent : public juce::Component
   private:
     juce::AudioProcessorValueTreeState& parameters;
     juce::Value& gain_reduction_decibels;
+    juce::Rectangle<float> bounds;
 
     void paintStyling(juce::Graphics&, juce::Rectangle<float>);
 
