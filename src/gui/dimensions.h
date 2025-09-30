@@ -35,9 +35,15 @@ constexpr int COMPRESSOR_BYPASS_BUTTON_HEIGHT = 30;
 
 constexpr int AMP_WIDTH = 850;
 constexpr int AMP_HEIGHT = 250;
+constexpr int AMP_SIDE_WIDTH = 150;
+constexpr int AMP_INNER_Y_PADDING = 10;
 constexpr int AMP_BORDER_THICKNESS = 2.0f;
 constexpr int AMP_BORDER_RADIUS = 20.0f;
-constexpr int AMP_KNOBS_TOP_BOX_HEIGHT = 150;
+constexpr int AMP_KNOBS_TOP_BOX_HEIGHT = 120;
+constexpr int AMP_KNOBS_BOTTOM_BOX_HEIGHT = 100;
+constexpr int AMP_KNOB_WIDTH = 70;
+constexpr int AMP_KNOB_HEIGHT = 90;
+constexpr int AMP_LABEL_HEIGHT = 20;
 
 constexpr int PREAMP_TOP_KNOB_BOX_HEIGHT = 160;
 constexpr int PREAMP_SIDE_WIDTH = 100;

@@ -64,6 +64,8 @@ class BaseLookAndFeel : public juce::LookAndFeel_V4
         juce::TabBarButton&, juce::Graphics&, bool isMouseOver, bool isMouseDown
     ) override;
 
+    void drawLabel(juce::Graphics& g, juce::Label& label) override;
+
     juce::Font getSliderPopupFont(juce::Slider&) override
     {
         return mainFont;

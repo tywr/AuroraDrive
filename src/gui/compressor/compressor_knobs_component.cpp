@@ -101,6 +101,7 @@ void CompressorKnobsComponent::switchColour(
     juce::Colour colour1, juce::Colour colour2
 )
 {
+    juce::ignoreUnused(colour2);
     for (CompressorKnob knob : knobs)
     {
         knob.slider->setColour(juce::Slider::rotarySliderFillColourId, colour1);

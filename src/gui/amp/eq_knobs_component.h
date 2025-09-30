@@ -6,7 +6,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <unordered_map>
 
-struct OverdriveKnob
+struct EQKnob
 {
     juce::Slider* slider;
     juce::Label* label;
@@ -14,11 +14,11 @@ struct OverdriveKnob
     juce::String label_text;
 };
 
-class OverdriveKnobsComponent : public juce::Component
+class EQKnobsComponent : public juce::Component
 {
   public:
-    OverdriveKnobsComponent(juce::AudioProcessorValueTreeState&);
-    ~OverdriveKnobsComponent() override;
+    EQKnobsComponent(juce::AudioProcessorValueTreeState&);
+    ~EQKnobsComponent() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
@@ -27,36 +27,36 @@ class OverdriveKnobsComponent : public juce::Component
   private:
     juce::AudioProcessorValueTreeState& parameters;
 
-    juce::Slider drive_slider;
-    juce::Label drive_label;
+    juce::Slider bass_slider;
+    juce::Label bass_label;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>
-        drive_slider_attachment;
+        bass_slider_attachment;
 
-    juce::Slider level_slider;
-    juce::Label level_label;
+    juce::Slider mid_slider;
+    juce::Label mid_label;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>
-        level_slider_attachment;
+        mid_slider_attachment;
 
-    juce::Slider character_slider;
-    juce::Label character_label;
+    juce::Slider treble_slider;
+    juce::Label treble_label;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>
-        character_slider_attachment;
+        treble_slider_attachment;
 
-    juce::Slider mix_slider;
-    juce::Label mix_label;
+    juce::Slider mid_freq_slider;
+    juce::Label mid_freq_label;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>
-        mix_slider_attachment;
+        mid_freq_slider_attachment;
 
     std::vector<
         std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>>
         slider_attachments;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(OverdriveKnobsComponent);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(EQKnobsComponent);
 
     // Define knobs for easy looping
-    std::vector<OverdriveKnob> knobs = {
-        {&drive_slider,     &drive_label,     "overdrive_drive_db",  "DRIVE"},
-        {&character_slider, &character_label, "overdrive_character", "CHAR" },
-        {&mix_slider,       &mix_label,       "overdrive_mix",       "MIX"  },
-        {&level_slider,     &level_label,     "overdrive_level_db",  "LEVEL"},
+    std::vector<EQKnob> knobs = {
+        {&bass_slider,     &bass_label,     "amp_eq_bass",          "BASS"  },
+        {&mid_slider,      &mid_label,      "amp_eq_mid",           "MID"   },
+        {&treble_slider,   &treble_label,   "amp_eq_treble",        "TREBLE"},
+        {&mid_freq_slider, &mid_freq_label, "amp_eq_mid_frequency", "FREQ"  },
     };
 };

@@ -1,12 +1,12 @@
-#include "overdrive_knobs_component.h"
+#include "eq_knobs_component.h"
 #include "../colours.h"
 #include "../dimensions.h"
+#include "../looks/amp_small_look_and_feel.h"
 
-OverdriveKnobsComponent::OverdriveKnobsComponent(
-    juce::AudioProcessorValueTreeState& params
-)
+EQKnobsComponent::EQKnobsComponent(juce::AudioProcessorValueTreeState& params)
     : parameters(params)
 {
+    setLookAndFeel(new AmpSmallLookAndFeel());
     for (auto knob : knobs)
     {
         addAndMakeVisible(knob.slider);
@@ -32,15 +32,15 @@ OverdriveKnobsComponent::OverdriveKnobsComponent(
     }
 }
 
-OverdriveKnobsComponent::~OverdriveKnobsComponent()
+EQKnobsComponent::~EQKnobsComponent()
 {
 }
 
-void OverdriveKnobsComponent::paint(juce::Graphics& g)
+void EQKnobsComponent::paint(juce::Graphics& g)
 {
 }
 
-void OverdriveKnobsComponent::resized()
+void EQKnobsComponent::resized()
 {
 
     auto bounds = getLocalBounds();
@@ -51,22 +51,20 @@ void OverdriveKnobsComponent::resized()
     {
         knob.label->setBounds(label_bounds.removeFromLeft(knob_box_size)
                                   .withSizeKeepingCentre(
-                                      GuiDimensions::AMP_KNOB_WIDTH,
-                                      GuiDimensions::AMP_LABEL_HEIGHT
+                                      GuiDimensions::DEFAULT_SMALL_KNOB_WIDTH,
+                                      GuiDimensions::DEFAULT_SMALL_LABEL_HEIGHT
                                   ));
         knob.slider->setBounds(bounds.removeFromLeft(knob_box_size)
                                    .withSizeKeepingCentre(
-                                       GuiDimensions::AMP_KNOB_WIDTH,
-                                       GuiDimensions::AMP_KNOB_HEIGHT
+                                       GuiDimensions::DEFAULT_SMALL_KNOB_WIDTH,
+                                       GuiDimensions::DEFAULT_SMALL_KNOB_HEIGHT
                                    ));
     }
     // Don't forget to set compressor colour based on updated label value
     // switchColour();
 }
 
-void OverdriveKnobsComponent::switchColour(
-    juce::Colour colour1, juce::Colour colour2
-)
+void EQKnobsComponent::switchColour(juce::Colour colour1, juce::Colour colour2)
 {
     juce::ignoreUnused(colour2);
     for (auto knob : knobs)

@@ -27,6 +27,7 @@ target_sources(${PROJECT_NAME}
     PRIVATE
         plugin_editor.cpp
         plugin_audio_processor.cpp
+        gui/looks/amp_small_look_and_feel.cpp
         gui/looks/base_look_and_feel.cpp
         gui/looks/compressor_look_and_feel.cpp
         gui/looks/header_look_and_feel.cpp
@@ -37,6 +38,7 @@ target_sources(${PROJECT_NAME}
         gui/compressor/compressor_component.cpp
         gui/amp/amp_component.cpp
         gui/amp/overdrive_knobs_component.cpp
+        gui/amp/eq_knobs_component.cpp
         gui/meter.cpp
         gui/header.cpp
         gui/tabs.cpp

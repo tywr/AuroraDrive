@@ -252,3 +252,12 @@ void BaseLookAndFeel::drawTabButton(
     g.setColour(colour);
     g.drawFittedText(text, bounds, juce::Justification::centred, 1);
 }
+
+void BaseLookAndFeel::drawLabel(juce::Graphics& g, juce::Label& label)
+{
+    auto bounds = label.getLocalBounds();
+    juce::String text = label.getText();
+    g.setFont(mainFont);
+    g.setColour(label.findColour(juce::Label::textColourId));
+    g.drawFittedText(text, bounds, juce::Justification::centred, 1);
+}
