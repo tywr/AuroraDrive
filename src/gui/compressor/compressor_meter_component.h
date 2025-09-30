@@ -1,30 +1,36 @@
 #pragma once
 
 #include "../looks/colors.h"
-#include "compressor_footer_component.h"
+#include "compressor_meter_component.h"
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <unordered_map>
 
-class CompressorFooterComponent : public juce::Component,
-                                  public juce::Value::Listener
+class CompressorMeterComponent : public juce::Component,
+                                 public juce::Value::Listener,
+                                 public juce::Timer
 {
   public:
-    CompressorFooterComponent(
+    CompressorMeterComponent(
         juce::AudioProcessorValueTreeState& g, juce::Value& v
     );
-    ~CompressorFooterComponent() override;
+    ~CompressorMeterComponent() override;
 
     void resized() override;
     void valueChanged(juce::Value& v) override;
     void paint(juce::Graphics&) override;
+    void visibilityChanged() override;
     void switchColour(juce::Colour colour1, juce::Colour colour2);
 
   private:
+    void timerCallback() override;
     juce::AudioProcessorValueTreeState& parameters;
     juce::Value gain_reduction_value;
     juce::Slider gain_reduction_slider;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CompressorFooterComponent)
+    float target_meter_value = 0.0f;
+    float smoothed_meter_value = 0.0f;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CompressorMeterComponent)
 };

@@ -1,8 +1,8 @@
 #include "compressor_component.h"
 #include "../dimensions.h"
 #include "../looks/colors.h"
-#include "compressor_footer_component.h"
 #include "compressor_knobs_component.h"
+#include "compressor_meter_component.h"
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
@@ -10,10 +10,10 @@ CompressorComponent::CompressorComponent(
     juce::AudioProcessorValueTreeState& params, juce::Value& value
 )
     : parameters(params), gain_reduction_decibels(value),
-      knobs_component(params), footer_component(params, value)
+      knobs_component(params), meter_component(params, value)
 {
     addAndMakeVisible(knobs_component);
-    addAndMakeVisible(footer_component);
+    addAndMakeVisible(meter_component);
     addAndMakeVisible(bypass_button);
 
     bypass_attachment =
@@ -79,7 +79,7 @@ void CompressorComponent::paint(juce::Graphics& g)
     g.fillPath(border_path);
 
     knobs_component.switchColour(colour1, colour2);
-    footer_component.switchColour(colour1, colour2);
+    meter_component.switchColour(colour1, colour2);
 }
 
 void CompressorComponent::resized()
@@ -97,7 +97,7 @@ void CompressorComponent::resized()
                 GuiDimensions::COMPRESSOR_BYPASS_BUTTON_HEIGHT
             )
     );
-    footer_component.setBounds(
+    meter_component.setBounds(
         bounds.removeFromBottom(GuiDimensions::COMPRESSOR_GAIN_REDUCTION_HEIGHT)
     );
     bounds.removeFromTop(GuiDimensions::COMPRESSOR_INNER_Y_TOP_PADDING);

@@ -12,7 +12,8 @@ Tabs::Tabs(
     juce::Value& compressorGainReductionDb
 )
     : juce::TabbedComponent(juce::TabbedButtonBar::TabsAtTop),
-      parameters(params)
+      parameters(params),
+      compressor_component(params, compressorGainReductionDb)
 {
     setColour(
         juce::TabbedComponent::backgroundColourId,
@@ -22,10 +23,7 @@ Tabs::Tabs(
         juce::TabbedComponent::outlineColourId, juce::Colours::transparentBlack
     );
 
-    addTab(
-        "COMP", AuroraColors::bg,
-        new CompressorComponent(params, compressorGainReductionDb), true
-    );
+    addTab("COMP", AuroraColors::bg, &compressor_component, false);
     // addTab(
     //     "PREAMP", AuroraColors::bg,
     //     new PreAmpComponent(params, compressorGainReductionDb), true

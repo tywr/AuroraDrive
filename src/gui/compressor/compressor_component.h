@@ -1,9 +1,8 @@
 #pragma once
 
 #include "../colours.h"
-#include "compressor_component.h"
-#include "compressor_footer_component.h"
 #include "compressor_knobs_component.h"
+#include "compressor_meter_component.h"
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
@@ -15,6 +14,11 @@ class CompressorComponent : public juce::Component
 
     void resized() override;
     void paint(juce::Graphics&) override;
+    void visibilityChanged() override
+    {
+        meter_component.setVisible(isVisible());
+        meter_component.visibilityChanged();
+    };
 
   private:
     juce::AudioProcessorValueTreeState& parameters;
@@ -22,7 +26,7 @@ class CompressorComponent : public juce::Component
 
     // Sub-components
     CompressorKnobsComponent knobs_component;
-    CompressorFooterComponent footer_component;
+    CompressorMeterComponent meter_component;
 
     // Bypass button
     juce::ToggleButton bypass_button;

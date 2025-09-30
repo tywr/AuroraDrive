@@ -4,7 +4,7 @@
 #include "colors.h"
 #include <juce_gui_basics/juce_gui_basics.h>
 
-class CompressorFooterLookAndFeel : public BaseLookAndFeel
+class CompressorMeterLookAndFeel : public BaseLookAndFeel
 {
   private:
     float strokeWidth = 6.0f;
@@ -13,12 +13,8 @@ class CompressorFooterLookAndFeel : public BaseLookAndFeel
             .withExtraKerningFactor(0.2f);
 
   public:
-    CompressorFooterLookAndFeel();
+    CompressorMeterLookAndFeel();
     void drawLabel(juce::Graphics&, juce::Label&) override;
-    void drawToggleButton(
-        juce::Graphics& g, juce::ToggleButton& button, bool isMouseOverButton,
-        bool isButtonDown
-    );
     void drawLinearSlider(
         juce::Graphics& g, int x, int y, int width, int height, float sliderPos,
         float minSliderPos, float maxSliderPos,

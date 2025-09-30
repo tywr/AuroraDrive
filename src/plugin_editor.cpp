@@ -37,7 +37,7 @@ void PluginEditor::paint(juce::Graphics& g)
 {
     g.fillAll(juce::Colours::black);
 
-    juce::Random random(12345);
+    juce::Random random(3);
     const int gridSize = 30; // Space between potential dots
 
     for (int x = 0; x < getWidth(); x += gridSize)
@@ -57,6 +57,31 @@ void PluginEditor::paint(juce::Graphics& g)
         }
     }
 }
+
+// void PluginEditor::paint(juce::Graphics& g)
+// {
+//     g.fillAll(juce::Colours::black);
+//
+//     juce::Random random(12345);
+//     const int gridSize = 30;    // Space between dots
+//     const float dotSize = 3.0f; // Fixed dot size
+//
+//     for (int x = 0; x < getWidth(); x += gridSize)
+//     {
+//         for (int y = 0; y < getHeight(); y += gridSize)
+//         {
+//             float alpha = random.nextFloat() * 0.2f + 0.05f; // Random alpha
+//
+//             g.setColour(juce::Colours::grey.withAlpha(alpha));
+//             g.fillEllipse(
+//                 x - dotSize / 2.0f, // Center the dot on grid point
+//                 y - dotSize / 2.0f, dotSize, dotSize
+//             );
+//         }
+//     }
+//
+//     // ... rest of your UI
+// }
 
 void PluginEditor::resized()
 {
