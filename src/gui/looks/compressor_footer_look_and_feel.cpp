@@ -8,7 +8,9 @@ CompressorFooterLookAndFeel::CompressorFooterLookAndFeel()
     setColourScheme(getColourScheme());
 }
 
-void CompressorFooterLookAndFeel::drawLabel(juce::Graphics& g, juce::Label& label)
+void CompressorFooterLookAndFeel::drawLabel(
+    juce::Graphics& g, juce::Label& label
+)
 {
     auto bounds = label.getLocalBounds();
     juce::String text = label.getText();
@@ -110,7 +112,10 @@ void CompressorFooterLookAndFeel::drawLinearSlider(
                 g.setColour(darkColour);
 
             g.fillEllipse(
-                currentDotX - dotRadius, dotY, dotDiameter, dotDiameter
+                currentDotX - dotRadius, dotY - dotSpacing / 3.0f, dotDiameter, dotDiameter
+            );
+            g.fillEllipse(
+                currentDotX - dotRadius, dotY + dotSpacing / 3.0f, dotDiameter, dotDiameter
             );
         }
     }

@@ -33,6 +33,7 @@ target_sources(${PROJECT_NAME}
         gui/looks/overdrive_look_and_feel.cpp
         gui/looks/preamp_footer_look_and_feel.cpp
         gui/looks/compressor_footer_look_and_feel.cpp
+        gui/looks/compressor_selector_look_and_feel.cpp
         gui/compressor/compressor_knobs_component.cpp
         gui/compressor/compressor_footer_component.cpp
         gui/compressor/compressor_component.cpp

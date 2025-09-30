@@ -15,7 +15,6 @@ CompressorComponent::CompressorComponent(
     addAndMakeVisible(knobs_component);
     addAndMakeVisible(footer_component);
     addAndMakeVisible(bypass_button);
-    addAndMakeVisible(type_slider);
 
     bypass_attachment =
         std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
@@ -30,21 +29,6 @@ CompressorComponent::CompressorComponent(
         GuiColours::COMPRESSOR_ACTIVE_COLOUR_1
     );
     bypass_button.onClick = [this]() { repaint(); };
-
-    type_slider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    type_slider.setTextBoxStyle(
-        juce::Slider::TextBoxBelow, false, 100, 20
-    );
-    type_slider.setColour(
-        juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack
-    );
-    type_slider.setColour(
-        juce::Slider::textBoxTextColourId, AuroraColors::grey3
-    );
-    type_slider_attachment =
-        std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-            parameters, "compressor_type", type_slider
-        );
 }
 
 CompressorComponent::~CompressorComponent()
@@ -117,8 +101,9 @@ void CompressorComponent::resized()
         bounds.removeFromBottom(GuiDimensions::COMPRESSOR_GAIN_REDUCTION_HEIGHT)
     );
     bounds.removeFromTop(GuiDimensions::COMPRESSOR_INNER_Y_TOP_PADDING);
-    knobs_component.setBounds(
-        bounds.removeFromTop(GuiDimensions::COMPRESSOR_KNOBS_BOX_HEIGHT)
-    );
-    type_slider.setBounds(bounds.removeFromTop(150));
+    knobs_component.setBounds(bounds.removeFromTop(
+        GuiDimensions::COMPRESSOR_KNOBS_TOP_BOX_HEIGHT +
+        GuiDimensions::COMPRESSOR_KNOBS_BOTTOM_BOX_HEIGHT +
+        GuiDimensions::COMPRESSOR_KNOBS_ROW_PADDING
+    ));
 }
