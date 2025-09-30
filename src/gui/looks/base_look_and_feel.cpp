@@ -168,6 +168,14 @@ void BaseLookAndFeel::drawRotarySlider(
                       )
         );
     }
+    // draw background
+    g.setColour(juce::Colours::black);
+    g.fillEllipse(
+        bounds.getCentreX() - (radius - lineW) + strokeWidth / 2.0f,
+        bounds.getCentreY() - (radius - lineW) + strokeWidth / 2.0f,
+        (radius - lineW) * 2 - strokeWidth, (radius - lineW) * 2 - strokeWidth
+    );
+    // draw marker
     const float markerLength = radius * 0.2f;
     const float markerThickness = lineW * 0.5f;
     const auto centre = bounds.getCentre();

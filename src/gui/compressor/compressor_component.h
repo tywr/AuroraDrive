@@ -24,6 +24,8 @@ class CompressorComponent : public juce::Component
     juce::AudioProcessorValueTreeState& parameters;
     juce::Value& gain_reduction_decibels;
 
+    void paintStyling(juce::Graphics&, juce::Rectangle<float>);
+
     // Sub-components
     CompressorKnobsComponent knobs_component;
     CompressorMeterComponent meter_component;

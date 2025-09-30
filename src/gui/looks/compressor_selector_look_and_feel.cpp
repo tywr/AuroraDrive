@@ -29,6 +29,13 @@ void CompressorSelectorLookAndFeel::drawRotarySlider(
             lineW, juce::PathStrokeType::mitered, juce::PathStrokeType::square
         )
     );
+    // draw background
+    g.setColour(juce::Colours::black);
+    g.fillEllipse(
+        bounds.getCentreX() - (radius - lineW) + stroke_width / 2.0f,
+        bounds.getCentreY() - (radius - lineW) + stroke_width / 2.0f,
+        (radius - lineW) * 2 - stroke_width, (radius - lineW) * 2 - stroke_width
+    );
 
     const float dotRadius = lineW * 1.0f;
     const float dotDiameter = dotRadius * 2.0f;

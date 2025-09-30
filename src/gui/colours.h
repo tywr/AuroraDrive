@@ -34,5 +34,6 @@ juce::Colour const DEFAULT_INACTIVE_COLOUR = ColourCodes::bg2;
 juce::Colour const COMPRESSOR_ACTIVE_COLOUR_1 = ColourCodes::blue0;
 juce::Colour const COMPRESSOR_ACTIVE_COLOUR_2 = ColourCodes::blue2;
 juce::Colour const COMPRESSOR_BG_COLOUR = ColourCodes::bg0;
+juce::Colour const COMPRESSOR_STYLING_COLOUR = ColourCodes::bg2;
 
 } // namespace GuiColours

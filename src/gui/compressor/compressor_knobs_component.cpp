@@ -9,7 +9,7 @@ CompressorKnobsComponent::CompressorKnobsComponent(
 )
     : parameters(params)
 {
-    setLookAndFeel(new CompressorLookAndFeel());
+    // setLookAndFeel(new CompressorLookAndFeel());
     type_slider.setLookAndFeel(&selector_look_and_feel);
     ratio_slider.setLookAndFeel(&selector_look_and_feel);
 
