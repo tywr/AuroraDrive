@@ -1,6 +1,6 @@
 #include "compressor_component.h"
-#include "../dimensions.h"
 #include "../colours.h"
+#include "../dimensions.h"
 #include "compressor_knobs_component.h"
 #include "compressor_meter_component.h"
 #include <juce_audio_basics/juce_audio_basics.h>
@@ -53,9 +53,12 @@ void CompressorComponent::paint(juce::Graphics& g)
     float border_thickness = GuiDimensions::COMPRESSOR_BORDER_THICKNESS;
     float border_radius = GuiDimensions::COMPRESSOR_BORDER_RADIUS;
 
-    auto outer_bounds = getLocalBounds().withSizeKeepingCentre(
-        GuiDimensions::COMPRESSOR_WIDTH, GuiDimensions::COMPRESSOR_HEIGHT
-    ).toFloat();
+    auto outer_bounds = getLocalBounds()
+                            .withSizeKeepingCentre(
+                                GuiDimensions::COMPRESSOR_WIDTH,
+                                GuiDimensions::COMPRESSOR_HEIGHT
+                            )
+                            .toFloat();
     auto inner_bounds = outer_bounds.reduced(border_thickness).toFloat();
 
     g.setColour(GuiColours::COMPRESSOR_BG_COLOUR);
@@ -78,12 +81,7 @@ void CompressorComponent::paint(juce::Graphics& g)
     knobs_component.switchColour(colour1, colour2);
     meter_component.switchColour(colour1, colour2);
 
-    paintStyling(
-        g, inner_bounds.withTrimmedBottom(
-               GuiDimensions::COMPRESSOR_GAIN_REDUCTION_HEIGHT +
-               GuiDimensions::COMPRESSOR_FOOTER_HEIGHT
-           )
-    );
+    paintStyling(g, outer_bounds);
 }
 
 void CompressorComponent::paintStyling(
@@ -96,10 +94,10 @@ void CompressorComponent::paintStyling(
     juce::Colour colour = GuiColours::COMPRESSOR_STYLING_COLOUR;
     g.setColour(colour);
 
-    const int spacing = 25;           // grid spacing
-    const float eventHorizon = 60.0f; // radius of black hole
+    const int spacing = 10;           // grid spacing
+    const float eventHorizon = 30.0f; // radius of black hole
     const float distortion = 5000.0f;
-    const float dotSize = 4.0f;
+    const float dotSize = 2.0f;
 
     // compute number of dots
     int numX = static_cast<int>(std::floor(bounds.getWidth() / spacing));

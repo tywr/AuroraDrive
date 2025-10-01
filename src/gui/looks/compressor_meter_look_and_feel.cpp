@@ -25,6 +25,9 @@ void CompressorMeterLookAndFeel::drawLinearSlider(
     const juce::Slider::SliderStyle style, juce::Slider& slider
 )
 {
+    // g.setColour(GuiColours::COMPRESSOR_BG_COLOUR);
+    // g.fillRect(x, y, width, height);
+
     const float intensity = 0.5f;
     const int numberOfDots = 20;
     const float dotRadius = 4.0f; // Adjust for desired dot size
