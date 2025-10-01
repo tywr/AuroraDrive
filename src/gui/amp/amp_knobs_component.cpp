@@ -1,12 +1,12 @@
-#include "overdrive_knobs_component.h"
+#include "amp_knobs_component.h"
 #include "../colours.h"
-#include "../dimensions.h"
+#include "../looks/amp_small_look_and_feel.h"
+#include "amp_dimensions.h"
 
-OverdriveKnobsComponent::OverdriveKnobsComponent(
-    juce::AudioProcessorValueTreeState& params
-)
+AmpKnobsComponent::AmpKnobsComponent(juce::AudioProcessorValueTreeState& params)
     : parameters(params)
 {
+    setLookAndFeel(new AmpSmallLookAndFeel());
     for (auto knob : knobs)
     {
         addAndMakeVisible(knob.slider);
@@ -32,41 +32,39 @@ OverdriveKnobsComponent::OverdriveKnobsComponent(
     }
 }
 
-OverdriveKnobsComponent::~OverdriveKnobsComponent()
+AmpKnobsComponent::~AmpKnobsComponent()
 {
 }
 
-void OverdriveKnobsComponent::paint(juce::Graphics& g)
+void AmpKnobsComponent::paint(juce::Graphics& g)
 {
 }
 
-void OverdriveKnobsComponent::resized()
+void AmpKnobsComponent::resized()
 {
 
     auto bounds = getLocalBounds();
-    auto label_bounds = bounds.removeFromTop(GuiDimensions::AMP_LABEL_HEIGHT);
+    auto label_bounds = bounds.removeFromTop(AmpDimensions::AMP_LABEL_HEIGHT);
     const int knob_box_size = bounds.getWidth() / knobs.size();
 
     for (auto knob : knobs)
     {
         knob.label->setBounds(label_bounds.removeFromLeft(knob_box_size)
                                   .withSizeKeepingCentre(
-                                      GuiDimensions::AMP_KNOB_WIDTH,
-                                      GuiDimensions::AMP_LABEL_HEIGHT
+                                      AmpDimensions::AMP_SMALL_KNOB_WIDTH,
+                                      AmpDimensions::AMP_SMALL_LABEL_HEIGHT
                                   ));
         knob.slider->setBounds(bounds.removeFromLeft(knob_box_size)
                                    .withSizeKeepingCentre(
-                                       GuiDimensions::AMP_KNOB_WIDTH,
-                                       GuiDimensions::AMP_KNOB_HEIGHT
+                                       AmpDimensions::AMP_SMALL_KNOB_WIDTH,
+                                       AmpDimensions::AMP_SMALL_KNOB_HEIGHT
                                    ));
     }
     // Don't forget to set compressor colour based on updated label value
     // switchColour();
 }
 
-void OverdriveKnobsComponent::switchColour(
-    juce::Colour colour1, juce::Colour colour2
-)
+void AmpKnobsComponent::switchColour(juce::Colour colour1, juce::Colour colour2)
 {
     juce::ignoreUnused(colour2);
     for (auto knob : knobs)
