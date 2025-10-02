@@ -4,6 +4,7 @@
 #include "amp_knobs_component.h"
 #include "designs/borealis.h"
 #include "designs/helios.h"
+#include "utils/voronoi.h"
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
@@ -25,6 +26,14 @@ AmpComponent::AmpComponent(juce::AudioProcessorValueTreeState& params)
         type.button->onClick = [this, type]() { switchType(type); };
     }
     initType();
+
+    voronoi_sites = voronoiSites;
+    for (const auto& path_string : voronoiPaths)
+    {
+        juce::Path path;
+        path.restoreFromString(path_string);
+        voronoi_cells.push_back(path);
+    }
 }
 
 AmpComponent::~AmpComponent()
@@ -59,10 +68,12 @@ void AmpComponent::switchType(AmpType new_type)
         {
             type_slider.setValue(index);
             type.button->setToggleState(true, juce::dontSendNotification);
+            type.button->setEnabled(false);
         }
         else
         {
             type.button->setToggleState(false, juce::dontSendNotification);
+            type.button->setEnabled(true);
         }
         index += 1;
     }
@@ -81,7 +92,10 @@ void AmpComponent::paintDesign(juce::Graphics& g, juce::Rectangle<float> bounds)
     }
     else if (selected_type.id == "borealis")
     {
-        paintDesignBorealis(g, bounds);
+        paintDesignBorealis(
+            g, bounds, current_colour1, current_colour2, voronoi_sites,
+            voronoi_cells
+        );
     }
 }
 

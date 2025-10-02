@@ -7,7 +7,6 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
-
 class AmpComponent : public juce::Component
 {
   public:
@@ -52,6 +51,11 @@ class AmpComponent : public juce::Component
     juce::ToggleButton borealis_button;
 
     AmpType selected_type = types[0];
+
+    // cache for paint
+    std::vector<juce::Point<float>> voronoi_sites;
+    std::vector<juce::Path> voronoi_cells;
+
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AmpComponent)
 };
