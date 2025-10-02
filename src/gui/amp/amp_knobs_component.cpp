@@ -7,6 +7,7 @@ AmpKnobsComponent::AmpKnobsComponent(juce::AudioProcessorValueTreeState& params)
     : parameters(params)
 {
     setLookAndFeel(new AmpSmallLookAndFeel());
+
     for (auto knob : knobs)
     {
         addAndMakeVisible(knob.slider);

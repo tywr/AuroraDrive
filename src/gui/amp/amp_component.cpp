@@ -2,6 +2,8 @@
 #include "../colours.h"
 #include "amp_dimensions.h"
 #include "amp_knobs_component.h"
+#include "designs/borealis.h"
+#include "designs/helios.h"
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
@@ -76,36 +78,24 @@ void AmpComponent::paintTypeButtons(juce::Graphics& g)
 
 void AmpComponent::paintDesign(juce::Graphics& g, juce::Rectangle<float> bounds)
 {
+    if (selected_type.id == "helios")
+    {
+        paintDesignHelios(g, bounds, current_colour1, current_colour2);
+    }
+    else if (selected_type.id == "borealis")
+    {
+        paintDesignBorealis(g, bounds);
+    }
 }
 
-void AmpComponent::paint(juce::Graphics& g)
+void AmpComponent::paintBorder(
+    juce::Graphics& g, juce::Rectangle<float> bounds, float border_radius
+)
 {
-    paintTypeButtons(g);
-
-    bool bypass = bypass_button.getToggleState();
-    juce::Colour colour1;
-    juce::Colour colour2;
-    if (!bypass)
-    {
-        colour1 = selected_type.colour1;
-        colour2 = selected_type.colour2;
-    }
-    else
-    {
-        colour1 = GuiColours::DEFAULT_INACTIVE_COLOUR;
-        colour2 = GuiColours::DEFAULT_INACTIVE_COLOUR;
-    }
     float border_thickness = AmpDimensions::AMP_BORDER_THICKNESS;
-    float border_radius = AmpDimensions::AMP_BORDER_RADIUS;
 
-    auto outer_bounds =
-        getLocalBounds()
-            .withTrimmedTop(AmpDimensions::AMP_TYPE_BUTTONS_HEIGHT)
-            .withSizeKeepingCentre(
-                AmpDimensions::AMP_WIDTH, AmpDimensions::AMP_HEIGHT
-            )
-            .toFloat();
-    auto inner_bounds = outer_bounds.reduced(border_thickness).toFloat();
+    auto outer_bounds = bounds.toFloat();
+    auto inner_bounds = bounds.reduced(border_thickness).toFloat();
 
     g.setColour(GuiColours::COMPRESSOR_BG_COLOUR);
     g.fillRoundedRectangle(inner_bounds, border_radius);
@@ -118,15 +108,47 @@ void AmpComponent::paint(juce::Graphics& g)
     border_path.setUsingNonZeroWinding(false);
 
     juce::ColourGradient border_gradient(
-        colour1, outer_bounds.getTopLeft(), colour2,
+        current_colour1, outer_bounds.getTopLeft(), current_colour2,
         outer_bounds.getBottomLeft(), false
     );
     g.setGradientFill(border_gradient);
     g.fillPath(border_path);
+}
 
-    paintDesign(g, outer_bounds);
+void AmpComponent::paint(juce::Graphics& g)
+{
+    paintTypeButtons(g);
 
-    knobs_component.switchColour(colour1, colour2);
+    bool bypass = bypass_button.getToggleState();
+
+    if (!bypass)
+    {
+        current_colour1 = selected_type.colour1;
+        current_colour2 = selected_type.colour2;
+    }
+    else
+    {
+        current_colour1 = GuiColours::DEFAULT_INACTIVE_COLOUR;
+        current_colour2 = GuiColours::DEFAULT_INACTIVE_COLOUR;
+    }
+
+    auto outer_bounds =
+        getLocalBounds()
+            .withTrimmedTop(AmpDimensions::AMP_TYPE_BUTTONS_HEIGHT)
+            .withSizeKeepingCentre(
+                AmpDimensions::AMP_WIDTH, AmpDimensions::AMP_HEIGHT
+            )
+            .toFloat();
+
+    paintBorder(g, outer_bounds, AmpDimensions::AMP_BORDER_RADIUS);
+
+    auto frame_bounds = outer_bounds.reduced(AmpDimensions::AMP_FRAME_PADDING)
+                            .removeFromTop(AmpDimensions::AMP_FRAME_HEIGHT);
+
+    paintBorder(g, frame_bounds, 3.0f);
+    paintDesign(g, frame_bounds.reduced(AmpDimensions::AMP_BORDER_THICKNESS));
+
+    knobs_component.switchColour(current_colour1, current_colour2);
 }
 
 void AmpComponent::resized()

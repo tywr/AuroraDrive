@@ -3,6 +3,9 @@ namespace AmpDimensions
 constexpr int AMP_WIDTH = 850;
 constexpr int AMP_HEIGHT = 400;
 
+constexpr int AMP_FRAME_PADDING = 30;
+constexpr int AMP_FRAME_HEIGHT = 260;
+
 constexpr int AMP_TYPE_BUTTONS_HEIGHT = 100;
 constexpr int AMP_TYPE_BUTTON_SIZE = 30;
 

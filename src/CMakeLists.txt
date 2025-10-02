@@ -22,7 +22,6 @@ juce_add_plugin(${PROJECT_NAME}
     
 )
 
-
 target_sources(${PROJECT_NAME}
     PRIVATE
         plugin_editor.cpp

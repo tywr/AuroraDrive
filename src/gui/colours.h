@@ -27,6 +27,10 @@ juce::Colour const white2 = juce::Colour(236, 239, 244);
 juce::Colour const aurora_green = juce::Colour(163, 190, 140);
 juce::Colour const aurora_violet = juce::Colour(180, 142, 173);
 juce::Colour const aurora_orange = juce::Colour(208, 135, 112);
+juce::Colour const aurora_red = juce::Colour(191, 97, 106);
+
+juce::Colour const helios_yellow = juce::Colour(242, 165, 61);
+juce::Colour const helios_orange = juce::Colour(138, 38, 27);
 } // namespace ColourCodes
 
 namespace GuiColours
