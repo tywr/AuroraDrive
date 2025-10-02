@@ -7,7 +7,7 @@ inline void paintSunFigureHelios(
 )
 {
     auto center = bounds.getCentre();
-    float maxRadius = juce::jmin(bounds.getWidth(), bounds.getHeight()) * 0.45f;
+    float maxRadius = bounds.getHeight() * 0.45f;
 
     float blackHoleOffsetX = 0.2f * maxRadius;
     float blackHoleOffsetY = -0.2f * maxRadius;

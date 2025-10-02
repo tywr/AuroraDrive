@@ -1,5 +1,6 @@
 #pragma once
 #include "designs/helios.h"
+#include "designs/borealis.h"
 
 struct AmpType
 {
@@ -67,7 +68,7 @@ class BorealisToggleButton : public juce::ToggleButton
             c1 = findColour(juce::ToggleButton::textColourId);
             c2 = findColour(juce::ToggleButton::textColourId);
         }
-        paintSunFigureHelios(g, bounds, c1, c2);
+        paintIconBorealis(g, bounds, c1, c2);
     };
 
   private:
