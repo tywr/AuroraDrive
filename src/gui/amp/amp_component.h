@@ -2,17 +2,11 @@
 
 #include "../colours.h"
 #include "amp_knobs_component.h"
-#include "utils/perlin.h"
+#include "amp_type.h"
+#include "designs/helios.h"
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
-struct AmpType
-{
-    juce::ToggleButton* button;
-    juce::String id;
-    juce::Colour colour1;
-    juce::Colour colour2;
-};
 
 class AmpComponent : public juce::Component
 {
@@ -43,18 +37,21 @@ class AmpComponent : public juce::Component
     juce::Colour current_colour1;
     juce::Colour current_colour2;
 
-    juce::ToggleButton helios_button;
-    juce::ToggleButton borealis_button;
-
-    std::vector<AmpType> types = {
-        {&helios_button,   "helios",   ColourCodes::helios_yellow,
-         ColourCodes::helios_orange},
-        {&borealis_button, "borealis", juce::Colours::darkblue,
-         juce::Colours::blue       }
+    AmpType helios_type = {
+        &helios_button, "helios", ColourCodes::helios_yellow,
+        ColourCodes::helios_orange
+    };
+    AmpType borealis_type = {
+        &borealis_button, "borealis", juce::Colours::darkblue,
+        juce::Colours::blue
     };
 
+    std::vector<AmpType> types = {helios_type, borealis_type};
+
+    HeliosToggleButton helios_button = HeliosToggleButton(helios_type);
+    juce::ToggleButton borealis_button;
+
     AmpType selected_type = types[0];
-    PerlinNoise perlin_noise;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AmpComponent)
 };

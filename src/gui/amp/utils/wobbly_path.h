@@ -1,7 +1,7 @@
 #pragma once
 #include "perlin.h"
 
-juce::Path createWobblyPath(
+inline juce::Path createWobblyPath(
     juce::Point<float> center, float radius, float noiseAmount,
     float noiseFrequency, float zOffset
 )

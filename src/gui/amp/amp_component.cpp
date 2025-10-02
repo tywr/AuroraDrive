@@ -51,9 +51,6 @@ void AmpComponent::initType()
 
 void AmpComponent::switchType(AmpType new_type)
 {
-    if (new_type.id == selected_type.id)
-        return;
-
     selected_type = new_type;
     double index = 0;
     for (auto type : types)

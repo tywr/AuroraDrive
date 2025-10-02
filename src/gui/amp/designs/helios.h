@@ -1,6 +1,7 @@
+#pragma once
 #include "../utils/wobbly_path.h"
 
-void paintSunFigureHelios(
+inline void paintSunFigureHelios(
     juce::Graphics& g, juce::Rectangle<float> bounds, juce::Colour c1,
     juce::Colour c2
 )
@@ -8,8 +9,8 @@ void paintSunFigureHelios(
     auto center = bounds.getCentre();
     float maxRadius = juce::jmin(bounds.getWidth(), bounds.getHeight()) * 0.45f;
 
-    float blackHoleOffsetX = 30.0f;
-    float blackHoleOffsetY = -22.0f;
+    float blackHoleOffsetX = 0.2f * maxRadius;
+    float blackHoleOffsetY = -0.2f * maxRadius;
     auto blackHoleCenter =
         center.translated(blackHoleOffsetX, blackHoleOffsetY);
 
@@ -31,7 +32,7 @@ void paintSunFigureHelios(
         maxRadius * 2, borderThickness
     );
 
-    maxRadius -= borderThickness * 3.0f;
+    maxRadius -= borderThickness * maxRadius * 0.03f;
 
     // Create a circular path for clipping
     juce::Path circlePath;
@@ -77,7 +78,7 @@ void paintSunFigureHelios(
     g.fillPath(holePath);
 }
 
-void paintDesignHelios(
+inline void paintDesignHelios(
     juce::Graphics& g, juce::Rectangle<float> bounds, juce::Colour c1,
     juce::Colour c2
 )
