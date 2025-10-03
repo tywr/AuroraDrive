@@ -3,4 +3,5 @@ project(AuroraDrive VERSION 0.0.1)
 add_subdirectory(modules/JUCE)
 add_subdirectory(src)
 add_definitions(-w)
+add_definitions(-W)
 # remove -w to see warnings
