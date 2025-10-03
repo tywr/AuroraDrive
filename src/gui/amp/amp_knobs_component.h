@@ -74,7 +74,7 @@ class AmpKnobsComponent : public juce::Component
 
     // Define knobs for easy looping
     std::vector<AmpKnob> knobs = {
-        {&drive_slider,     &drive_label,     "overdrive_drive_db",  "DRIVE"  },
+        {&drive_slider,     &drive_label,     "overdrive_drive",  "DRIVE"  },
         {&bass_slider,      &bass_label,      "amp_eq_bass",         "BASS"   },
         {&low_mid_slider,   &low_mid_label,   "amp_eq_low_mid",      "LO MIDS"},
         {&hi_mid_slider,    &hi_mid_label,    "amp_eq_hi_mid",       "HI MIDS"},

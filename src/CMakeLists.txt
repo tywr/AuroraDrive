@@ -43,8 +43,8 @@ target_sources(${PROJECT_NAME}
         gui/ir_gui.cpp
         dsp/maths/toms917.cpp
         dsp/compressor.cpp
-        dsp/overdrive.cpp
         dsp/ir.cpp
+        dsp/overdrives/helios.cpp
         )
 
 

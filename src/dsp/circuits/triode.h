@@ -6,7 +6,6 @@
 
 #pragma once
 #include <cmath>
-#include <fstream> // For writing to CSV for plotting
 #include <iostream>
 #include <vector>
 
@@ -25,9 +24,10 @@ class Triode
         float fs, float kp, float kp2, float kpg, float E, float Ci, float Co,
         float Ck, float Ri, float Ro, float Rp, float Rk, float Rg
     );
+    void initializeState();
 
     // Processes a block of samples (a vector)
-    std::vector<float> process(const std::vector<float>& input);
+    // std::vector<float> process(const std::vector<float>& input);
 
     // Processes a single sample
     float processSample(float inputSample);
@@ -53,8 +53,6 @@ class Triode
     // --- Circuit Parameters (needed for initialization) ---
     float Rp_val, Rk_val;
 
-    // --- Helper Methods ---
-    void initializeState();
     TriodeWaves triode(float ag, float ak, float ap);
 };
 
@@ -132,16 +130,16 @@ inline void Triode::initializeState()
     wCo_s = Vp0;
 }
 
-inline std::vector<float> Triode::process(const std::vector<float>& input)
-{
-    initializeState(); // Set initial DC operating point
-    std::vector<float> output(input.size());
-    for (size_t n = 0; n < input.size(); ++n)
-    {
-        output[n] = processSample(input[n]);
-    }
-    return output;
-}
+// inline std::vector<float> Triode::process(const std::vector<float>& input)
+// {
+//     initializeState(); // Set initial DC operating point
+//     std::vector<float> output(input.size());
+//     for (size_t n = 0; n < input.size(); ++n)
+//     {
+//         output[n] = processSample(input[n]);
+//     }
+//     return output;
+// }
 
 inline float Triode::processSample(float inputSample)
 {

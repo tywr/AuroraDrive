@@ -135,7 +135,7 @@ if __name__ == "__main__":
     T = 3 / freq
     N = int(T * fs)
     t = np.linspace(0, T, N)
-    y = 2.5 * np.sin(2 * np.pi * freq * t)
+    y = np.sin(2 * np.pi * freq * t)
 
     kp = 1.014e-5
     kp2 = 5.498e-8

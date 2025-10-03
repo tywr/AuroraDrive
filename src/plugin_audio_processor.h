@@ -2,7 +2,7 @@
 
 #include "dsp/compressor.h"
 #include "dsp/ir.h"
-#include "dsp/overdrive.h"
+#include "dsp/overdrives/helios.h"
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_dsp/juce_dsp.h>
 
@@ -60,7 +60,7 @@ class PluginAudioProcessor final
   private:
     juce::AudioProcessorValueTreeState parameters;
     Compressor compressor;
-    Overdrive overdrive;
+    HeliosOverdrive helios_overdrive;
     IRConvolver irConvolver;
     float previousInputGainLinear;
     float previousOutputGainLinear;

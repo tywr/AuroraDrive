@@ -13,12 +13,27 @@ print(lib2.wrightomega_double)
 lib2.wrightomega_double.argtypes = [ctypes.c_double]
 lib2.wrightomega_double.restype = ctypes.c_double
 
+def omega_small(x):
+    """
+    Approximates the Wright Omega function for small values of x using a
+    5th-order Taylor series expansion.
+    """
+    c0 = 0.5671432904097838
+    c1 = 0.3618963236098023
+    c2 = 0.0736778463779836
+    c3 = -0.0013437346889135
+    c4 = -0.0016355437889344
+    c5 = 0.0002166542734346
+
+    return c0 + c1 * x + c2 * x**2 + c3 * x**3 + c4 * x**4 + c5 * x**5
+
+
 
 def omega(x: float) -> float:
-    if x > 0.5:
+    if x > 1.5:
         return lib.omega4(x)
     else:
-        return lib.wrightomega_double(x)
+        return omega_small(x)
 
 
 class DiodeClipper:
@@ -48,7 +63,6 @@ class DiodeClipper:
         self.k4 = 1 / self.v_t
         self.k5 = np.log((self.i_s * self.r) / crb_1 * self.v_t)
         self.k6 = self.b1 - self.a1 * self.b0
-        print(self.k6)
 
         self.prev_v = 1
         self.prev_p = self.k6 * self.prev_v

@@ -3,7 +3,7 @@
 
 #include <juce_dsp/juce_dsp.h>
 
-void BorealisOverdrive::prepare(const juce::dsp::ProcessSpec& spec)
+void HeliosOverdrive::prepare(const juce::dsp::ProcessSpec& spec)
 {
     juce::dsp::ProcessSpec oversampled_spec = spec;
     oversampled_spec.sampleRate *= 2;
@@ -32,13 +32,13 @@ void BorealisOverdrive::prepare(const juce::dsp::ProcessSpec& spec)
     triode.initializeState();
 }
 
-float BorealisOverdrive::driveToGain(float d)
+float HeliosOverdrive::driveToGain(float d)
 {
     float t = d / 10.0f;
     return 2.0f + std::pow(t, 2) * 100.0f;
 }
 
-void BorealisOverdrive::process(juce::AudioBuffer<float>& buffer)
+void HeliosOverdrive::process(juce::AudioBuffer<float>& buffer)
 {
     if (bypass)
     {
@@ -63,7 +63,7 @@ void BorealisOverdrive::process(juce::AudioBuffer<float>& buffer)
     applyGain(buffer, previous_level, level);
 };
 
-void BorealisOverdrive::applyOverdrive(float& sample, float sampleRate)
+void HeliosOverdrive::applyOverdrive(float& sample, float sampleRate)
 {
     juce::ignoreUnused(sampleRate);
 

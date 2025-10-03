@@ -206,23 +206,20 @@ void Compressor::process(juce::AudioBuffer<float>& buffer)
     }
     float sampleRate = static_cast<float>(processSpec.sampleRate);
 
-    for (int channel = 0; channel < buffer.getNumChannels(); ++channel)
+    auto* channelData = buffer.getWritePointer(0);
+    for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
     {
-        auto* channelData = buffer.getWritePointer(channel);
-        for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
+        switch (type)
         {
-            switch (type)
-            {
-            case 0:
-                computeGainReductionOptometric(channelData[sample], sampleRate);
-                break;
-            case 1:
-                computeGainReductionFet(channelData[sample], sampleRate);
-                break;
-            case 2:
-                computeGainReductionVca(channelData[sample], sampleRate);
-                break;
-            }
+        case 0:
+            computeGainReductionOptometric(channelData[sample], sampleRate);
+            break;
+        case 1:
+            computeGainReductionFet(channelData[sample], sampleRate);
+            break;
+        case 2:
+            computeGainReductionVca(channelData[sample], sampleRate);
+            break;
         }
     }
     // apply level

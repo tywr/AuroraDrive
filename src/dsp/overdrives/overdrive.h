@@ -1,7 +1,16 @@
+#include <juce_dsp/juce_dsp.h>
 
-class BaseOverdrive
+class Overdrive
 {
   public:
+    virtual void prepare(const juce::dsp::ProcessSpec& spec) {};
+    virtual void applyOverdrive(float& sample, float sampleRate) {};
+    virtual float driveToGain(float drive)
+    {
+        return drive;
+    };
+    virtual void process(juce::AudioBuffer<float>& buffer) {};
+
     void applyGain(
         juce::AudioBuffer<float>& buffer, float& previous_gain, float& gain
     )
@@ -43,7 +52,9 @@ class BaseOverdrive
         type = index;
     }
 
-  private:
+  protected:
+    juce::dsp::ProcessSpec processSpec{-1, 0, 0};
+
     // gui parameters
     int type;
     bool bypass;
@@ -51,4 +62,8 @@ class BaseOverdrive
     float drive;
     float character;
     float mix;
+
+    // state parameters
+    float previous_drive_gain = 1.0f;
+    float previous_level = 1.0f;
 };

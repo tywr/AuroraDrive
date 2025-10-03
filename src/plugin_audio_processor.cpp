@@ -8,12 +8,8 @@
 PluginAudioProcessor::PluginAudioProcessor()
     : AudioProcessor(
           BusesProperties()
-#if !JucePlugin_IsMidiEffect
-#if !JucePlugin_IsSynth
-              .withInput("Input", juce::AudioChannelSet::stereo(), true)
-#endif
+              .withInput("Input", juce::AudioChannelSet::mono(), true)
               .withOutput("Output", juce::AudioChannelSet::stereo(), true)
-#endif
       ),
       parameters(
           *this, nullptr, juce::Identifier("PluginParameters"),
@@ -35,7 +31,7 @@ PluginAudioProcessor::PluginAudioProcessor()
     parameters.addParameterListener("compressor_mix", this);
     parameters.addParameterListener("overdrive_bypass", this);
     parameters.addParameterListener("overdrive_level_db", this);
-    parameters.addParameterListener("overdrive_drive_db", this);
+    parameters.addParameterListener("overdrive_drive", this);
     parameters.addParameterListener("overdrive_character", this);
     parameters.addParameterListener("overdrive_mix", this);
     parameters.addParameterListener("ir_bypass", this);
@@ -56,20 +52,12 @@ const juce::String PluginAudioProcessor::getName() const
 
 bool PluginAudioProcessor::acceptsMidi() const
 {
-#if JucePlugin_WantsMidiInput
-    return true;
-#else
     return false;
-#endif
 }
 
 bool PluginAudioProcessor::producesMidi() const
 {
-#if JucePlugin_ProducesMidiOutput
-    return true;
-#else
     return false;
-#endif
 }
 
 bool PluginAudioProcessor::isMidiEffect() const
@@ -149,23 +137,23 @@ void PluginAudioProcessor::parameterChanged(
     // Overdrive
     if (parameterID == "overdrive_bypass")
     {
-        overdrive.setBypass(newValue >= 0.5f);
+        helios_overdrive.setBypass(newValue >= 0.5f);
     }
     else if (parameterID == "overdrive_mix")
     {
-        overdrive.setMix(newValue);
+        helios_overdrive.setMix(newValue);
     }
     else if (parameterID == "overdrive_level_db")
     {
-        overdrive.setLevel(juce::Decibels::decibelsToGain(newValue));
+        helios_overdrive.setLevel(juce::Decibels::decibelsToGain(newValue));
     }
-    else if (parameterID == "overdrive_drive_db")
+    else if (parameterID == "overdrive_drive")
     {
-        overdrive.setDrive(juce::Decibels::decibelsToGain(newValue));
+        helios_overdrive.setDrive(newValue);
     }
     else if (parameterID == "overdrive_character")
     {
-        overdrive.setCharacter(newValue);
+        helios_overdrive.setCharacter(newValue);
     }
     // Impulse Response Convolver
     else if (parameterID == "ir_bypass")
@@ -234,22 +222,22 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
     );
 
     // Set all initial values from overdrive
-    overdrive.prepare(spec);
-    overdrive.setBypass(
+    helios_overdrive.prepare(spec);
+    helios_overdrive.setBypass(
         parameters.getRawParameterValue("overdrive_bypass")->load() < 0.5f
     );
-    overdrive.setMix(parameters.getRawParameterValue("overdrive_mix")->load());
-    overdrive.setLevel(
+    helios_overdrive.setMix(
+        parameters.getRawParameterValue("overdrive_mix")->load()
+    );
+    helios_overdrive.setLevel(
         juce::Decibels::decibelsToGain(
             parameters.getRawParameterValue("overdrive_level_db")->load()
         )
     );
-    overdrive.setDrive(
-        juce::Decibels::decibelsToGain(
-            parameters.getRawParameterValue("overdrive_drive_db")->load()
-        )
+    helios_overdrive.setDrive(
+        parameters.getRawParameterValue("overdrive_drive")->load()
     );
-    overdrive.setCharacter(
+    helios_overdrive.setCharacter(
         parameters.getRawParameterValue("overdrive_character")->load()
     );
 
@@ -325,9 +313,20 @@ void PluginAudioProcessor::processBlock(
     compressor.process(buffer);
     compressorGainReductionDb.setValue(compressor.getGainReductionDb());
 
-    overdrive.process(buffer);
+    helios_overdrive.process(buffer);
 
     irConvolver.process(buffer);
+
+    // Convert mono to stereo if needed
+    const float* input = buffer.getReadPointer(0);
+    float* left = buffer.getWritePointer(0);
+    float* right = buffer.getWritePointer(1);
+    for (int i = 0; i < buffer.getNumSamples(); ++i)
+    {
+        float mono_sample = input[i];
+        left[i] = mono_sample;
+        right[i] = mono_sample;
+    }
 
     applyOutputGain(buffer);
     updateOutputLevel(buffer);
