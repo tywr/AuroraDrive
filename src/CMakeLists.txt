@@ -45,6 +45,7 @@ target_sources(${PROJECT_NAME}
         dsp/compressor.cpp
         dsp/ir.cpp
         dsp/overdrives/helios.cpp
+        dsp/overdrives/borealis.cpp
         )
 
 

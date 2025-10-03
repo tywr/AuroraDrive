@@ -29,6 +29,7 @@ PluginAudioProcessor::PluginAudioProcessor()
     parameters.addParameterListener("compressor_level_db", this);
     parameters.addParameterListener("compressor_type", this);
     parameters.addParameterListener("compressor_mix", this);
+    parameters.addParameterListener("amp_type", this);
     parameters.addParameterListener("overdrive_bypass", this);
     parameters.addParameterListener("overdrive_level_db", this);
     parameters.addParameterListener("overdrive_drive", this);
@@ -134,26 +135,47 @@ void PluginAudioProcessor::parameterChanged(
     {
         compressor.setMix(static_cast<int>(newValue) / 100.0f);
     }
+    // Amp type
+    if (parameterID == "amp_type")
+    {
+        int index = static_cast<int>(newValue);
+        current_overdrive = overdrives[index];
+    }
     // Overdrive
     if (parameterID == "overdrive_bypass")
     {
-        helios_overdrive.setBypass(newValue >= 0.5f);
+        for (auto& overdrive : overdrives)
+        {
+            overdrive->setBypass(newValue >= 0.5f);
+        }
     }
     else if (parameterID == "overdrive_mix")
     {
-        helios_overdrive.setMix(newValue);
+        for (auto& overdrive : overdrives)
+        {
+            overdrive->setMix(newValue);
+        }
     }
     else if (parameterID == "overdrive_level_db")
     {
-        helios_overdrive.setLevel(juce::Decibels::decibelsToGain(newValue));
+        for (auto& overdrive : overdrives)
+        {
+            overdrive->setLevel(juce::Decibels::decibelsToGain(newValue));
+        }
     }
     else if (parameterID == "overdrive_drive")
     {
-        helios_overdrive.setDrive(newValue);
+        for (auto& overdrive : overdrives)
+        {
+            overdrive->setDrive(newValue);
+        }
     }
     else if (parameterID == "overdrive_character")
     {
-        helios_overdrive.setCharacter(newValue);
+        for (auto& overdrive : overdrives)
+        {
+            overdrive->setCharacter(newValue);
+        }
     }
     // Impulse Response Convolver
     else if (parameterID == "ir_bypass")
@@ -221,25 +243,32 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
         )
     );
 
+    int amp_index =
+        static_cast<int>(parameters.getRawParameterValue("amp_type")->load());
+    current_overdrive = overdrives[amp_index];
+
     // Set all initial values from overdrive
-    helios_overdrive.prepare(spec);
-    helios_overdrive.setBypass(
-        parameters.getRawParameterValue("overdrive_bypass")->load() < 0.5f
-    );
-    helios_overdrive.setMix(
-        parameters.getRawParameterValue("overdrive_mix")->load()
-    );
-    helios_overdrive.setLevel(
-        juce::Decibels::decibelsToGain(
-            parameters.getRawParameterValue("overdrive_level_db")->load()
-        )
-    );
-    helios_overdrive.setDrive(
-        parameters.getRawParameterValue("overdrive_drive")->load()
-    );
-    helios_overdrive.setCharacter(
-        parameters.getRawParameterValue("overdrive_character")->load()
-    );
+    for (auto& overdrive : overdrives)
+    {
+        overdrive->prepare(spec);
+        overdrive->setBypass(
+            parameters.getRawParameterValue("overdrive_bypass")->load() < 0.5f
+        );
+        overdrive->setMix(
+            parameters.getRawParameterValue("overdrive_mix")->load()
+        );
+        overdrive->setLevel(
+            juce::Decibels::decibelsToGain(
+                parameters.getRawParameterValue("overdrive_level_db")->load()
+            )
+        );
+        overdrive->setDrive(
+            parameters.getRawParameterValue("overdrive_drive")->load()
+        );
+        overdrive->setCharacter(
+            parameters.getRawParameterValue("overdrive_character")->load()
+        );
+    }
 
     // Set all initial values for IR convolution
     irConvolver.prepare(spec);
@@ -313,7 +342,7 @@ void PluginAudioProcessor::processBlock(
     compressor.process(buffer);
     compressorGainReductionDb.setValue(compressor.getGainReductionDb());
 
-    helios_overdrive.process(buffer);
+    current_overdrive->process(buffer);
 
     irConvolver.process(buffer);
 

@@ -1,9 +1,9 @@
-#include "helios.h"
+#include "borealis.h"
 #include "../circuits/triode.h"
 
 #include <juce_dsp/juce_dsp.h>
 
-void HeliosOverdrive::prepare(const juce::dsp::ProcessSpec& spec)
+void BorealisOverdrive::prepare(const juce::dsp::ProcessSpec& spec)
 {
     juce::dsp::ProcessSpec oversampled_spec = spec;
     oversampled_spec.sampleRate *= 2;
@@ -16,29 +16,25 @@ void HeliosOverdrive::prepare(const juce::dsp::ProcessSpec& spec)
     low_pass_filter.prepare(oversampled_spec);
 
     auto hpf_coefficients = juce::dsp::IIR::Coefficients<float>::makeHighPass(
-        oversampled_spec.sampleRate, helios_params.hpf_cutoff
+        oversampled_spec.sampleRate, borealis_params.hpf_cutoff
     );
     *high_pass_filter.coefficients = *hpf_coefficients;
 
     auto lpf_coefficients = juce::dsp::IIR::Coefficients<float>::makeHighPass(
-        oversampled_spec.sampleRate, helios_params.hpf_cutoff
+        oversampled_spec.sampleRate, borealis_params.hpf_cutoff
     );
     *low_pass_filter.coefficients = *lpf_coefficients;
 
-    triode = Triode(
-        oversampled_spec.sampleRate, kp, kp2, kpg, E, Ci, Co, Ck, Ri, Ro, Rp,
-        Rk, Rg
-    );
-    triode.initializeState();
+    diode = Diode(oversampled_spec.sampleRate, c, r, i_s, v_t);
 }
 
-float HeliosOverdrive::driveToGain(float d)
+float BorealisOverdrive::driveToGain(float d)
 {
     float t = d / 10.0f;
     return 2.0f + std::pow(t, 2) * 100.0f;
 }
 
-void HeliosOverdrive::process(juce::AudioBuffer<float>& buffer)
+void BorealisOverdrive::process(juce::AudioBuffer<float>& buffer)
 {
     if (bypass)
     {
@@ -63,7 +59,7 @@ void HeliosOverdrive::process(juce::AudioBuffer<float>& buffer)
     applyGain(buffer, previous_level, level);
 };
 
-void HeliosOverdrive::applyOverdrive(float& sample, float sampleRate)
+void BorealisOverdrive::applyOverdrive(float& sample, float sampleRate)
 {
     juce::ignoreUnused(sampleRate);
 
@@ -71,7 +67,7 @@ void HeliosOverdrive::applyOverdrive(float& sample, float sampleRate)
     high_pass_filter.processSample(sample);
 
     // Apply triod overdrive
-    float current = padding * triode.processSample(sample);
+    float current = diode.processSample(sample);
 
     // Apply mix and low pass filter
     sample = current * mix + sample * (1 - mix);

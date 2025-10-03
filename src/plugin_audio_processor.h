@@ -2,7 +2,9 @@
 
 #include "dsp/compressor.h"
 #include "dsp/ir.h"
+#include "dsp/overdrives/borealis.h"
 #include "dsp/overdrives/helios.h"
+#include "dsp/overdrives/overdrive.h"
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_dsp/juce_dsp.h>
 
@@ -60,11 +62,19 @@ class PluginAudioProcessor final
   private:
     juce::AudioProcessorValueTreeState parameters;
     Compressor compressor;
+
+    Overdrive* current_overdrive = nullptr;
     HeliosOverdrive helios_overdrive;
+    BorealisOverdrive borealis_overdrive;
+
     IRConvolver irConvolver;
     float previousInputGainLinear;
     float previousOutputGainLinear;
     std::atomic<float>* inputGainParameter = nullptr;
     std::atomic<float>* outputGainParameter = nullptr;
+
+    std::vector<Overdrive*> overdrives = {
+        &helios_overdrive, &borealis_overdrive
+    };
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginAudioProcessor)
 };

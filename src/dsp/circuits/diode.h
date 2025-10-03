@@ -1,31 +1,11 @@
+#pragma once
 #include "../maths/omega.h"
 #include <cmath>
-
-inline float omega(float x)
-{
-    if (x > 1.5f)
-    {
-        return omega4(x);
-    }
-    else
-    {
-        float c0 = 0.5671432904097838;
-        float c1 = 0.3618963236098023;
-        float c2 = 0.0736778463779836;
-        float c3 = -0.0013437346889135;
-        float c4 = -0.0016355437889344;
-        float c5 = 0.0002166542734346;
-
-        return c0 + c1 * x + c2 * std::pow(x, 2.0f) + c3 * std::pow(x, 3.0f) +
-               c4 * std::pow(x, 4.0f) + c5 * std::pow(x, 5.0f);
-    }
-}
 
 class Diode
 {
   public:
     Diode(float fs, float c, float r, float i_s, float v_t);
-    void initializeState();
     float processSample(float);
 
   private:
@@ -34,6 +14,7 @@ class Diode
     float prev_p;
 
     // Main parameters
+    float fs;
     float c;
     float r;
     float i_s;
@@ -52,6 +33,27 @@ class Diode
     float k5;
     float k6;
 
+};
+
+inline float
+omega(float x)
+{
+    if (x > 1.5f)
+    {
+        return omega4(x);
+    }
+    else
+    {
+        float c0 = 0.5671432904097838f;
+        float c1 = 0.3618963236098023f;
+        float c2 = 0.0736778463779836f;
+        float c3 = -0.0013437346889135f;
+        float c4 = -0.0016355437889344f;
+        float c5 = 0.0002166542734346f;
+
+        return c0 + c1 * x + c2 * std::pow(x, 2.0f) + c3 * std::pow(x, 3.0f) +
+               c4 * std::pow(x, 4.0f) + c5 * std::pow(x, 5.0f);
+    }
 }
 
 inline Diode::Diode(float t_fs, float t_c, float t_r, float t_i_s, float t_v_t)
@@ -78,10 +80,10 @@ inline Diode::Diode(float t_fs, float t_c, float t_r, float t_i_s, float t_v_t)
     prev_p = k6 * prev_v;
 }
 
-inline void Diode::processSample(float vin)
+inline float Diode::processSample(float vin)
 {
     float q = k1 * vin - prev_p;
-    float r = np.sign(q);
+    float r = (q > 0.0f) ? 1.0f : ((q < 0.0f) ? -1.0f : 0.0f); // sign function
     float w = k2 * q + k3 * r;
     float vout = w - v_t * r * omega(k4 * r * w + k5);
     float p = k6 * vout - a1 * prev_p;

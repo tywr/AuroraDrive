@@ -1,3 +1,4 @@
+#pragma once
 #include <juce_dsp/juce_dsp.h>
 
 class Overdrive
@@ -46,10 +47,6 @@ class Overdrive
     void setCharacter(float newCharacter)
     {
         character = newCharacter;
-    }
-    void setTypeFromIndex(int index)
-    {
-        type = index;
     }
 
   protected:

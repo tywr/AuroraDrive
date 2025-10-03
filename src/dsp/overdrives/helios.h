@@ -5,7 +5,7 @@
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_dsp/juce_dsp.h>
 
-class BorealisOverdrive : public Overdrive
+class HeliosOverdrive : public Overdrive
 {
   public:
     void prepare(const juce::dsp::ProcessSpec& spec) override;
@@ -22,7 +22,7 @@ class BorealisOverdrive : public Overdrive
     {
         float hpf_cutoff = 120.0f;
         float lpf_cutoff = 8000.0f;
-    } borealis_params;
+    } helios_params;
 
     // internal parameters
     float padding = 1 / 50.0f;
