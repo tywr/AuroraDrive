@@ -26,7 +26,6 @@ void HeliosOverdrive::prepare(const juce::dsp::ProcessSpec& spec)
         );
     *post_lpf.coefficients = *post_lpf_coefficients;
 
-
     triode = Triode(
         oversampled_spec.sampleRate, kp, kp2, kpg, E, Ci, Co, Ck, Ri, Ro, Rp,
         Rk, Rg
@@ -37,7 +36,7 @@ void HeliosOverdrive::prepare(const juce::dsp::ProcessSpec& spec)
 float HeliosOverdrive::driveToGain(float d)
 {
     float t = d / 10.0f;
-    return 2.0f + std::pow(t, 2) * 50.0f;
+    return 1.0f + std::pow(t, 2) * 20.0f;
 }
 
 float HeliosOverdrive::charToFreq(float c)
@@ -92,7 +91,7 @@ void HeliosOverdrive::applyOverdrive(float& sample, float sampleRate)
 
     float filtered = tone_lpf.processSample(sample);
     float distorded = triode.processSample(filtered);
-    float out = padding * distorded;
+    float out = padding * post_lpf.processSample(distorded);
 
     // Apply mix and low pass filter
     sample = out * mix + sample * (1 - mix);

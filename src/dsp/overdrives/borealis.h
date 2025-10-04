@@ -19,11 +19,17 @@ class BorealisOverdrive : public Overdrive
     float attack_shelf_freq = 2800.0f;
     float attack_shelf_gain = juce::Decibels::decibelsToGain(12.0f);
 
+    juce::dsp::IIR::Filter<float> dc_hpf;
+    float dc_hpf_cutoff = 10.0f;
+
     juce::dsp::IIR::Filter<float> pre_hpf;
     float pre_hpf_cutoff = 72.0f;
 
     juce::dsp::IIR::Filter<float> post_lpf;
     float post_lpf_cutoff = 1600.0f;
+
+    juce::dsp::IIR::Filter<float> post_lpf2;
+    float post_lpf2_cutoff = 10000.0f;
 
     float padding = 5.0f;
 

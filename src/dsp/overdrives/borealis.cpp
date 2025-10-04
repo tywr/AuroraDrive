@@ -14,6 +14,13 @@ void BorealisOverdrive::prepare(const juce::dsp::ProcessSpec& spec)
     DBG("Preparing Borealis Overdrive with sample rate "
         << processSpec.sampleRate);
 
+    dc_hpf.prepare(oversampled_spec);
+    auto dc_hpf_coefficients =
+        juce::dsp::IIR::Coefficients<float>::makeHighPass(
+            oversampled_spec.sampleRate, dc_hpf_cutoff
+        );
+    *dc_hpf.coefficients = *dc_hpf_coefficients;
+
     attack_shelf.prepare(oversampled_spec);
     auto attack_shelf_coefficients =
         juce::dsp::IIR::Coefficients<float>::makeHighShelf(
@@ -36,13 +43,20 @@ void BorealisOverdrive::prepare(const juce::dsp::ProcessSpec& spec)
         );
     *post_lpf.coefficients = *post_lpf_coefficients;
 
+    post_lpf2.prepare(oversampled_spec);
+    auto post_lpf2_coefficients =
+        juce::dsp::IIR::Coefficients<float>::makeLowPass(
+            oversampled_spec.sampleRate, post_lpf2_cutoff
+        );
+    *post_lpf2.coefficients = *post_lpf2_coefficients;
+
     diode = GermaniumDiode(oversampled_spec.sampleRate);
 }
 
 float BorealisOverdrive::driveToGain(float d)
 {
     float t = d / 10.0f;
-    return 1.0f + std::pow(t, 2) * 10.0f;
+    return 1.0f + std::pow(t, 2) * 20.0f;
 }
 
 void BorealisOverdrive::process(juce::AudioBuffer<float>& buffer)
@@ -76,11 +90,11 @@ void BorealisOverdrive::applyOverdrive(float& sample, float sampleRate)
     juce::ignoreUnused(sampleRate);
 
     float coef = character / 10.0f;
-    float hpfed = pre_hpf.processSample(sample);
+    float hpfed = pre_hpf.processSample(dc_hpf.processSample(sample));
     float shaped =
         attack_shelf.processSample(hpfed) * coef + hpfed * (1 - coef);
     float distorded = diode.processSample(shaped);
-    float out = padding * post_lpf.processSample(distorded);
+    float out = post_lpf2.processSample(post_lpf.processSample(distorded));
 
     sample = out * mix + sample * (1 - mix);
 }

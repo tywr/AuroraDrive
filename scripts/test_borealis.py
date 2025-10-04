@@ -63,14 +63,15 @@ if __name__ == "__main__":
     frequency = 440
     duration = 3 / frequency
     t = np.linspace(0, duration, int(sample_rate * duration), endpoint=False)
-    input = np.sin(2 * np.pi * frequency * t)
+    input = 0.01 * np.sin(2 * np.pi * frequency * t)
 
     diode = PyDiode(sample_rate, 1e-8, 2200, 200e-9, 0.02585)
-    diode_clipper = DiodeClipper(sample_rate)
-    # output = [diode.process_sample(sample) for sample in input]
-    output_2 = [diode_clipper.process_sample(sample) for sample in input]
+    # diode_clipper = DiodeClipper(sample_rate)
+    output = [diode.process_sample(sample) for sample in input]
+    # output_2 = [diode_clipper.process_sample(sample) for sample in input]
 
-    plt.plot(t, input, label="Input Signal")
-    # plt.plot(t, output, label="Output Signal")
-    plt.plot(t, output_2, label="Output Signal (Python)")
+    plt.plot(t, input, label="Input Signal", color="blue")
+    plt.plot(t, output, label="Output Signal", color="orange")
+    plt.legend()
+    # plt.plot(t, output_2, label="Output Signal (Python)")
     plt.show()

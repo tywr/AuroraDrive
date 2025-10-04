@@ -77,6 +77,10 @@ class DiodeClipper:
 
     def process_sample(self, s: float):
         vin = s  # Input sample value
+        if abs(vin) < 0.1:
+            p = self.k6 * vin - self.a1 * self.prev_p
+            self.prev_p = p
+            return vin
         if self.is_asymetric and vin < 0 or not self.is_asymetric:
             q = self.k1 * vin - self.prev_p
             r = np.sign(q)
@@ -92,24 +96,27 @@ class DiodeClipper:
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
-    sample_rate = 96000
-    for frequency in [60 * 2**i for i in range(8)]:
-        duration = 5 / frequency
-        n_samples = int(duration * sample_rate)
+    sample_rate = 88200
+    frequency = 440
+    duration = 5 / frequency
+    n_samples = int(duration * sample_rate)
 
-        t = np.linspace(0, duration, n_samples, endpoint=False)
-        y = np.sin(2 * np.pi * frequency * t)
+    t = np.linspace(0, duration, n_samples, endpoint=False)
+    y = 0.3 * np.sin(2 * np.pi * frequency * t)
 
-        diod_clipper = DiodeClipper(sample_rate)
-        y_clipped = diod_clipper.process(y)
+    diod_clipper = DiodeClipper(sample_rate)
+    y_clipped = diod_clipper.process(y)
 
-        plt.plot(
-            y,
-            y_clipped,
-            label=f"{frequency} Hz",
-            alpha=0.5,
-            color=plt.cm.viridis(frequency / 4000),
-        )
+    plt.plot(
+        t,
+        y,
+        label="input",
+    )
+    plt.plot(
+        t,
+        y_clipped,
+        label="output",
+    )
     plt.legend()
     plt.show()
 

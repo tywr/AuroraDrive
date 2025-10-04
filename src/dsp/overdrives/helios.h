@@ -22,7 +22,7 @@ class HeliosOverdrive : public Overdrive
     float post_lpf_cutoff = 6000.0f;
 
     // internal parameters
-    float padding = 1 / 50.0f;
+    float padding = 1 / 60.0f;
 
     // triode parameters
     float kp = 1.014e-5;

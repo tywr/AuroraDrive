@@ -1,5 +1,6 @@
 #pragma once
 #include "../maths/omega.h"
+#include "../maths/toms917.h"
 #include <cmath>
 
 class GermaniumDiode
@@ -38,7 +39,7 @@ class GermaniumDiode
 
 inline float omega(float x)
 {
-    if ((x > 1.5f) || (x < -1.5f))
+    if (std::abs(x) > 1.5f)
     {
         return omega4(x);
     }
@@ -53,6 +54,7 @@ inline float omega(float x)
 
         return c0 + c1 * x + c2 * std::pow(x, 2.0f) + c3 * std::pow(x, 3.0f) +
                c4 * std::pow(x, 4.0f) + c5 * std::pow(x, 5.0f);
+        // return static_cast<float>(wrightomega_double(x));
     }
 }
 
@@ -78,6 +80,13 @@ inline GermaniumDiode::GermaniumDiode(float t_fs)
 
 inline float GermaniumDiode::processSample(float vin)
 {
+    if (std::abs(vin) < 0.1f)
+    {
+        float p = k6 * vin - a1 * prev_p;
+        prev_p = p;
+        prev_v = vin;
+        return vin;
+    }
     float q = k1 * vin - prev_p;
     float r = (q > 0.0f) ? 1.0f : ((q < 0.0f) ? -1.0f : 0.0f); // sign function
     float w = k2 * q + k3 * r;
