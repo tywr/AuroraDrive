@@ -35,6 +35,10 @@ PluginAudioProcessor::PluginAudioProcessor()
     parameters.addParameterListener("overdrive_drive", this);
     parameters.addParameterListener("overdrive_character", this);
     parameters.addParameterListener("overdrive_mix", this);
+    parameters.addParameterListener("amp_eq_bass", this);
+    parameters.addParameterListener("amp_eq_low_mid", this);
+    parameters.addParameterListener("amp_eq_hi_mid", this);
+    parameters.addParameterListener("amp_eq_treble", this);
     parameters.addParameterListener("ir_bypass", this);
     parameters.addParameterListener("ir_mix", this);
     parameters.addParameterListener("ir_filepath", this);
@@ -144,6 +148,7 @@ void PluginAudioProcessor::parameterChanged(
     // Overdrive
     if (parameterID == "amp_bypass")
     {
+        amp_eq.setBypass(newValue >= 0.5f);
         for (auto& overdrive : overdrives)
         {
             overdrive->setBypass(newValue >= 0.5f);
@@ -176,6 +181,23 @@ void PluginAudioProcessor::parameterChanged(
         {
             overdrive->setCharacter(newValue);
         }
+    }
+    // Amp EQ
+    else if (parameterID == "amp_eq_bass")
+    {
+        amp_eq.setBassGain(juce::Decibels::decibelsToGain(newValue));
+    }
+    else if (parameterID == "amp_eq_low_mid")
+    {
+        amp_eq.setLowMidGain(juce::Decibels::decibelsToGain(newValue));
+    }
+    else if (parameterID == "amp_eq_hi_mid")
+    {
+        amp_eq.setHighMidGain(juce::Decibels::decibelsToGain(newValue));
+    }
+    else if (parameterID == "amp_eq_treble")
+    {
+        amp_eq.setTrebleGain(juce::Decibels::decibelsToGain(newValue));
     }
     // Impulse Response Convolver
     else if (parameterID == "ir_bypass")
@@ -270,6 +292,31 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
         );
     }
 
+    amp_eq.prepare(spec);
+    amp_eq.setBypass(
+        parameters.getRawParameterValue("amp_bypass")->load() >= 0.5f
+    );
+    amp_eq.setBassGain(
+        juce::Decibels::decibelsToGain(
+            parameters.getRawParameterValue("amp_eq_bass")->load()
+        )
+    );
+    amp_eq.setLowMidGain(
+        juce::Decibels::decibelsToGain(
+            parameters.getRawParameterValue("amp_eq_low_mid")->load()
+        )
+    );
+    amp_eq.setHighMidGain(
+        juce::Decibels::decibelsToGain(
+            parameters.getRawParameterValue("amp_eq_hi_mid")->load()
+        )
+    );
+    amp_eq.setTrebleGain(
+        juce::Decibels::decibelsToGain(
+            parameters.getRawParameterValue("amp_eq_treble")->load()
+        )
+    );
+
     // Set all initial values for IR convolution
     irConvolver.prepare(spec);
     irConvolver.setBypass(
@@ -332,6 +379,8 @@ void PluginAudioProcessor::processBlock(
     compressorGainReductionDb.setValue(compressor.getGainReductionDb());
 
     current_overdrive->process(buffer);
+
+    amp_eq.process(buffer);
 
     irConvolver.process(buffer);
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "dsp/amp_eq.h"
 #include "dsp/compressor.h"
 #include "dsp/ir.h"
 #include "dsp/overdrives/borealis.h"
@@ -66,6 +67,8 @@ class PluginAudioProcessor final
     Overdrive* current_overdrive = nullptr;
     HeliosOverdrive helios_overdrive;
     BorealisOverdrive borealis_overdrive;
+
+    AmpEQ amp_eq;
 
     IRConvolver irConvolver;
     float previousInputGainLinear;
