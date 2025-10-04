@@ -11,6 +11,10 @@ class Overdrive
         return drive;
     };
     virtual void process(juce::AudioBuffer<float>& buffer) {};
+    void virtual setCharacter(float newCharacter)
+    {
+        character = newCharacter;
+    }
 
     void applyGain(
         juce::AudioBuffer<float>& buffer, float& previous_gain, float& gain
@@ -43,10 +47,6 @@ class Overdrive
     void setDrive(float newDrive)
     {
         drive = newDrive;
-    }
-    void setCharacter(float newCharacter)
-    {
-        character = newCharacter;
     }
 
   protected:

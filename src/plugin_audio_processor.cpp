@@ -292,10 +292,6 @@ bool PluginAudioProcessor::isBusesLayoutSupported(
     const BusesLayout& layouts
 ) const
 {
-#if JucePlugin_IsMidiEffect
-    juce::ignoreUnused(layouts);
-    return true;
-#else
     // This is the place where you check if the layout is supported.
     // In this template code we only support mono or stereo.
     // Some plugin hosts, such as certain GarageBand versions, will only
@@ -304,14 +300,7 @@ bool PluginAudioProcessor::isBusesLayoutSupported(
         layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
         return false;
 
-    // This checks if the input layout matches the output layout
-#if !JucePlugin_IsSynth
-    if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
-        return false;
-#endif
-
     return true;
-#endif
 }
 
 //==============================================================================
@@ -346,6 +335,9 @@ void PluginAudioProcessor::processBlock(
 
     irConvolver.process(buffer);
 
+    applyOutputGain(buffer);
+    updateOutputLevel(buffer);
+
     // Convert mono to stereo if needed
     const float* input = buffer.getReadPointer(0);
     float* left = buffer.getWritePointer(0);
@@ -356,9 +348,6 @@ void PluginAudioProcessor::processBlock(
         left[i] = mono_sample;
         right[i] = mono_sample;
     }
-
-    applyOutputGain(buffer);
-    updateOutputLevel(buffer);
 }
 
 //==============================================================================

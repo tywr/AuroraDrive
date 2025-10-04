@@ -11,18 +11,15 @@ class HeliosOverdrive : public Overdrive
     void prepare(const juce::dsp::ProcessSpec& spec) override;
     void process(juce::AudioBuffer<float>& buffer) override;
     float driveToGain(float) override;
+    float charToFreq(float);
     void applyOverdrive(float& sample, float sampleRate) override;
 
   private:
-    juce::dsp::IIR::Filter<float> high_pass_filter;
-    juce::dsp::IIR::Filter<float> low_pass_filter;
+    juce::dsp::IIR::Filter<float> tone_lpf;
+    float tone_lpf_cutoff = 1.0f;
 
-    // hardcoded parameters for each overdrive type
-    struct
-    {
-        float hpf_cutoff = 120.0f;
-        float lpf_cutoff = 8000.0f;
-    } helios_params;
+    juce::dsp::IIR::Filter<float> post_lpf;
+    float post_lpf_cutoff = 6000.0f;
 
     // internal parameters
     float padding = 1 / 50.0f;

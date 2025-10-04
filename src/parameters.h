@@ -56,7 +56,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout()
         ),
         std::make_unique<juce::AudioParameterFloat>(
             "overdrive_character", "Overdrive Character",
-            juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.5f
+            juce::NormalisableRange<float>(0.0f, 10.0f, 0.01f), 5.0f
         ),
         std::make_unique<juce::AudioParameterFloat>(
             "overdrive_mix", "Overdrive Mix",
