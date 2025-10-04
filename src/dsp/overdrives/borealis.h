@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../circuits/diode.h"
+#include "../circuits/germanium_diode.h"
 #include "overdrive.h"
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_dsp/juce_dsp.h>
@@ -27,12 +27,8 @@ class BorealisOverdrive : public Overdrive
     // internal parameters
     float padding = 1 / 50.0f;
 
-    float c = 1e-8;
-    float r = 2200;
-    float i_s = 200e-9;
-    float v_t = 0.02585;
 
-    Diode diode = Diode(44100.0f, i_s, r, c, v_t);
+    GermaniumDiode diode = GermaniumDiode(44100.0f);
 
     juce::dsp::Oversampling<float> oversampler2x{
         2, 2,

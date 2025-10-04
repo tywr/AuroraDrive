@@ -2,23 +2,25 @@
 #include "../maths/omega.h"
 #include <cmath>
 
-class Diode
+class GermaniumDiode
 {
   public:
-    Diode(float fs, float c, float r, float i_s, float v_t);
+    GermaniumDiode(float fs);
     float processSample(float);
 
   private:
+    // Fixed variables
+    float c = 1e-8;
+    float r = 2200;
+    float i_s = 200e-9;
+    float v_t = 0.02585;
+
     // State variables
     float prev_v;
     float prev_p;
 
     // Main parameters
     float fs;
-    float c;
-    float r;
-    float i_s;
-    float v_t;
 
     // Fixed variables for computation
     float b0;
@@ -32,13 +34,11 @@ class Diode
     float k4;
     float k5;
     float k6;
-
 };
 
-inline float
-omega(float x)
+inline float omega(float x)
 {
-    if (x > 1.5f)
+    if ((x > 1.5f) || (x < -1.5f))
     {
         return omega4(x);
     }
@@ -56,13 +56,9 @@ omega(float x)
     }
 }
 
-inline Diode::Diode(float t_fs, float t_c, float t_r, float t_i_s, float t_v_t)
+inline GermaniumDiode::GermaniumDiode(float t_fs)
 {
     fs = t_fs;
-    c = t_c;
-    r = t_r;
-    i_s = t_i_s;
-    v_t = t_v_t;
 
     b0 = 2.0f / fs;
     b1 = -2.0f / fs;
@@ -80,7 +76,7 @@ inline Diode::Diode(float t_fs, float t_c, float t_r, float t_i_s, float t_v_t)
     prev_p = k6 * prev_v;
 }
 
-inline float Diode::processSample(float vin)
+inline float GermaniumDiode::processSample(float vin)
 {
     float q = k1 * vin - prev_p;
     float r = (q > 0.0f) ? 1.0f : ((q < 0.0f) ? -1.0f : 0.0f); // sign function

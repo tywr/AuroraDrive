@@ -3,15 +3,11 @@ import ctypes
 
 import numpy as np
 
-lib = ctypes.CDLL("scripts/omega.so")
-lib2 = ctypes.CDLL("scripts/toms917.so")
+lib = ctypes.CDLL("scripts/bin/omega.so")
 
-lib.omega4.argtypes = [ctypes.c_float]
-lib.omega4.restype = ctypes.c_float
+lib.omega4_py.argtypes = [ctypes.c_float]
+lib.omega4_py.restype = ctypes.c_float
 
-print(lib2.wrightomega_double)
-lib2.wrightomega_double.argtypes = [ctypes.c_double]
-lib2.wrightomega_double.restype = ctypes.c_double
 
 def omega_small(x):
     """
@@ -28,11 +24,13 @@ def omega_small(x):
     return c0 + c1 * x + c2 * x**2 + c3 * x**3 + c4 * x**4 + c5 * x**5
 
 
-
 def omega(x: float) -> float:
-    if x > 1.5:
-        return lib.omega4(x)
+    print(x)
+    if x > 1.5 or x < -1.5:
+        return lib.omega4_py(x)
     else:
+        print("Using small x approximation for omega")
+        # return lib.omega4_py(x)
         return omega_small(x)
 
 
@@ -83,7 +81,7 @@ class DiodeClipper:
             q = self.k1 * vin - self.prev_p
             r = np.sign(q)
             w = self.k2 * q + self.k3 * r
-            vout = w - self.v_t * r * lib.omega4(self.k4 * r * w + self.k5)
+            vout = w - self.v_t * r * omega(self.k4 * r * w + self.k5)
             p = self.k6 * vout - self.a1 * self.prev_p
             self.prev_p = p
             return vout

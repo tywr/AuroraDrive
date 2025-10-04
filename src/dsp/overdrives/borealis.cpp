@@ -1,5 +1,4 @@
 #include "borealis.h"
-#include "../circuits/triode.h"
 
 #include <juce_dsp/juce_dsp.h>
 
@@ -25,13 +24,13 @@ void BorealisOverdrive::prepare(const juce::dsp::ProcessSpec& spec)
     );
     *low_pass_filter.coefficients = *lpf_coefficients;
 
-    diode = Diode(oversampled_spec.sampleRate, c, r, i_s, v_t);
+    diode = GermaniumDiode(oversampled_spec.sampleRate);
 }
 
 float BorealisOverdrive::driveToGain(float d)
 {
     float t = d / 10.0f;
-    return 2.0f + std::pow(t, 2) * 100.0f;
+    return 1.0f + std::pow(t, 2) * 50.0f;
 }
 
 void BorealisOverdrive::process(juce::AudioBuffer<float>& buffer)
