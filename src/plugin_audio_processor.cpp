@@ -30,7 +30,7 @@ PluginAudioProcessor::PluginAudioProcessor()
     parameters.addParameterListener("compressor_type", this);
     parameters.addParameterListener("compressor_mix", this);
     parameters.addParameterListener("amp_type", this);
-    parameters.addParameterListener("overdrive_bypass", this);
+    parameters.addParameterListener("amp_bypass", this);
     parameters.addParameterListener("overdrive_level_db", this);
     parameters.addParameterListener("overdrive_drive", this);
     parameters.addParameterListener("overdrive_character", this);
@@ -142,7 +142,7 @@ void PluginAudioProcessor::parameterChanged(
         current_overdrive = overdrives[index];
     }
     // Overdrive
-    if (parameterID == "overdrive_bypass")
+    if (parameterID == "amp_bypass")
     {
         for (auto& overdrive : overdrives)
         {
@@ -180,7 +180,7 @@ void PluginAudioProcessor::parameterChanged(
     // Impulse Response Convolver
     else if (parameterID == "ir_bypass")
     {
-        irConvolver.setBypass((newValue < 0.5f) ? true : false);
+        irConvolver.setBypass((newValue >= 0.5f) ? true : false);
     }
     else if (parameterID == "ir_mix")
     {
@@ -252,7 +252,7 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
     {
         overdrive->prepare(spec);
         overdrive->setBypass(
-            parameters.getRawParameterValue("overdrive_bypass")->load() < 0.5f
+            parameters.getRawParameterValue("amp_bypass")->load() >= 0.5f
         );
         overdrive->setMix(
             parameters.getRawParameterValue("overdrive_mix")->load()
@@ -273,7 +273,7 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
     // Set all initial values for IR convolution
     irConvolver.prepare(spec);
     irConvolver.setBypass(
-        parameters.getRawParameterValue("ir_bypass")->load() < 0.5f
+        parameters.getRawParameterValue("ir_bypass")->load() >= 0.5f
     );
     irConvolver.setMix(parameters.getRawParameterValue("ir_mix")->load());
     irConvolver.setFilepath(

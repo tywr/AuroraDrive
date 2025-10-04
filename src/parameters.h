@@ -44,7 +44,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout()
             0
         ),
         std::make_unique<juce::AudioParameterBool>(
-            "overdrive_bypass", "Overdrive Bypass", false
+            "amp_bypass", "Amp Bypass", false
         ),
         std::make_unique<juce::AudioParameterFloat>(
             "overdrive_level_db", "Overdrive Level dB",

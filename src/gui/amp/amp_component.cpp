@@ -14,6 +14,12 @@ AmpComponent::AmpComponent(juce::AudioProcessorValueTreeState& params)
     addAndMakeVisible(knobs_component);
     addAndMakeVisible(bypass_button);
 
+    bypass_attachment =
+        std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
+            parameters, "amp_bypass", bypass_button
+        );
+    bypass_button.onClick = [this]() { repaint(); };
+
     type_slider_attachment =
         std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
             parameters, "amp_type", type_slider
@@ -130,6 +136,12 @@ void AmpComponent::paint(juce::Graphics& g)
         current_colour1 = GuiColours::DEFAULT_INACTIVE_COLOUR;
         current_colour2 = GuiColours::DEFAULT_INACTIVE_COLOUR;
     }
+    bypass_button.setColour(
+        juce::ToggleButton::tickColourId, GuiColours::DEFAULT_INACTIVE_COLOUR
+    );
+    bypass_button.setColour(
+        juce::ToggleButton::tickDisabledColourId, current_colour1
+    );
 
     auto outer_bounds =
         getLocalBounds()
@@ -139,15 +151,45 @@ void AmpComponent::paint(juce::Graphics& g)
             )
             .toFloat();
 
-    paintBorder(g, outer_bounds, AmpDimensions::AMP_BORDER_RADIUS);
+    // paintBorder(g, outer_bounds, AmpDimensions::AMP_BORDER_RADIUS);
 
-    auto frame_bounds = outer_bounds.reduced(AmpDimensions::AMP_FRAME_PADDING)
-                            .removeFromTop(AmpDimensions::AMP_FRAME_HEIGHT);
+    auto frame_bounds = outer_bounds.reduced(AmpDimensions::AMP_FRAME_PADDING);
+    auto higher_frame_bounds = frame_bounds.withTrimmedBottom(
+        AmpDimensions::AMP_KNOBS_BOTTOM_BOX_HEIGHT +
+        AmpDimensions::AMP_INNER_TOP_PADDING
+    );
+    auto lower_frame_bounds =
+        frame_bounds.withTrimmedTop(higher_frame_bounds.getHeight());
 
-    paintBorder(g, frame_bounds, 3.0f);
-    paintDesign(g, frame_bounds.reduced(AmpDimensions::AMP_BORDER_THICKNESS));
+    g.setColour(GuiColours::AMP_BG_COLOUR);
+    g.fillRect(frame_bounds);
+
+    g.setColour(GuiColours::DEFAULT_INACTIVE_COLOUR);
+    g.drawLine(
+        lower_frame_bounds.getX(), lower_frame_bounds.getY(),
+        lower_frame_bounds.getRight(), lower_frame_bounds.getY(), 1.0f
+    );
+
+    paintDesign(g, higher_frame_bounds);
 
     knobs_component.switchColour(current_colour1, current_colour2);
+
+    juce::Path path;
+    path.addRoundedRectangle(outer_bounds, AmpDimensions::AMP_BORDER_RADIUS);
+    path.addRoundedRectangle(
+        frame_bounds,
+        AmpDimensions::AMP_BORDER_RADIUS - AmpDimensions::AMP_FRAME_PADDING
+    );
+    path.setUsingNonZeroWinding(false);
+    juce::ColourGradient gradient(
+        current_colour1, outer_bounds.getX(),
+        outer_bounds.getY(), // start color and point
+        current_colour2, outer_bounds.getX(),
+        outer_bounds.getBottom(), // end color and point
+        false                     // not radial
+    );
+    g.setGradientFill(gradient);
+    g.fillPath(path);
 }
 
 void AmpComponent::resized()
@@ -175,9 +217,19 @@ void AmpComponent::resized()
 
     // Bottom part with buttons
     auto bottom_bounds =
-        amp_bounds.reduced(0, AmpDimensions::AMP_INNER_BOTTOM_PADDING)
+        amp_bounds
+            .reduced(
+                0, AmpDimensions::AMP_INNER_BOTTOM_PADDING +
+                       AmpDimensions::AMP_FRAME_PADDING
+            )
             .removeFromBottom(AmpDimensions::AMP_KNOBS_BOTTOM_BOX_HEIGHT);
     knobs_component.setBounds(
         bottom_bounds.reduced(AmpDimensions::AMP_SIDE_WIDTH, 0)
+    );
+    bypass_button.setBounds(
+        bottom_bounds.removeFromLeft(AmpDimensions::AMP_SIDE_WIDTH)
+            .withSizeKeepingCentre(
+                AmpDimensions::AMP_BYPASS_SIDE, AmpDimensions::AMP_BYPASS_SIDE
+            )
     );
 }

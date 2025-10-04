@@ -28,6 +28,8 @@ class AmpComponent : public juce::Component
     juce::AudioProcessorValueTreeState& parameters;
     AmpKnobsComponent knobs_component;
     juce::ToggleButton bypass_button;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>
+        bypass_attachment;
 
     juce::Slider type_slider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>
