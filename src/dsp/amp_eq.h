@@ -31,23 +31,26 @@ class AmpEQ
         bypass = shouldBypass;
     }
 
-    void setBassShelfCoefficients();
+    void setCoefficients();
 
   private:
     juce::dsp::ProcessSpec processSpec{-1, 0, 0};
 
     juce::dsp::IIR::Filter<float> bass_shelf;
-    float bass_shelf_frequency = 250.0f;
+    float bass_shelf_frequency = 100.0f;
     float bass_shelf_q = 0.707f;
 
     juce::dsp::IIR::Filter<float> low_mid_peak;
     float low_mid_peak_frequency = 500.0f;
+    float low_mid_peak_q = 0.707f;
 
     juce::dsp::IIR::Filter<float> high_mid_peak;
     float high_mid_peak_frequency = 1500.0f;
+    float high_mid_peak_q = 0.707f;
 
-    juce::dsp::IIR::Filter<float> treble_shelf;
-    float treble_shelf_frequency = 3000.0f;
+    juce::dsp::IIR::Filter<float> treble_peak;
+    float treble_peak_frequency = 5000.0f;
+    float treble_peak_q = 0.707f;
 
     // GUI Parameters
     bool bypass = false;

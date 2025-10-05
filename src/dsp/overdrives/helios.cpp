@@ -42,8 +42,8 @@ float HeliosOverdrive::driveToGain(float d)
 float HeliosOverdrive::charToFreq(float c)
 {
     float t = character / 10.0f;
-    float max_value = 15000.0f;
-    float min_value = 500.0f;
+    float max_value = 8000.0f;
+    float min_value = 800.0f;
     return min_value + std::pow(t, 2) * (max_value - min_value);
 }
 
@@ -53,6 +53,9 @@ void HeliosOverdrive::process(juce::AudioBuffer<float>& buffer)
     {
         return;
     }
+    juce::AudioBuffer<float> dry_buffer;
+    dry_buffer.makeCopyOf(buffer);
+
     float drive_gain = driveToGain(drive);
     applyGain(buffer, previous_drive_gain, drive_gain);
     float sampleRate = static_cast<float>(processSpec.sampleRate);
@@ -83,6 +86,10 @@ void HeliosOverdrive::process(juce::AudioBuffer<float>& buffer)
     oversampler2x.processSamplesDown(block);
 
     applyGain(buffer, previous_level, level);
+    buffer.applyGain(padding);
+    buffer.applyGain(mix);
+    dry_buffer.applyGain(1.0f - mix);
+    buffer.addFrom(0, 0, dry_buffer, 0, 0, buffer.getNumSamples());
 };
 
 void HeliosOverdrive::applyOverdrive(float& sample, float sampleRate)
@@ -91,8 +98,6 @@ void HeliosOverdrive::applyOverdrive(float& sample, float sampleRate)
 
     float filtered = tone_lpf.processSample(sample);
     float distorded = triode.processSample(filtered);
-    float out = padding * post_lpf.processSample(distorded);
-
-    // Apply mix and low pass filter
-    sample = out * mix + sample * (1 - mix);
+    float out = post_lpf.processSample(distorded);
+    sample = out;
 }

@@ -64,9 +64,7 @@ IRLoader::IRLoader(juce::AudioProcessorValueTreeState& params)
     gainSlider.setColour(
         juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack
     );
-    gainSlider.setColour(
-        juce::Slider::textBoxTextColourId, ColourCodes::grey3
-    );
+    gainSlider.setColour(juce::Slider::textBoxTextColourId, ColourCodes::grey3);
     gainSlider.setColour(
         juce::Slider::rotarySliderFillColourId, ColourCodes::white0
     );
@@ -124,11 +122,11 @@ void IRLoader::switchColour()
 {
     if (bypassButton.getToggleState())
     {
-        iRColour = ColourCodes::white0;
+        iRColour = ColourCodes::grey3;
     }
     else
     {
-        iRColour = ColourCodes::grey3;
+        iRColour = ColourCodes::white0;
     }
     irMixSlider.setColour(juce::Slider::rotarySliderFillColourId, iRColour);
     gainSlider.setColour(juce::Slider::rotarySliderFillColourId, iRColour);
@@ -149,7 +147,7 @@ void IRLoader::refreshStatus()
             juce::Slider::rotarySliderFillColourId, ColourCodes::grey3
         );
         bypassButton.setColour(
-            juce::ToggleButton::tickColourId, ColourCodes::grey3
+            juce::ToggleButton::tickDisabledColourId, ColourCodes::grey3
         );
     }
     else if (file.existsAsFile())
@@ -159,7 +157,7 @@ void IRLoader::refreshStatus()
         );
         irMixSlider.setColour(juce::Slider::rotarySliderFillColourId, iRColour);
         gainSlider.setColour(juce::Slider::rotarySliderFillColourId, iRColour);
-        bypassButton.setColour(juce::ToggleButton::tickColourId, iRColour);
+        bypassButton.setColour(juce::ToggleButton::tickDisabledColourId, iRColour);
     }
     repaint();
 }

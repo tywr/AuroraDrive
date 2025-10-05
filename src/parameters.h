@@ -43,6 +43,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout()
             juce::StringArray{"helios", "borealis"}, // Choice options
             0
         ),
+        std::make_unique<juce::AudioParameterFloat>(
+            "amp_master", "Amp Master Level",
+            juce::NormalisableRange<float>(-24.0f, 12.0f, 0.1f, 1.0f), 0.0f
+        ),
         std::make_unique<juce::AudioParameterBool>(
             "amp_bypass", "Amp Bypass", false
         ),
@@ -60,7 +64,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout()
         ),
         std::make_unique<juce::AudioParameterFloat>(
             "overdrive_mix", "Overdrive Mix",
-            juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.5f
+            juce::NormalisableRange<float>(0.0f, 100.0f, 1.0f), 50.0f
         ),
         std::make_unique<juce::AudioParameterFloat>(
             "amp_eq_bass", "Amp EQ Bass",

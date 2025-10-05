@@ -20,6 +20,8 @@ PluginAudioProcessor::PluginAudioProcessor()
 
     inputGainParameter = parameters.getRawParameterValue("input_gain_db");
     outputGainParameter = parameters.getRawParameterValue("output_gain_db");
+    ampMasterGainParameter = parameters.getRawParameterValue("amp_master");
+    isAmpBypassed = false;
 
     parameters.addParameterListener("input_gain_db", this);
     parameters.addParameterListener("output_gain_db", this);
@@ -31,6 +33,7 @@ PluginAudioProcessor::PluginAudioProcessor()
     parameters.addParameterListener("compressor_mix", this);
     parameters.addParameterListener("amp_type", this);
     parameters.addParameterListener("amp_bypass", this);
+    parameters.addParameterListener("amp_master", this);
     parameters.addParameterListener("overdrive_level_db", this);
     parameters.addParameterListener("overdrive_drive", this);
     parameters.addParameterListener("overdrive_character", this);
@@ -148,6 +151,7 @@ void PluginAudioProcessor::parameterChanged(
     // Overdrive
     if (parameterID == "amp_bypass")
     {
+        isAmpBypassed = (newValue >= 0.5f);
         amp_eq.setBypass(newValue >= 0.5f);
         for (auto& overdrive : overdrives)
         {
@@ -158,7 +162,7 @@ void PluginAudioProcessor::parameterChanged(
     {
         for (auto& overdrive : overdrives)
         {
-            overdrive->setMix(newValue);
+            overdrive->setMix(static_cast<int>(newValue) / 100.0f);
         }
     }
     else if (parameterID == "overdrive_level_db")
@@ -270,6 +274,8 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
     current_overdrive = overdrives[amp_index];
 
     // Set all initial values from overdrive
+    isAmpBypassed =
+        parameters.getRawParameterValue("amp_bypass")->load() >= 0.5f;
     for (auto& overdrive : overdrives)
     {
         overdrive->prepare(spec);
@@ -277,7 +283,10 @@ void PluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
             parameters.getRawParameterValue("amp_bypass")->load() >= 0.5f
         );
         overdrive->setMix(
-            parameters.getRawParameterValue("overdrive_mix")->load()
+            static_cast<int>(
+                parameters.getRawParameterValue("overdrive_mix")->load()
+            ) /
+            100.0f
         );
         overdrive->setLevel(
             juce::Decibels::decibelsToGain(
@@ -382,6 +391,9 @@ void PluginAudioProcessor::processBlock(
 
     amp_eq.process(buffer);
 
+    if (!isAmpBypassed)
+        applyAmpMasterGain(buffer);
+
     irConvolver.process(buffer);
 
     applyOutputGain(buffer);
@@ -460,6 +472,27 @@ void PluginAudioProcessor::applyOutputGain(juce::AudioBuffer<float>& buffer)
             currentOutputGainLinear
         );
         previousOutputGainLinear = currentOutputGainLinear;
+    }
+}
+
+void PluginAudioProcessor::applyAmpMasterGain(juce::AudioBuffer<float>& buffer)
+{
+    // Apply output gain with smoothing
+    auto currentAmpMasterGainLinear =
+        juce::Decibels::decibelsToGain(ampMasterGainParameter->load());
+    if (juce::approximatelyEqual(
+            currentAmpMasterGainLinear, previousAmpMasterGainLinear
+        ))
+    {
+        buffer.applyGain(currentAmpMasterGainLinear);
+    }
+    else
+    {
+        buffer.applyGainRamp(
+            0, buffer.getNumSamples(), previousAmpMasterGainLinear,
+            currentAmpMasterGainLinear
+        );
+        previousAmpMasterGainLinear = currentAmpMasterGainLinear;
     }
 }
 

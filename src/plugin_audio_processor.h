@@ -39,6 +39,7 @@ class PluginAudioProcessor final
     void updateOutputLevel(juce::AudioBuffer<float>& buffer);
     void applyInputGain(juce::AudioBuffer<float>& buffer);
     void applyOutputGain(juce::AudioBuffer<float>& buffer);
+    void applyAmpMasterGain(juce::AudioBuffer<float>& buffer);
     double smoothLevel(double newLevel, double currentLevel);
 
     juce::AudioProcessorEditor* createEditor() override;
@@ -71,10 +72,14 @@ class PluginAudioProcessor final
     AmpEQ amp_eq;
 
     IRConvolver irConvolver;
+
     float previousInputGainLinear;
     float previousOutputGainLinear;
+    float previousAmpMasterGainLinear;
     std::atomic<float>* inputGainParameter = nullptr;
     std::atomic<float>* outputGainParameter = nullptr;
+    std::atomic<float>* ampMasterGainParameter = nullptr;
+    bool isAmpBypassed = false;
 
     std::vector<Overdrive*> overdrives = {
         &helios_overdrive, &borealis_overdrive

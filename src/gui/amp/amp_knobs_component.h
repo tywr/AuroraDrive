@@ -13,7 +13,6 @@ struct AmpKnob
     juce::String label_text;
 };
 
-
 class AmpKnobsComponent : public juce::Component
 {
   public:
@@ -67,6 +66,11 @@ class AmpKnobsComponent : public juce::Component
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>
         treble_slider_attachment;
 
+    juce::Slider master_slider;
+    juce::Label master_label;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>
+        master_slider_attachment;
+
     std::vector<
         std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>>
         slider_attachments;
@@ -74,13 +78,14 @@ class AmpKnobsComponent : public juce::Component
 
     // Define knobs for easy looping
     std::vector<AmpKnob> knobs = {
-        {&drive_slider,     &drive_label,     "overdrive_drive",  "DRIVE"  },
+        {&drive_slider,     &drive_label,     "overdrive_drive",     "DRIVE"  },
+        {&character_slider, &character_label, "overdrive_character", "CHAR"   },
+        {&mix_slider,       &mix_label,       "overdrive_mix",       "MIX"    },
+        {&level_slider,     &level_label,     "overdrive_level_db",  "LEVEL"  },
         {&bass_slider,      &bass_label,      "amp_eq_bass",         "BASS"   },
         {&low_mid_slider,   &low_mid_label,   "amp_eq_low_mid",      "LO MIDS"},
         {&hi_mid_slider,    &hi_mid_label,    "amp_eq_hi_mid",       "HI MIDS"},
         {&treble_slider,    &treble_label,    "amp_eq_treble",       "TREBLE" },
-        {&character_slider, &character_label, "overdrive_character", "CHAR"   },
-        {&mix_slider,       &mix_label,       "overdrive_mix",       "MIX"    },
-        {&level_slider,     &level_label,     "overdrive_level_db",  "LEVEL"  },
+        {&master_slider,    &master_label,    "amp_master",          "MASTER" },
     };
 };

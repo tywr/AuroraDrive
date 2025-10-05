@@ -9,14 +9,13 @@ void AmpEQ::prepare(const juce::dsp::ProcessSpec& spec)
     bass_shelf.prepare(processSpec);
     low_mid_peak.prepare(processSpec);
     high_mid_peak.prepare(processSpec);
-    treble_shelf.prepare(processSpec);
+    treble_peak.prepare(processSpec);
 }
 
-void AmpEQ::setBassShelfCoefficients()
+void AmpEQ::setCoefficients()
 {
     if (!juce::approximatelyEqual(smoothed_bass_gain, bass_gain))
     {
-        DBG("Updating bass shelf gain to " << bass_gain);
         smoothed_bass_gain +=
             (bass_gain - smoothed_bass_gain) * smoothing_factor;
         auto bass_shelf_coefficients =
@@ -25,6 +24,39 @@ void AmpEQ::setBassShelfCoefficients()
                 smoothed_bass_gain
             );
         *bass_shelf.coefficients = *bass_shelf_coefficients;
+    }
+    if (!juce::approximatelyEqual(smoothed_low_mid_gain, low_mid_gain))
+    {
+        smoothed_low_mid_gain +=
+            (low_mid_gain - smoothed_low_mid_gain) * smoothing_factor;
+        auto low_mid_peak_coefficients =
+            juce::dsp::IIR::Coefficients<float>::makePeakFilter(
+                processSpec.sampleRate, low_mid_peak_frequency, low_mid_peak_q,
+                smoothed_low_mid_gain
+            );
+        *low_mid_peak.coefficients = *low_mid_peak_coefficients;
+    }
+    if (!juce::approximatelyEqual(smoothed_high_mid_gain, high_mid_gain))
+    {
+        smoothed_high_mid_gain +=
+            (high_mid_gain - smoothed_high_mid_gain) * smoothing_factor;
+        auto high_mid_peak_coefficients =
+            juce::dsp::IIR::Coefficients<float>::makePeakFilter(
+                processSpec.sampleRate, high_mid_peak_frequency,
+                high_mid_peak_q, smoothed_high_mid_gain
+            );
+        *high_mid_peak.coefficients = *high_mid_peak_coefficients;
+    }
+    if (!juce::approximatelyEqual(smoothed_treble_gain, treble_gain))
+    {
+        smoothed_treble_gain +=
+            (treble_gain - smoothed_treble_gain) * smoothing_factor;
+        auto treble_peak_coefficients =
+            juce::dsp::IIR::Coefficients<float>::makePeakFilter(
+                processSpec.sampleRate, treble_peak_frequency, treble_peak_q,
+                smoothed_treble_gain
+            );
+        *treble_peak.coefficients = *treble_peak_coefficients;
     }
 }
 
@@ -35,7 +67,7 @@ void AmpEQ::process(juce::AudioBuffer<float>& buffer)
         return;
     }
     float sampleRate = static_cast<float>(processSpec.sampleRate);
-    setBassShelfCoefficients();
+    setCoefficients();
 
     auto* channelData = buffer.getWritePointer(0);
     for (int i = 0; i < buffer.getNumSamples(); ++i)
@@ -50,4 +82,7 @@ void AmpEQ::applyEQ(float& sample, float sampleRate)
 {
     juce::ignoreUnused(sampleRate);
     sample = bass_shelf.processSample(sample);
+    sample = low_mid_peak.processSample(sample);
+    sample = high_mid_peak.processSample(sample);
+    sample = treble_peak.processSample(sample);
 }
