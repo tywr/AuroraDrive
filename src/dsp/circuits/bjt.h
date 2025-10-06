@@ -7,6 +7,7 @@ class BJT
   public:
     BJT() {};
     float processSample(float);
+    float omega(float);
 
   private:
     // Fixed variables
@@ -18,7 +19,7 @@ class BJT
     float k = std::log((i_s * re / vt) * (1 + 1 / beta_f));
 };
 
-inline float omega(float x)
+inline float BJT::omega(float x)
 {
     if (std::abs(x) > 1.5f)
     {
