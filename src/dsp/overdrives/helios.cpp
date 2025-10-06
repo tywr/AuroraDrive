@@ -12,6 +12,27 @@ void HeliosOverdrive::prepare(const juce::dsp::ProcessSpec& spec)
     oversampler2x.reset();
     oversampler2x.initProcessing(static_cast<size_t>(spec.maximumBlockSize));
 
+    dc_hpf.prepare(oversampled_spec);
+    auto dc_hpf_coefficients =
+        juce::dsp::IIR::Coefficients<float>::makeHighPass(
+            oversampled_spec.sampleRate, dc_hpf_cutoff
+        );
+    *dc_hpf.coefficients = *dc_hpf_coefficients;
+
+    dc_hpf2.prepare(oversampled_spec);
+    auto dc_hpf2_coefficients =
+        juce::dsp::IIR::Coefficients<float>::makeHighPass(
+            oversampled_spec.sampleRate, dc_hpf2_cutoff
+        );
+    *dc_hpf2.coefficients = *dc_hpf2_coefficients;
+
+    pre_hpf.prepare(oversampled_spec);
+    auto pre_hpf_coefficients =
+        juce::dsp::IIR::Coefficients<float>::makeHighPass(
+            oversampled_spec.sampleRate, pre_hpf_cutoff
+        );
+    *pre_hpf.coefficients = *pre_hpf_coefficients;
+
     tone_lpf.prepare(oversampled_spec);
     auto tone_lpf_coefficients =
         juce::dsp::IIR::Coefficients<float>::makeLowPass(
@@ -26,17 +47,18 @@ void HeliosOverdrive::prepare(const juce::dsp::ProcessSpec& spec)
         );
     *post_lpf.coefficients = *post_lpf_coefficients;
 
-    triode = Triode(
-        oversampled_spec.sampleRate, kp, kp2, kpg, E, Ci, Co, Ck, Ri, Ro, Rp,
-        Rk, Rg
-    );
-    triode.initializeState();
+    triode = Triode(oversampled_spec.sampleRate);
+    triode2 = Triode(oversampled_spec.sampleRate);
+    triode_pre = Triode(oversampled_spec.sampleRate);
+    triode_pre2 = Triode(oversampled_spec.sampleRate);
 }
 
 float HeliosOverdrive::driveToGain(float d)
 {
     float t = d / 10.0f;
-    return 1.0f + std::pow(t, 2) * 20.0f;
+    float min_gain = juce::Decibels::decibelsToGain(10.0f);
+    float max_gain = juce::Decibels::decibelsToGain(36.0f);
+    return min_gain + std::pow(t, 3.0f) * (max_gain - min_gain);
 }
 
 float HeliosOverdrive::charToFreq(float c)
@@ -65,7 +87,6 @@ void HeliosOverdrive::process(juce::AudioBuffer<float>& buffer)
     if (!juce::approximatelyEqual(tone_lpf_cutoff, new_tone_lpf_cutoff))
     {
         tone_lpf_cutoff = new_tone_lpf_cutoff;
-        DBG("Borealis tone cutoff: " << tone_lpf_cutoff);
         auto tone_lpf_coefficients =
             juce::dsp::IIR::Coefficients<float>::makeLowPass(
                 sampleRate, tone_lpf_cutoff
@@ -86,7 +107,6 @@ void HeliosOverdrive::process(juce::AudioBuffer<float>& buffer)
     oversampler2x.processSamplesDown(block);
 
     applyGain(buffer, previous_level, level);
-    buffer.applyGain(padding);
     buffer.applyGain(mix);
     dry_buffer.applyGain(1.0f - mix);
     buffer.addFrom(0, 0, dry_buffer, 0, 0, buffer.getNumSamples());
@@ -96,8 +116,13 @@ void HeliosOverdrive::applyOverdrive(float& sample, float sampleRate)
 {
     juce::ignoreUnused(sampleRate);
 
-    float filtered = tone_lpf.processSample(sample);
-    float distorded = triode.processSample(filtered);
-    float out = post_lpf.processSample(distorded);
-    sample = out;
+    float hpfed = pre_hpf.processSample(sample);
+    float filtered = tone_lpf.processSample(hpfed);
+    float preamped1 = dc_hpf.processSample(triode_pre.processSample(filtered));
+    float preamped2 =
+        dc_hpf2.processSample(triode_pre2.processSample(preamped1));
+    float distorded_plus = triode.processSample(preamped2);
+    float distorded_minus = triode2.processSample(-preamped2);
+    float out = post_lpf.processSample(distorded_plus - distorded_minus);
+    sample = out * padding;
 }

@@ -11,9 +11,6 @@ void BorealisOverdrive::prepare(const juce::dsp::ProcessSpec& spec)
     oversampler2x.reset();
     oversampler2x.initProcessing(static_cast<size_t>(spec.maximumBlockSize));
 
-    DBG("Preparing Borealis Overdrive with sample rate "
-        << processSpec.sampleRate);
-
     attack_shelf.prepare(oversampled_spec);
     float attack_shelf_gain = charToGain(character);
     smoothed_attack_shelf_gain = attack_shelf_gain;
@@ -72,9 +69,9 @@ void BorealisOverdrive::prepare(const juce::dsp::ProcessSpec& spec)
 float BorealisOverdrive::driveToFrequency(float d)
 {
     float t = d / 10.0f;
-    float min_frequency = 52.0f;
-    float max_frequency = 300.0f;
-    return max_frequency - (max_frequency - min_frequency) * (t * t);
+    float min_frequency = 153.0f;
+    float max_frequency = 454.0f;
+    return max_frequency - (max_frequency - min_frequency) * std::pow(t, 0.5f);
 }
 
 float BorealisOverdrive::charToGain(float c)
@@ -82,7 +79,7 @@ float BorealisOverdrive::charToGain(float c)
     float t = c / 10.0f;
     float min_gain = juce::Decibels::decibelsToGain(-8.0f);
     float max_gain = juce::Decibels::decibelsToGain(18.0f);
-    return min_gain + (max_gain - min_gain) * (t * t);
+    return min_gain + (max_gain - min_gain) * std::pow(t, 0.5f);
 }
 
 void BorealisOverdrive::setCoefficients()
@@ -118,7 +115,7 @@ float BorealisOverdrive::driveToGain(float d)
     float t = d / 10.0f;
     float min_gain = juce::Decibels::decibelsToGain(3.0f);
     float max_gain = juce::Decibels::decibelsToGain(24.0f);
-    return min_gain + std::pow(t, 2) * max_gain;
+    return min_gain + std::pow(t, 2) * (max_gain - min_gain);
 }
 
 void BorealisOverdrive::process(juce::AudioBuffer<float>& buffer)
@@ -170,5 +167,5 @@ void BorealisOverdrive::applyOverdrive(float& sample, float sampleRate)
     float distorded = diode.processSample(shaped);
     float out = post_lpf.processSample(distorded);
 
-    sample = out + 0.1f * ff1 + 0.3f * ff2;
+    sample = out + 0.25f * ff1 + 0.2f * ff2;
 }

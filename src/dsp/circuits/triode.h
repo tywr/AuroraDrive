@@ -20,10 +20,7 @@ class Triode
 {
   public:
     // Constructor
-    Triode(
-        float fs, float kp, float kp2, float kpg, float E, float Ci, float Co,
-        float Ck, float Ri, float Ro, float Rp, float Rk, float Rg
-    );
+    Triode(float fs);
     void initializeState();
 
     // Processes a block of samples (a vector)
@@ -33,13 +30,25 @@ class Triode
     float processSample(float inputSample);
 
   private:
+    float padding = 0.02f;
+
+    float kp = 1.014e-5;
+    float kp2 = 5.498e-8;
+    float kpg = 1.076e-5;
+    float E = 250;
+    float Ri = 1e6;
+    float Rg = 20e3;
+    float Ck = 10e-6;
+    float Co = 10e-9;
+    float Rp = 100e3;
+    float Ro = 1e6;
+    float Rk = 1e3;
+    float Ci = 100e-9;
+
     // --- State Variables ---
     float wCi_s;
     float wCk_s;
     float wCo_s;
-
-    // --- Input Parameters (stored for use in methods) ---
-    float kp, kp2, kpg, E;
 
     // --- Pre-calculated Coefficients ---
     float wpg_kt, wpk_kt, wsp_kl, wpp_kt;
@@ -50,29 +59,11 @@ class Triode
     float bk_bp, k_eta, k_delta, k_bp_s;
     float bp_ap_0, bp_ak_0;
 
-    // --- Circuit Parameters (needed for initialization) ---
-    float Rp_val, Rk_val;
-
     TriodeWaves triode(float ag, float ak, float ap);
 };
 
-// --- IMPLEMENTATION ---
-// Note: All method implementations are marked 'inline' because they are in a
-// header file.
-
-inline Triode::Triode(
-    float fs, float kp, float kp2, float kpg, float E, float Ci, float Co,
-    float Ck, float Ri, float Ro, float Rp, float Rk, float Rg
-)
+inline Triode::Triode(float fs)
 {
-    // Store parameters that are needed later
-    this->kp = kp;
-    this->kp2 = kp2;
-    this->kpg = kpg;
-    this->E = E;
-    this->Rp_val = Rp;
-    this->Rk_val = Rk;
-
     float wVi_R = 1e-6;
     float wCi_R = 1.0 / (2.0 * fs * Ci);
     float wCk_R = 1.0 / (2.0 * fs * Ck);
@@ -109,21 +100,13 @@ inline Triode::Triode(
     bp_ap_0 = (1.0 / (wpp_R + wpk_R)) * (wpk_R - wpp_R);
     bp_ak_0 = (1.0 / (wpp_R + wpk_R)) * (wpp_R + wpp_R);
 
-    // Initialize state variables to zero
-    wCi_s = 0.0;
-    wCk_s = 0.0;
-    wCo_s = 0.0;
-}
-
-inline void Triode::initializeState()
-{
-    float k1 = kpg / (2.0 * kp2) + Rp_val / Rk_val + 1.0;
+    float k1 = kpg / (2.0 * kp2) + Rp / Rk + 1.0;
     float k2 = k1 * (kp / kp2 + 2.0 * E) * kp2;
-    float k3 = Rk_val * k2 + 1.0;
+    float k3 = Rk * k2 + 1.0;
     float sign_k1 = (k1 >= 0) ? 1.0 : -1.0;
     float Vk0 = (k3 - sign_k1 * std::sqrt(2.0 * k3 - 1.0)) /
-                (2.0 * Rk_val * k1 * k1 * kp2);
-    float Vp0 = E - Rp_val / Rk_val * Vk0;
+                (2.0 * Rk * k1 * k1 * kp2);
+    float Vp0 = E - Rp / Rk * Vk0;
 
     wCi_s = 0.0;
     wCk_s = Vk0;
@@ -156,7 +139,7 @@ inline float Triode::processSample(float inputSample)
     wCk_s = waves.bk - wpk_kt * wCk_s;
     wCo_s = wsp_kl * waves.bp + kCoCo * wCo_s + kCo0;
 
-    return vout;
+    return padding * vout;
 }
 
 inline TriodeWaves Triode::triode(float ag, float ak, float ap)

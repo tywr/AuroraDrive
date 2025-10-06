@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.signal import butter, filtfilt
 
 
 class Triode:
@@ -131,11 +132,6 @@ if __name__ == "__main__":
 
     # Example usage
     fs = 44100
-    freq = 80
-    T = 3 / freq
-    N = int(T * fs)
-    t = np.linspace(0, T, N)
-    y = np.sin(2 * np.pi * freq * t)
 
     kp = 1.014e-5
     kp2 = 5.498e-8
@@ -166,11 +162,40 @@ if __name__ == "__main__":
         Rk=Rk,
         Rg=Rg,
     )
+    triode2 = Triode(
+        fs=fs,
+        kp=kp,
+        kp2=kp2,
+        kpg=kpg,
+        E=E,
+        Ci=Ci,
+        Co=Co,
+        Ck=Ck,
+        Ri=Ri,
+        Ro=Ro,
+        Rp=Rp,
+        Rk=Rk,
+        Rg=Rg,
+    )
 
+    freq = 100
+    T = 10 / freq
+    N = int(T * fs)
+    t = np.linspace(0, T, N)
+    y = np.sin(2 * np.pi * freq * t)
+
+    b, a = butter(1, 20, btype="highpass", analog=False, fs=fs)
     yout = triode.process(y)
+    yout_hpf = filtfilt(b, a, yout)
+    yout2 = triode2.process(yout_hpf)
 
     plt.plot(t, y, label="Input")
+    print(yout.mean())
+    print(yout_hpf.mean())
+    plt.plot(t, y, label="Input Signal")
     plt.plot(t, yout, label="Overdriven")
+    plt.plot(t, yout_hpf, label="Overdriven + HPF")
+    plt.plot(t, yout2, label="Overdriven + HPF + Overdriven")
     plt.legend()
     plt.show()
 
