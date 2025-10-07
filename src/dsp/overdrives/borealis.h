@@ -2,6 +2,7 @@
 
 #include "../circuits/bjt.h"
 #include "../circuits/germanium_diode.h"
+#include "../circuits/triode.h"
 #include "overdrive.h"
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_dsp/juce_dsp.h>
@@ -41,8 +42,9 @@ class BorealisOverdrive : public Overdrive
     float post_lpf_cutoff = 3400.0f;
     float post_lpf_q = 0.57;
 
-    float padding = 5.0f;
+    float padding = juce::Decibels::decibelsToGain(12.0f);
 
+    Triode triode = Triode(44100.0f);
     GermaniumDiode diode = GermaniumDiode(44100.0f);
 
     juce::dsp::Oversampling<float> oversampler2x{

@@ -30,8 +30,8 @@ class Triode
     float processSample(float inputSample);
 
   private:
-    float padding = 0.02f;
-
+    // padding to bring -12dB to ~0dB
+    float padding = -2.0f / 27.0f;
     float kp = 1.014e-5;
     float kp2 = 5.498e-8;
     float kpg = 1.076e-5;
@@ -104,8 +104,8 @@ inline Triode::Triode(float fs)
     float k2 = k1 * (kp / kp2 + 2.0 * E) * kp2;
     float k3 = Rk * k2 + 1.0;
     float sign_k1 = (k1 >= 0) ? 1.0 : -1.0;
-    float Vk0 = (k3 - sign_k1 * std::sqrt(2.0 * k3 - 1.0)) /
-                (2.0 * Rk * k1 * k1 * kp2);
+    float Vk0 =
+        (k3 - sign_k1 * std::sqrt(2.0 * k3 - 1.0)) / (2.0 * Rk * k1 * k1 * kp2);
     float Vp0 = E - Rp / Rk * Vk0;
 
     wCi_s = 0.0;

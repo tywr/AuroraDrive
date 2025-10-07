@@ -33,6 +33,14 @@ void HeliosOverdrive::prepare(const juce::dsp::ProcessSpec& spec)
         );
     *pre_hpf.coefficients = *pre_hpf_coefficients;
 
+    mid_scoop.prepare(oversampled_spec);
+    auto mid_scoop_coefficients =
+        juce::dsp::IIR::Coefficients<float>::makePeakFilter(
+            oversampled_spec.sampleRate, mid_scoop_frequency, mid_scoop_q,
+            mid_scoop_gain
+        );
+    *mid_scoop.coefficients = *mid_scoop_coefficients;
+
     tone_lpf.prepare(oversampled_spec);
     auto tone_lpf_coefficients =
         juce::dsp::IIR::Coefficients<float>::makeLowPass(
@@ -56,8 +64,8 @@ void HeliosOverdrive::prepare(const juce::dsp::ProcessSpec& spec)
 float HeliosOverdrive::driveToGain(float d)
 {
     float t = d / 10.0f;
-    float min_gain = juce::Decibels::decibelsToGain(10.0f);
-    float max_gain = juce::Decibels::decibelsToGain(36.0f);
+    float min_gain = juce::Decibels::decibelsToGain(3.0f);
+    float max_gain = juce::Decibels::decibelsToGain(18.0f);
     return min_gain + std::pow(t, 3.0f) * (max_gain - min_gain);
 }
 
@@ -78,8 +86,7 @@ void HeliosOverdrive::process(juce::AudioBuffer<float>& buffer)
     juce::AudioBuffer<float> dry_buffer;
     dry_buffer.makeCopyOf(buffer);
 
-    float drive_gain = driveToGain(drive);
-    applyGain(buffer, previous_drive_gain, drive_gain);
+    // applyGain(buffer, previous_drive_gain, drive_gain);
     float sampleRate = static_cast<float>(processSpec.sampleRate);
     // Update tone cutoff
     float new_tone_lpf_cutoff = charToFreq(character);
@@ -116,13 +123,13 @@ void HeliosOverdrive::applyOverdrive(float& sample, float sampleRate)
 {
     juce::ignoreUnused(sampleRate);
 
+    float drive_gain = driveToGain(drive);
     float hpfed = pre_hpf.processSample(sample);
-    float filtered = tone_lpf.processSample(hpfed);
-    float preamped1 = dc_hpf.processSample(triode_pre.processSample(filtered));
+    float filtered = mid_scoop.processSample(tone_lpf.processSample(hpfed));
+    float preamped1 =
+        drive_gain * dc_hpf.processSample(triode_pre.processSample(filtered));
     float preamped2 =
         dc_hpf2.processSample(triode_pre2.processSample(preamped1));
-    float distorded_plus = triode.processSample(preamped2);
-    float distorded_minus = triode2.processSample(-preamped2);
-    float out = post_lpf.processSample(distorded_plus - distorded_minus);
+    float out = post_lpf.processSample(preamped2);
     sample = out * padding;
 }

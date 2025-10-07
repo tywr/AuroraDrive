@@ -63,6 +63,7 @@ void BorealisOverdrive::prepare(const juce::dsp::ProcessSpec& spec)
         );
     *post_lpf.coefficients = *post_lpf_coefficients;
 
+    triode = Triode(oversampled_spec.sampleRate);
     diode = GermaniumDiode(oversampled_spec.sampleRate);
 }
 
@@ -70,16 +71,16 @@ float BorealisOverdrive::driveToFrequency(float d)
 {
     float t = d / 10.0f;
     float min_frequency = 153.0f;
-    float max_frequency = 454.0f;
-    return max_frequency - (max_frequency - min_frequency) * std::pow(t, 0.5f);
+    float max_frequency = 453.0f;
+    return max_frequency - (max_frequency - min_frequency) * std::pow(t, 2.0f);
 }
 
 float BorealisOverdrive::charToGain(float c)
 {
     float t = c / 10.0f;
-    float min_gain = juce::Decibels::decibelsToGain(-8.0f);
-    float max_gain = juce::Decibels::decibelsToGain(18.0f);
-    return min_gain + (max_gain - min_gain) * std::pow(t, 0.5f);
+    float min_gain = juce::Decibels::decibelsToGain(-12.0f);
+    float max_gain = juce::Decibels::decibelsToGain(6.0f);
+    return min_gain + (max_gain - min_gain) * std::pow(t, 3.0f);
 }
 
 void BorealisOverdrive::setCoefficients()
@@ -113,8 +114,8 @@ void BorealisOverdrive::setCoefficients()
 float BorealisOverdrive::driveToGain(float d)
 {
     float t = d / 10.0f;
-    float min_gain = juce::Decibels::decibelsToGain(3.0f);
-    float max_gain = juce::Decibels::decibelsToGain(24.0f);
+    float min_gain = juce::Decibels::decibelsToGain(-6.0f);
+    float max_gain = juce::Decibels::decibelsToGain(9.0f);
     return min_gain + std::pow(t, 2) * (max_gain - min_gain);
 }
 
@@ -127,8 +128,6 @@ void BorealisOverdrive::process(juce::AudioBuffer<float>& buffer)
     juce::AudioBuffer<float> dry_buffer;
     dry_buffer.makeCopyOf(buffer);
 
-    float drive_gain = driveToGain(drive);
-    applyGain(buffer, previous_drive_gain, drive_gain);
     float sampleRate = static_cast<float>(processSpec.sampleRate);
     setCoefficients();
 
@@ -154,18 +153,22 @@ void BorealisOverdrive::applyOverdrive(float& sample, float sampleRate)
 {
     juce::ignoreUnused(sampleRate);
 
+    float drive_gain = driveToGain(drive);
+    float in = triode.processSample(sample);
+    float in_drive = in * drive_gain;
+
     // feed forward 1
-    float ff1 = ff1_lpf.processSample(sample);
+    float ff1 = ff1_lpf.processSample(in);
 
     // feed forward 2
-    float ff2 = ff2_lpf.processSample(ff2_hpf.processSample(sample) + sample);
+    float ff2 = ff2_lpf.processSample(ff2_hpf.processSample(in_drive) + in);
 
     // distortion chain
-    float hpfed = pre_hpf.processSample(sample);
+    float hpfed = pre_hpf.processSample(in_drive);
     float lpfed = pre_lpf.processSample(hpfed);
     float shaped = attack_shelf.processSample(lpfed);
     float distorded = diode.processSample(shaped);
     float out = post_lpf.processSample(distorded);
 
-    sample = out + 0.25f * ff1 + 0.2f * ff2;
+    sample = padding * (out + 0.15f * ff1 + 0.10f * ff2);
 }

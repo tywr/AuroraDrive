@@ -124,7 +124,7 @@ class Triode:
         self.wCk_s = wT_bk - self.wpk_kt * self.wCk_s
         self.wCo_s = self.wsp_kl * wT_bp + self.kCoCo * self.wCo_s + self.kCo0
 
-        return vout
+        return -vout * 2 / 27
 
 
 if __name__ == "__main__":
@@ -178,37 +178,61 @@ if __name__ == "__main__":
         Rg=Rg,
     )
 
-    freq = 100
-    T = 10 / freq
+    freq = 440
+    T = 30 / freq
     N = int(T * fs)
     t = np.linspace(0, T, N)
-    y = np.sin(2 * np.pi * freq * t)
+    y = 0.251189 * np.sin(2 * np.pi * freq * t)
 
+    input_gain = 1
+    drive_gain = 7.94
+
+    yout = triode.process(y * input_gain)
     b, a = butter(1, 20, btype="highpass", analog=False, fs=fs)
-    yout = triode.process(y)
     yout_hpf = filtfilt(b, a, yout)
-    yout2 = triode2.process(yout_hpf)
 
-    plt.plot(t, y, label="Input")
-    print(yout.mean())
-    print(yout_hpf.mean())
-    plt.plot(t, y, label="Input Signal")
-    plt.plot(t, yout, label="Overdriven")
-    plt.plot(t, yout_hpf, label="Overdriven + HPF")
-    plt.plot(t, yout2, label="Overdriven + HPF + Overdriven")
-    plt.legend()
+    yout2 = triode2.process(yout_hpf * drive_gain)
+    b, a = butter(1, 20, btype="highpass", analog=False, fs=fs)
+    yout2_hpf = filtfilt(b, a, yout2)
+
+
+    start = N // 4
+    end = 3 * N // 4
+
+    t = t[start:end]
+    y = y[start:end]
+    yout_hpf = yout_hpf[start:end]
+    yout2_hpf = yout2_hpf[start:end]
+
+    plt.plot(t, y, label="Input Signal", alpha=1)
+    plt.plot(t, yout_hpf, label="Output Signal", alpha=0.6)
+    plt.plot(t, yout2_hpf, label="Output Signal", alpha=0.6)
     plt.show()
 
-    # Y = np.fft.fft(y)
-    # Y_clipped = np.fft.fft(yout)
-    # xf = np.fft.fftfreq(N, 1 / fs)
-    #
-    # Y_norm = 2 / N * np.abs(Y[0 : N // 2])
-    # Y_clipped_norm = 2 / N * np.abs(Y_clipped[0 : N // 2])
-    # xf_pos = xf[0 : N // 2]
-    #
-    # plt.plot(xf_pos, Y_norm, label="Input")
-    # plt.plot(xf_pos, Y_clipped_norm, label="Overdrive")
-    # plt.xlim(0, 8000)
-    # plt.legend()
-    # plt.show()
+
+    n = len(y)
+    Y = np.fft.fft(y)
+    Yout = np.fft.fft(yout_hpf)
+    Yout2 = np.fft.fft(yout2_hpf)
+    xf = np.fft.fftfreq(n, 1 / fs)
+    xf_pos = xf[: n // 2]
+    Y_abs = np.abs(Y[: n // 2])  # Get magnitudes of the positive frequencies
+    Yout_abs = np.abs(Yout[: n // 2])
+    Yout2_abs = np.abs(Yout2[: n // 2])
+    Y_norm = Y_abs / n
+    Yout_norm = Yout_abs / n
+    Yout2_norm = Yout2_abs / n
+    Y_norm[1:] = Y_norm[1:] * 2
+    Yout_norm[1:] = Yout_norm[1:] * 2
+    Yout2_norm[1:] = Yout2_norm[1:] * 2
+
+    plt.figure(figsize=(12, 6))
+    plt.plot(xf_pos, Y_norm, label="Input Spectrum", alpha=1)
+    plt.plot(xf_pos, Yout_norm, label="Output Spectrum", alpha=0.5)
+    plt.plot(xf_pos, Yout2_norm, label="Output Spectrum 2", alpha=0.5)
+    plt.title("Single-Sided Amplitude Spectrum of the Signal")
+    plt.xlabel("Frequency (Hz)")
+    plt.ylabel("Amplitude")
+    plt.grid(True)
+    plt.legend()
+    plt.show()

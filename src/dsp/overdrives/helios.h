@@ -15,24 +15,29 @@ class HeliosOverdrive : public Overdrive
     void applyOverdrive(float& sample, float sampleRate) override;
 
   private:
+    juce::dsp::IIR::Filter<float> pre_hpf;
+    float pre_hpf_cutoff = 30.0f;
+
+    juce::dsp::IIR::Filter<float> mid_scoop;
+    float mid_scoop_frequency = 600.0f;
+    float mid_scoop_q = 0.5f;
+    float mid_scoop_gain = juce::Decibels::decibelsToGain(-3.0f);
+
+    juce::dsp::IIR::Filter<float> tone_lpf;
+    float tone_lpf_cutoff = 1.0f;
+
     juce::dsp::IIR::Filter<float> dc_hpf;
     float dc_hpf_cutoff = 20.0f;
 
     juce::dsp::IIR::Filter<float> dc_hpf2;
     float dc_hpf2_cutoff = 20.0f;
 
-    juce::dsp::IIR::Filter<float> pre_hpf;
-    float pre_hpf_cutoff = 75.0f;
-
-    juce::dsp::IIR::Filter<float> tone_lpf;
-    float tone_lpf_cutoff = 1.0f;
-
     juce::dsp::IIR::Filter<float> post_lpf;
     float post_lpf_cutoff = 3400.0f;
 
     // triode parameters
 
-    float padding = 0.1f;
+    float padding = juce::Decibels::decibelsToGain(-16.0f);
     Triode triode = Triode(44100);
     Triode triode2 = Triode(44100);
     Triode triode_pre = Triode(44100);
