@@ -25,11 +25,9 @@ def omega_small(x):
 
 
 def omega(x: float) -> float:
-    print(x)
     if x > 1.5 or x < -1.5:
         return lib.omega4_py(x)
     else:
-        print("Using small x approximation for omega")
         # return lib.omega4_py(x)
         return omega_small(x)
 
@@ -41,14 +39,16 @@ class DiodeClipper:
     # Diode parameters
     c = 1e-8
     r = 2_200
-    i_s = 200e-9
-    v_t = 0.02585
+    # i_s = 200e-9
+    i_s = 10e-9
+    v_t = 1.7 * 0.02585
+    # v_t = 0.02585
 
     # Discretization coefficients
 
-    def __init__(self, sample_rate, asymetric: bool = False):
+    def __init__(self, sample_rate, side="both"):
         self.sample_rate = sample_rate
-        self.is_asymetric = asymetric
+        self.side = side
 
         self.b0 = 2 / sample_rate
         self.b1 = -2 / sample_rate
@@ -81,7 +81,11 @@ class DiodeClipper:
             p = self.k6 * vin - self.a1 * self.prev_p
             self.prev_p = p
             return vin
-        if self.is_asymetric and vin < 0 or not self.is_asymetric:
+        if self.side == "up" and vin < 0:
+            return vin
+        elif self.side == "down" and vin > 0:
+            return vin
+        else:
             q = self.k1 * vin - self.prev_p
             r = np.sign(q)
             w = self.k2 * q + self.k3 * r
@@ -89,8 +93,6 @@ class DiodeClipper:
             p = self.k6 * vout - self.a1 * self.prev_p
             self.prev_p = p
             return vout
-        else:
-            return vin
 
 
 if __name__ == "__main__":
@@ -102,7 +104,7 @@ if __name__ == "__main__":
     n_samples = int(duration * sample_rate)
 
     t = np.linspace(0, duration, n_samples, endpoint=False)
-    y = 0.3 * np.sin(2 * np.pi * frequency * t)
+    y = 1 * np.sin(2 * np.pi * frequency * t)
 
     diod_clipper = DiodeClipper(sample_rate)
     y_clipped = diod_clipper.process(y)

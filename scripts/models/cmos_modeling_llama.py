@@ -1,16 +1,18 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from numpy.polynomial.polynomial import Polynomial
+from scipy.optimize import curve_fit
+from sklearn.neural_network import MLPRegressor
+from sklearn.preprocessing import StandardScaler
+import onnxruntime as rt
+import skl2onnx
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import FloatTensorType
 
 
 class ModelLlama:
     """
     Models a single CMOS inverter unit based on the DAFx 2020 paper_21.
-
-    This function implements the extended Shichman-Hodges model described
-    in the paper "Real-Time Black-Box Modelling with Recurrent Neural
-    Networks for Audio Distortion Effects". It solves the non-linear
-    Kirchhoff's Current Law equation for the inverter's output node
-    using the Newton-Raphson method.
 
     Args:
         vin: The input voltage to the CMOS inverter gate.
@@ -19,9 +21,14 @@ class ModelLlama:
         The corresponding output voltage from the inverter.
     """
 
-    def __init__(self, V_dd=9.0, delta=0.06):
+    def __init__(self, sample_rate, V_dd=9.0, delta=0.06):
+        self.sample_rate = sample_rate
         self.V_dd = V_dd
         self.delta = 0.06
+        self.r = 330e3
+        self.c = 22e-12
+        self.prev_vout = 0
+        self.prev_vin = 0
 
     def nmos(self, vgs, vds):
         """Calculates NMOS I_ds and its derivative w.r.t. vds (g_ds)."""
@@ -78,13 +85,9 @@ class ModelLlama:
         return ids, gds, vt, alpha
 
     def solve(self, vin: float) -> float:
-        # if vin < 1.5:
-        #     return 0
-
         vout = self.V_dd / 2.0
 
-        # Iterate a fixed number of times for stability and real-time safety
-        for _ in range(10):
+        for _ in range(5):
             # NMOS:
             vgs_n = vin
             vds_n = vout
@@ -114,11 +117,64 @@ class ModelLlama:
         return vout
 
 
+# def sigmoid_model(vin, A, k, v_mid, C):
+#     """A sigmoid model based on the hyperbolic tangent function."""
+#     return A * np.tanh(k * (vin - v_mid)) + C
+#
+#
+# def regression():
+#     model = ModelLlama(V_dd=9.0, delta=0.06)
+#     input = np.linspace(1.5, 9, 100000)
+#     output = np.array([model.solve(v) for v in input])
+#
+#     X = input.reshape(-1, 1)
+#     y = output
+#
+#     scaler = StandardScaler()
+#     X_scaled = scaler.fit_transform(X)
+#
+#     nn_model = MLPRegressor(
+#         hidden_layer_sizes=(16, 8),
+#         activation="tanh",  # The 'tanh' activation is a great choice for S-curves
+#         solver="adam",  # A standard, robust optimizer
+#         max_iter=100000,  # Increase iterations to ensure convergence
+#         random_state=42,  # For reproducibility
+#         learning_rate_init=0.005,
+#         tol=1e-9,
+#     )
+#     nn_model.fit(X_scaled, y)
+#
+#     new_input = np.linspace(1.5, 9, 1000).reshape(-1, 1)
+#     in_scaled = scaler.transform(new_input)
+#     out_predicted = nn_model.predict(in_scaled)
+#
+#     plt.plot(input, output, label="CMOS Inverter Output V(out)")
+#     plt.plot(new_input, out_predicted)
+#     plt.legend()
+#     plt.show()
+#
+#     scaler_mean = scaler.mean_[0]
+#     scaler_scale = scaler.scale_[0]
+#
+#     with open("scaler_params.txt", "w") as f:
+#         f.write(f"{scaler_mean}\n")
+#         f.write(f"{scaler_scale}\n")
+#
+#     print("\nScaler parameters saved to scaler_params.txt")
+#     print(f"Mean: {scaler_mean}")
+#     print(f"Scale: {scaler_scale}")
+#
+#     initial_type = [("float_input", FloatTensorType([None, 1]))]
+#     onnx_model = convert_sklearn(nn_model, initial_types=initial_type)
+#     model_filename = "vtc_model.onnx"
+#     with open(model_filename, "wb") as f:
+#         f.write(onnx_model.SerializeToString())
+
+
 # --- Demonstration of the function ---
 if __name__ == "__main__":
     print("Demonstrating the DAFx 2020 CMOS Inverter Model.")
 
-    model = ModelLlama(V_dd=9.0, delta=0.06)
     # Vin = np.linspace(0, 9, 9)
     # plt.axhline(y=0, color="r", linestyle="-", alpha=0.1)
     # for vin in Vin:
@@ -187,14 +243,31 @@ if __name__ == "__main__":
     # plt.show()
 
     # # Vout / Vin curve
-    input_voltages = np.linspace(0, 9, 10000)
-    output_voltages = np.array([model.solve(v) for v in input_voltages])
+    sample_rate = 44100
+    model = ModelLlama(sample_rate=sample_rate, V_dd=9.0, delta=0.06)
+    # model_rc = ModelLlama(sample_rate=sample_rate, V_dd=9.0, delta=0.06)
 
+    frequency = 1000
+    max_t = 10 / frequency
+    dt = 1.0 / sample_rate
+    t = np.arange(0, max_t, dt)
+
+    input = 4.5 + 1.25 * np.sin(2 * np.pi * frequency * t)
+    # output_rc = np.array([model_rc.solve_rc(v) for v in input])
+    output = np.array([model.solve(v) for v in input])
     plt.figure(figsize=(10, 6))
-    plt.plot(input_voltages, output_voltages, label="CMOS Inverter Output V(out)")
-    plt.plot(input_voltages, input_voltages, "r--", label="V(out) = V(in)", alpha=0.5)
-    plt.axhline(y=9, color="gray", linestyle="--", label="Vdd")
-    plt.axhline(y=0.0, color="gray", linestyle="--")
+    # plt.scatter(input, output_rc, color="red", alpha=0.5)
+    plt.scatter(input, output, color="blue", alpha=0.5)
+    # plt.plot(input, output, label="CMOS Inverter Output V(out)")
+    # plt.plot(
+    #     input,
+    #     output_rc,
+    #     label="CMOS Inverter Output V(out) with Resistance",
+    #     color="orange",
+    # )
+    # plt.plot(input, input, "r--", label="V(out) = V(in)", alpha=0.5)
+    # plt.axhline(y=9, color="gray", linestyle="--", label="Vdd")
+    # plt.axhline(y=0.0, color="gray", linestyle="--")
     plt.title("DC Transfer Curve of the Red LLAMA")
     plt.xlabel("Input Voltage (Vin)")
     plt.ylabel("Output Voltage (Vout)")
@@ -221,4 +294,27 @@ if __name__ == "__main__":
     # plt.ylabel("Voltage (V)")
     # plt.grid(True)
     # plt.legend()
+    # plt.show()
+
+    # fs = 44100
+    # freq = 440
+    # T = 10 / freq
+    # N = int(T * fs)
+    # t = np.linspace(0, T, N)
+    # input = 4.5 + 5 * np.sin(2 * np.pi * freq * t)
+    # output = np.array([model.solve(v) for v in input])
+
+    # plt.plot(t, input, label="Input Signal (Vin)", alpha=1)
+    # plt.plot(t, output, label="Output Signal (Vout)", alpha=0.5)
+    # plt.show()
+
+    # n = len(output)
+    # Y = np.fft.fft(output)
+    # xf = np.fft.fftfreq(n, 1 / fs)
+    # xf_pos = xf[: n // 2]
+    # Y_abs = np.abs(Y[: n // 2])
+    # Y_norm = Y_abs / n
+    # Y_norm[1:] = Y_norm[1:] * 2
+    #
+    # plt.plot(xf_pos, Y_norm, label="Output Spectrum", alpha=0.5)
     # plt.show()

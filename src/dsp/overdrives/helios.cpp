@@ -1,4 +1,5 @@
 #include "Helios.h"
+#include "../circuits/silicon_diode.h"
 #include "../circuits/triode.h"
 
 #include <juce_dsp/juce_dsp.h>
@@ -64,9 +65,13 @@ void HeliosOverdrive::prepare(const juce::dsp::ProcessSpec& spec)
 float HeliosOverdrive::driveToGain(float d)
 {
     float t = d / 10.0f;
-    float min_gain = juce::Decibels::decibelsToGain(3.0f);
-    float max_gain = juce::Decibels::decibelsToGain(18.0f);
-    return min_gain + std::pow(t, 3.0f) * (max_gain - min_gain);
+    // version 1
+    // float min_gain = juce::Decibels::decibelsToGain(3.0f);
+    // float max_gain = juce::Decibels::decibelsToGain(18.0f);
+    // version 2
+    float min_gain = juce::Decibels::decibelsToGain(-24.0f);
+    float max_gain = juce::Decibels::decibelsToGain(24.0f);
+    return min_gain + std::pow(t, 1.0f) * (max_gain - min_gain);
 }
 
 float HeliosOverdrive::charToFreq(float c)
@@ -123,13 +128,27 @@ void HeliosOverdrive::applyOverdrive(float& sample, float sampleRate)
 {
     juce::ignoreUnused(sampleRate);
 
+    // First triode algorithm test
+    //
+    // float drive_gain = driveToGain(drive);
+    // float hpfed = pre_hpf.processSample(sample);
+    // float filtered = mid_scoop.processSample(tone_lpf.processSample(hpfed));
+    // float preamped1 =
+    //     drive_gain *
+    //     dc_hpf.processSample(triode_pre.processSample(filtered));
+    // float preamped2 =
+    //     dc_hpf2.processSample(triode_pre2.processSample(preamped1));
+    // float out = post_lpf.processSample(preamped2);
+    // sample = out * padding;
+
     float drive_gain = driveToGain(drive);
-    float hpfed = pre_hpf.processSample(sample);
-    float filtered = mid_scoop.processSample(tone_lpf.processSample(hpfed));
-    float preamped1 =
-        drive_gain * dc_hpf.processSample(triode_pre.processSample(filtered));
-    float preamped2 =
-        dc_hpf2.processSample(triode_pre2.processSample(preamped1));
-    float out = post_lpf.processSample(preamped2);
-    sample = out * padding;
+    float filtered = pre_hpf.processSample(sample);
+    // Pass signal through silicon diode circuit to limit signal between +0.7
+    // and -0.7. Below diode cutting point of 0.7V, we only get CMOS inverter
+    // saturation.
+    float gated = diode.processSample(drive_gain * filtered);
+    // Pass signal through CMOS inverter on linear region
+    float distorted = cmos.processSample(4.5f + gated);
+    float out = post_lpf.processSample(dc_hpf.processSample(distorted));
+    sample = padding * out;
 }

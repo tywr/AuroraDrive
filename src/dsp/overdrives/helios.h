@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../circuits/cmos.h"
+#include "../circuits/silicon_diode.h"
 #include "../circuits/triode.h"
 #include "overdrive.h"
 #include <juce_audio_basics/juce_audio_basics.h>
@@ -33,11 +35,16 @@ class HeliosOverdrive : public Overdrive
     float dc_hpf2_cutoff = 20.0f;
 
     juce::dsp::IIR::Filter<float> post_lpf;
-    float post_lpf_cutoff = 3400.0f;
+    // float post_lpf_cutoff = 3400.0f;
+    float post_lpf_cutoff = 2192.0f;
 
     // triode parameters
 
-    float padding = juce::Decibels::decibelsToGain(-16.0f);
+    // float padding = juce::Decibels::decibelsToGain(-16.0f);
+    float padding = juce::Decibels::decibelsToGain(12.0f);
+
+    CMOS cmos = CMOS();
+    SiliconDiode diode = SiliconDiode(44100.0f);
     Triode triode = Triode(44100);
     Triode triode2 = Triode(44100);
     Triode triode_pre = Triode(44100);
