@@ -16,7 +16,6 @@ class PluginEditor final : public juce::AudioProcessorEditor
 
     //==============================================================================
     void paint(juce::Graphics&) override;
-    void paintBackground(float scale);
     void resized() override;
 
     void setupGainControl(

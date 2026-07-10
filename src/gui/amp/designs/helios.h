@@ -56,9 +56,10 @@ inline void paintSunFigureHelios(
         juce::Colour currentColour =
             c1.interpolatedWith(c2, (float)i / (numLayers - 1));
 
-        float zOffset = i * zOffsetStep;
+        float zOffset = (float)i * zOffsetStep;
         auto currCenter = center.translated(
-            blackHoleOffsetX * i / numLayers, blackHoleOffsetY * i / numLayers
+            blackHoleOffsetX * (float)i / (float)numLayers,
+            blackHoleOffsetY * (float)i / (float)numLayers
         );
         auto path = createWobblyPath(
             currCenter, currentRadius, noiseAmount, noiseFrequency, zOffset
@@ -106,7 +107,7 @@ inline void paintDesignHelios(
                               (proportion * 0.8f); // Start larger, go to max
 
         float zOffset =
-            i * backgroundZOffsetStep +
+            (float)i * backgroundZOffsetStep +
             100.0f; // Add a large offset to distinguish from thermal noise
         auto path = createWobblyPath(
             center, currentRadius, backgroundNoiseAmount,

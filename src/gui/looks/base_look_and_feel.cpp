@@ -214,13 +214,13 @@ void BaseLookAndFeel::drawLinearSlider(
     juce::Rectangle<float> filledTrack;
     if (style == juce::Slider::LinearBar)
     {
-        filledTrack = juce::Rectangle<float>(x, y, sliderPos, height);
+        filledTrack = juce::Rectangle<float>((float)x, (float)y, sliderPos, (float)height);
     }
     else if (style == juce::Slider::LinearBarVertical)
     {
         // revert to always display from bottom to top
-        auto deltaY = sliderPos - y;
-        filledTrack = juce::Rectangle<float>(x, y + deltaY, width, height);
+        auto deltaY = sliderPos - (float)y;
+        filledTrack = juce::Rectangle<float>((float)x, (float)y + deltaY, (float)width, (float)height);
     }
     g.setColour(slider.findColour(juce::Slider::trackColourId));
     g.fillRect(filledTrack);
@@ -291,9 +291,9 @@ void BaseLookAndFeel::drawComboBox(
     g.drawRect(bounds, 1.0f);
 
     // Arrow
-    float arrowSize = height * 0.3f;
-    float arrowX = width - height * 0.6f;
-    float arrowY = height * 0.5f;
+    float arrowSize = (float)height * 0.3f;
+    float arrowX = (float)width - (float)height * 0.6f;
+    float arrowY = (float)height * 0.5f;
 
     juce::Path arrow;
     arrow.addTriangle(

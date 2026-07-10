@@ -51,45 +51,7 @@ PluginEditor::~PluginEditor()
 //==============================================================================
 void PluginEditor::paint(juce::Graphics& g)
 {
-    float scale = g.getInternalContext().getPhysicalPixelScaleFactor();
-    if (!is_background_drawn)
-    {
-        paintBackground(scale);
-        is_background_drawn = true;
-    }
-    auto bounds = getLocalBounds();
-    g.drawImageAt(background, bounds.getX(), bounds.getY());
-}
-
-void PluginEditor::paintBackground(float scale)
-{
-    int width = static_cast<int>(scale * getWidth());
-    int height = static_cast<int>(scale * getHeight());
-    background = juce::Image(juce::Image::ARGB, width, height, true);
-
-    juce::Graphics g(background);
-    juce::Graphics cache(background);
     g.fillAll(juce::Colours::black);
-
-    juce::Random random(3);
-    const int gridSize = 30; // Space between potential dots
-
-    for (int x = 0; x < getWidth(); x += gridSize)
-    {
-        for (int y = 0; y < getHeight(); y += gridSize)
-        {
-            if (random.nextFloat() > 0.7f) // 30% chance of dot
-            {
-                float offsetX = random.nextFloat() * gridSize;
-                float offsetY = random.nextFloat() * gridSize;
-                float size = random.nextFloat() * 3.0f + 0.5f;
-                float alpha = random.nextFloat() * 0.5f + 0.05f;
-
-                g.setColour(juce::Colours::white.withAlpha(alpha));
-                g.fillEllipse(x + offsetX, y + offsetY, size, size);
-            }
-        }
-    }
 }
 
 void PluginEditor::resized()
@@ -97,7 +59,7 @@ void PluginEditor::resized()
     auto bounds = getLocalBounds();
 
     const float header_ratio = 0.1f;
-    const int header_height = static_cast<int>(getHeight() * header_ratio);
+    const int header_height = static_cast<int>((float)getHeight() * header_ratio);
     header.setBounds(bounds.removeFromTop(header_height));
 
     panels.setBounds(bounds);
@@ -225,9 +187,8 @@ void PluginEditor::handleSavePreset()
                 return;
             }
 
-            auto& sessionManager = processorRef.getSessionManager();
             Preset newPreset = processorRef.getPresetManager().getCurrentStateAsPreset(presetName);
-            sessionManager.setPreset(currentIndex, newPreset);
+            processorRef.getSessionManager().setPreset(currentIndex, newPreset);
 
             juce::AlertWindow::showMessageBoxAsync(
                 juce::AlertWindow::InfoIcon,
