@@ -68,18 +68,7 @@ void BaseLookAndFeel::drawButtonBackground(
 
     g.setColour(colour);
 
-    bool isInsideAlertWindow =
-        (button.findParentComponentOfClass<juce::AlertWindow>() != nullptr);
-    if (isInsideAlertWindow)
-    {
-        g.fillRect(bounds);
-        g.setColour(ColourCodes::grey3);
-        g.drawRect(bounds, 1.0f);
-    }
-    else
-    {
-        g.drawEllipse(bounds.reduced(strokeWidth), strokeWidth);
-    }
+    g.fillRoundedRectangle(bounds, 8.0f);
 }
 
 void BaseLookAndFeel::drawButtonText(
@@ -141,9 +130,8 @@ void BaseLookAndFeel::drawToggleButton(
     if (isMouseOverButton)
         trackColour = trackColour.brighter(0.1f);
 
-    // Draw the squared track
     g.setColour(trackColour);
-    g.fillRect(switchBounds);
+    g.fillRoundedRectangle(switchBounds, switchHeight * 0.5f);
 
     // Calculate thumb position (right when on, left when off)
     float thumbX;
@@ -155,13 +143,12 @@ void BaseLookAndFeel::drawToggleButton(
 
     float thumbY = switchBounds.getCentreY() - thumbSize / 2.0f;
 
-    // Draw the squared thumb
     juce::Colour thumbColour = juce::Colours::white;
     if (isButtonDown)
         thumbColour = thumbColour.darker(0.1f);
 
     g.setColour(thumbColour);
-    g.fillRect(thumbX, thumbY, thumbSize, thumbSize);
+    g.fillEllipse(thumbX, thumbY, thumbSize, thumbSize);
 }
 
 void BaseLookAndFeel::drawRotarySlider(
@@ -272,7 +259,7 @@ void BaseLookAndFeel::drawLabel(juce::Graphics& g, juce::Label& label)
     juce::String text = label.getText();
     g.setFont(mainFont);
     g.setColour(label.findColour(juce::Label::textColourId));
-    g.drawFittedText(text, bounds, juce::Justification::centred, 1);
+    g.drawFittedText(text, bounds, label.getJustificationType(), 1);
 }
 
 void BaseLookAndFeel::drawComboBox(
@@ -285,10 +272,7 @@ void BaseLookAndFeel::drawComboBox(
     auto bounds = juce::Rectangle<float>(0, 0, (float)width, (float)height);
 
     g.setColour(box.findColour(juce::ComboBox::backgroundColourId));
-    g.fillRect(bounds);
-
-    g.setColour(ColourCodes::grey3);
-    g.drawRect(bounds, 1.0f);
+    g.fillRoundedRectangle(bounds, 8.0f);
 
     // Arrow
     float arrowSize = (float)height * 0.3f;
@@ -315,10 +299,7 @@ void BaseLookAndFeel::drawAlertBox(
     auto bounds = alert.getLocalBounds().toFloat();
 
     g.setColour(alert.findColour(juce::AlertWindow::backgroundColourId));
-    g.fillRect(bounds);
-
-    g.setColour(alert.findColour(juce::AlertWindow::outlineColourId));
-    g.drawRect(bounds, 2.0f);
+    g.fillRoundedRectangle(bounds, 12.0f);
 
     g.setColour(alert.findColour(juce::AlertWindow::textColourId));
     textLayout.draw(g, textArea.toFloat());

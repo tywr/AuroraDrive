@@ -14,7 +14,7 @@ ChorusComponent::ChorusComponent(juce::AudioProcessorValueTreeState& params)
     addAndMakeVisible(bypass_button);
 
     title_label.setText("CHORUS", juce::dontSendNotification);
-    title_label.setJustificationType(juce::Justification::centredLeft);
+    title_label.setJustificationType(juce::Justification::centred);
 
     bypass_attachment =
         std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
@@ -37,40 +37,26 @@ ChorusComponent::~ChorusComponent()
 void ChorusComponent::paint(juce::Graphics& g)
 {
     bool bypass = bypass_button.getToggleState();
-    juce::Colour colour1, colour2, border_colour;
+    juce::Colour colour1, colour2;
     if (!bypass)
     {
         colour1 = ColourCodes::orange;
         colour2 = ColourCodes::white0;
-        border_colour = ColourCodes::grey0;
     }
     else
     {
         colour1 = GuiColours::DEFAULT_INACTIVE_COLOUR;
         colour2 = ColourCodes::grey0;
-        border_colour = ColourCodes::grey0;
     }
 
-    float border_thickness = GuiDimensions::PANEL_BORDER_THICKNESS;
     auto bounds = getLocalBounds();
 
     title_label.setColour(juce::Label::textColourId, colour2);
 
-    // Fill background
     g.setColour(GuiColours::COMPRESSOR_BG_COLOUR);
-    g.fillRect(bounds);
-
-    // Draw outer border
-    g.setColour(border_colour);
-    g.drawRect(bounds, border_thickness);
-
-    // Draw title bar background and border
-    auto title_bounds =
-        bounds.removeFromTop(GuiDimensions::PANEL_TITLE_BAR_HEIGHT);
-    g.setColour(ColourCodes::bg2);
-    g.fillRect(title_bounds);
-    g.setColour(border_colour);
-    g.drawRect(title_bounds, border_thickness);
+    g.fillRoundedRectangle(
+        bounds.toFloat(), (float)GuiDimensions::BORDER_RADIUS
+    );
 
     knobs_component.switchColour(colour1, colour2);
 }
@@ -82,13 +68,11 @@ void ChorusComponent::resized()
     // Title bar with label and bypass button
     auto title_bounds =
         bounds.removeFromTop(GuiDimensions::PANEL_TITLE_BAR_HEIGHT);
-    title_label.setBounds(title_bounds.removeFromLeft(100.0f));
+    title_label.setBounds(title_bounds);
+    title_bounds.removeFromRight(GuiDimensions::BYPASS_BUTTON_PADDING);
     bypass_button.setBounds(
         title_bounds
-            .removeFromRight(
-                GuiDimensions::BYPASS_BUTTON_WIDTH +
-                GuiDimensions::BYPASS_BUTTON_PADDING
-            )
+            .removeFromRight(GuiDimensions::BYPASS_BUTTON_WIDTH)
             .reduced(GuiDimensions::PANEL_BORDER_THICKNESS)
     );
 

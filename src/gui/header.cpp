@@ -1,6 +1,7 @@
 #include "header.h"
 
 #include "colours.h"
+#include "dimensions.h"
 #include "looks/tuner_look_and_feel.h"
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_gui_basics/juce_gui_basics.h>
@@ -66,53 +67,12 @@ Header::~Header()
 
 void Header::paint(juce::Graphics& g)
 {
-    auto bounds = getLocalBounds().toFloat();
-
-    // Calculate section bounds
-    int const padding = 10;
-    int const knob_padding = 3 * padding;
-    int const knob_size = getHeight() - padding * 2;
-    int const meter_width = 6;
-
-    float leftSeparatorX =
-        padding + meter_width + padding + knob_size + knob_padding + padding;
-    float rightSeparatorX = getWidth() - padding - meter_width - padding -
-                            knob_size - knob_padding - padding;
-
-    // Draw black background behind input slider section
-    juce::Rectangle<float> inputSection(
-        0.0f, 0.0f, leftSeparatorX, (float)getHeight()
-    );
-    g.setColour(juce::Colours::black);
-    g.fillRect(inputSection);
-
-    // Draw grey background behind center section (tuner)
-    juce::Rectangle<float> centerSection(
-        leftSeparatorX, 0.0f, rightSeparatorX - leftSeparatorX,
-        (float)getHeight()
-    );
-    g.setColour(ColourCodes::bg2);
-    g.fillRect(centerSection);
-
-    // Draw black background behind output slider section
-    juce::Rectangle<float> outputSection(
-        rightSeparatorX, 0.0f, getWidth() - rightSeparatorX, (float)getHeight()
-    );
-    g.setColour(juce::Colours::black);
-    g.fillRect(outputSection);
-
-    // Draw solid grey frame around entire header
-    g.setColour(ColourCodes::grey3);
-    g.drawRect(bounds, 2.0f);
-
-    // Draw separators between sections
-    float separatorY1 = 0.0f;
-    float separatorY2 = (float)getHeight();
-
-    g.setColour(ColourCodes::grey3);
-    g.drawLine(leftSeparatorX, separatorY1, leftSeparatorX, separatorY2, 2.0f);
-    g.drawLine(
-        rightSeparatorX, separatorY1, rightSeparatorX, separatorY2, 2.0f
+    auto bounds = getLocalBounds()
+                      .reduced(GuiDimensions::PANEL_GAP, 8)
+                      .toFloat();
+    g.setColour(GuiColours::PANEL_BACKGROUND);
+    g.fillRoundedRectangle(
+        bounds, (float)GuiDimensions::BORDER_RADIUS
     );
 }
 

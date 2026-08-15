@@ -45,18 +45,22 @@ namespace GuiColours
 {
 juce::Colour const DEFAULT_INACTIVE_COLOUR = ColourCodes::bg2;
 
-juce::Colour const COMPRESSOR_BG_COLOUR = ColourCodes::bg0;
+juce::Colour const APP_BACKGROUND = ColourCodes::bg0;
+juce::Colour const PANEL_BACKGROUND = ColourCodes::bg1;
+juce::Colour const CONTROL_BACKGROUND = ColourCodes::bg2;
+
+juce::Colour const COMPRESSOR_BG_COLOUR = PANEL_BACKGROUND;
 juce::Colour const CHORUS_ACTIVE_COLOUR_1 = ColourCodes::aurora_violet;
 juce::Colour const CHORUS_ACTIVE_COLOUR_2 = ColourCodes::aurora_green;
-juce::Colour const CHORUS_BG_COLOUR = ColourCodes::bg0;
+juce::Colour const CHORUS_BG_COLOUR = PANEL_BACKGROUND;
 juce::Colour const CHORUS_STYLING_COLOUR = ColourCodes::bg2;
 
 juce::Colour const EQ_ACTIVE_COLOUR_1 = ColourCodes::blue0;
 juce::Colour const EQ_ACTIVE_COLOUR_2 = ColourCodes::blue1;
-juce::Colour const EQ_BG_COLOUR = ColourCodes::bg0;
+juce::Colour const EQ_BG_COLOUR = PANEL_BACKGROUND;
 juce::Colour const EQ_STYLING_COLOUR = ColourCodes::bg2;
 
-juce::Colour const AMP_BG_COLOUR = ColourCodes::bg0;
+juce::Colour const AMP_BG_COLOUR = PANEL_BACKGROUND;
 
 juce::Colour const RACK_COLOUR = ColourCodes::grey0;
 } // namespace GuiColours

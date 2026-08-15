@@ -25,17 +25,17 @@ void PresetSlot::paint(juce::Graphics& g)
 
     if (isActive)
     {
-        // Selected: orange square background
-        g.setColour(ColourCodes::orange); // Orange
-        g.fillRect(bounds);
+        g.setColour(ColourCodes::orange);
+        g.fillRoundedRectangle(bounds, 8.0f);
 
         g.setColour(juce::Colours::black);
     }
     else
     {
-        // Non-selected: black/transparent background with white text
         if (isHovered)
         {
+            g.setColour(GuiColours::CONTROL_BACKGROUND);
+            g.fillRoundedRectangle(bounds, 8.0f);
             g.setColour(ColourCodes::white1);
         }
         else
@@ -108,7 +108,9 @@ void PresetBar::resized()
 
     for (int i = 0; i < SessionManager::MAX_PRESETS; ++i)
     {
-        presetSlots[i]->setBounds(bounds.removeFromLeft(slotWidth));
+        presetSlots[i]->setBounds(
+            bounds.removeFromLeft(slotWidth).reduced(2, 4)
+        );
     }
 }
 

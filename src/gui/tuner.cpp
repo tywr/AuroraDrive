@@ -1,4 +1,6 @@
 #include "tuner.h"
+#include "dimensions.h"
+#include "fonts.h"
 #include <cmath>
 #include <juce_gui_basics/juce_gui_basics.h>
 
@@ -66,20 +68,22 @@ Tuner::~Tuner()
 
 void Tuner::paint(juce::Graphics& g)
 {
-    g.fillAll(juce::Colours::black);
+    g.fillAll(GuiColours::APP_BACKGROUND);
 
     bool inTune = currentFreq > 0.0f && std::abs(centsDeviation) < inTuneThreshold;
     juce::Colour accentColour = inTune ? ColourCodes::orange : ColourCodes::grey3;
 
     auto bounds = getLocalBounds().reduced(100).toFloat();
-    g.setColour(accentColour.withAlpha(0.4f));
-    g.drawRect(bounds, 2.0f);
+    g.setColour(GuiColours::PANEL_BACKGROUND);
+    g.fillRoundedRectangle(
+        bounds, (float)GuiDimensions::BORDER_RADIUS
+    );
 
     auto innerBounds = bounds.reduced(40.0f);
 
     // Note label
     g.setColour(inTune ? ColourCodes::orange : ColourCodes::white0);
-    g.setFont(48.0f);
+    g.setFont(Fonts::getFont(48.0f));
     g.drawText(
         noteLabel, innerBounds.removeFromTop(60.0f),
         juce::Justification::centred
@@ -93,7 +97,7 @@ void Tuner::paint(juce::Graphics& g)
 
     // Bar background
     g.setColour(ColourCodes::bg2);
-    g.fillRect(sliderBounds);
+    g.fillRoundedRectangle(sliderBounds, sliderHeight * 0.5f);
 
     // Tick marks
     float centerX = sliderBounds.getCentreX();
@@ -121,10 +125,10 @@ void Tuner::paint(juce::Graphics& g)
         float indicatorH = sliderHeight + 10.0f;
 
         g.setColour(inTune ? ColourCodes::orange : ColourCodes::white0);
-        g.fillRect(
+        g.fillRoundedRectangle(
             indicatorX - indicatorW / 2.0f,
             sliderBounds.getCentreY() - indicatorH / 2.0f,
-            indicatorW, indicatorH
+            indicatorW, indicatorH, indicatorW * 0.5f
         );
     }
 }

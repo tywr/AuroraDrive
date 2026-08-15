@@ -1,5 +1,6 @@
 #include "plugin_editor.h"
 
+#include "gui/colours.h"
 #include "gui/looks/base_look_and_feel.h"
 #include "plugin_audio_processor.h"
 #include <juce_core/juce_core.h>
@@ -51,7 +52,7 @@ PluginEditor::~PluginEditor()
 //==============================================================================
 void PluginEditor::paint(juce::Graphics& g)
 {
-    g.fillAll(juce::Colours::black);
+    g.fillAll(GuiColours::APP_BACKGROUND);
 }
 
 void PluginEditor::resized()
