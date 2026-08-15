@@ -18,7 +18,7 @@ CompressorComponent::CompressorComponent(
     addAndMakeVisible(bypass_button);
 
     title_label.setText("COMPRESSOR", juce::dontSendNotification);
-    title_label.setJustificationType(juce::Justification::centred);
+    title_label.setJustificationType(juce::Justification::centredLeft);
 
     bypass_attachment =
         std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
@@ -174,13 +174,14 @@ void CompressorComponent::resized()
     auto height = bounds.getHeight() - GuiDimensions::PANEL_TITLE_BAR_HEIGHT;
     auto title_bounds =
         bounds.removeFromTop(GuiDimensions::PANEL_TITLE_BAR_HEIGHT);
-    title_label.setBounds(title_bounds);
-    title_bounds.removeFromRight(GuiDimensions::BYPASS_BUTTON_PADDING);
+    title_bounds.removeFromLeft(GuiDimensions::BYPASS_BUTTON_PADDING);
     bypass_button.setBounds(
         title_bounds
-            .removeFromRight(GuiDimensions::BYPASS_BUTTON_WIDTH)
+            .removeFromLeft(GuiDimensions::BYPASS_BUTTON_WIDTH)
             .reduced(GuiDimensions::PANEL_BORDER_THICKNESS)
     );
+    title_bounds.removeFromLeft(GuiDimensions::PANEL_KNOB_PADDING);
+    title_label.setBounds(title_bounds);
     meter_component.setBounds(bounds.removeFromTop(height / 2));
     knobs_component.setBounds(bounds);
 }

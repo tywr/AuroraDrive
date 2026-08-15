@@ -13,7 +13,7 @@ IRComponent::IRComponent(juce::AudioProcessorValueTreeState& params)
 {
     addAndMakeVisible(title_label);
     title_label.setText("IMPULSE", juce::dontSendNotification);
-    title_label.setJustificationType(juce::Justification::centred);
+    title_label.setJustificationType(juce::Justification::centredLeft);
 
     addAndMakeVisible(drag_tooltip);
     drag_tooltip.setJustificationType(juce::Justification::centred);
@@ -128,13 +128,14 @@ void IRComponent::resized()
     // Title bar with label and bypass button
     auto title_bounds =
         full_bounds.removeFromTop(GuiDimensions::PANEL_TITLE_BAR_HEIGHT);
-    title_label.setBounds(title_bounds);
-    title_bounds.removeFromRight(GuiDimensions::BYPASS_BUTTON_PADDING);
+    title_bounds.removeFromLeft(GuiDimensions::BYPASS_BUTTON_PADDING);
     bypassButton.setBounds(title_bounds
-                               .removeFromRight(
+                               .removeFromLeft(
                                    GuiDimensions::BYPASS_BUTTON_WIDTH
                                )
                                .reduced(GuiDimensions::PANEL_BORDER_THICKNESS));
+    title_bounds.removeFromLeft(GuiDimensions::PANEL_KNOB_PADDING);
+    title_label.setBounds(title_bounds);
 
     // Split remaining bounds into top row (display) and bottom row (knobs)
     auto display_section =

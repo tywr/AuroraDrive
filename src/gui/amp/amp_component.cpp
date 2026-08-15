@@ -16,7 +16,7 @@ AmpComponent::AmpComponent(juce::AudioProcessorValueTreeState& params)
     addAndMakeVisible(bypass_button);
 
     title_label.setText("OVERDRIVE", juce::dontSendNotification);
-    title_label.setJustificationType(juce::Justification::centred);
+    title_label.setJustificationType(juce::Justification::centredLeft);
 
     bypass_attachment =
         std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
@@ -123,13 +123,14 @@ void AmpComponent::resized()
     // Title bar with label and bypass button
     auto title_bounds =
         bounds.removeFromTop(GuiDimensions::PANEL_TITLE_BAR_HEIGHT);
-    title_label.setBounds(title_bounds);
-    title_bounds.removeFromRight(GuiDimensions::BYPASS_BUTTON_PADDING);
+    title_bounds.removeFromLeft(GuiDimensions::BYPASS_BUTTON_PADDING);
     bypass_button.setBounds(
         title_bounds
-            .removeFromRight(GuiDimensions::BYPASS_BUTTON_WIDTH)
+            .removeFromLeft(GuiDimensions::BYPASS_BUTTON_WIDTH)
             .reduced(GuiDimensions::PANEL_BORDER_THICKNESS)
     );
+    title_bounds.removeFromLeft(GuiDimensions::PANEL_KNOB_PADDING);
+    title_label.setBounds(title_bounds);
 
     // Design area (upper half)
     auto design_bounds = bounds.removeFromTop(height / 2);

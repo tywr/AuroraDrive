@@ -107,48 +107,24 @@ void BaseLookAndFeel::drawToggleButton(
 )
 {
     auto bounds = button.getLocalBounds().toFloat();
+    const float diameter =
+        juce::jmin(bounds.getWidth(), bounds.getHeight()) * 0.67f;
+    auto buttonBounds =
+        juce::Rectangle<float>(diameter, diameter).withCentre(bounds.getCentre());
 
-    // Define switch dimensions (horizontal slider)
-    const float switchHeight =
-        juce::jmin(bounds.getWidth(), bounds.getHeight()) * 0.5f;
-    const float switchWidth = switchHeight * 2.0f;
-    const float thumbSize = switchHeight * 0.8f;
-    const float padding = (switchHeight - thumbSize) / 2.0f;
-
-    // Center the switch in the button bounds
-    auto switchBounds = juce::Rectangle<float>(switchWidth, switchHeight)
-                            .withCentre(bounds.getCentre());
-
-    // Determine colors based on state
-    juce::Colour trackColour;
-    if (button.getToggleState())
-        trackColour = button.findColour(juce::ToggleButton::tickColourId);
-    else
-        trackColour =
-            button.findColour(juce::ToggleButton::tickDisabledColourId);
+    auto colour = button.getToggleState()
+                      ? button.findColour(juce::ToggleButton::tickColourId)
+                      : button.findColour(
+                            juce::ToggleButton::tickDisabledColourId
+                        );
 
     if (isMouseOverButton)
-        trackColour = trackColour.brighter(0.1f);
-
-    g.setColour(trackColour);
-    g.fillRoundedRectangle(switchBounds, switchHeight * 0.5f);
-
-    // Calculate thumb position (right when on, left when off)
-    float thumbX;
-    if (button.getToggleState())
-        thumbX = switchBounds.getRight() - thumbSize -
-                 padding; // Right position (ON)
-    else
-        thumbX = switchBounds.getX() + padding; // Left position (OFF)
-
-    float thumbY = switchBounds.getCentreY() - thumbSize / 2.0f;
-
-    juce::Colour thumbColour = juce::Colours::white;
+        colour = colour.brighter(0.12f);
     if (isButtonDown)
-        thumbColour = thumbColour.darker(0.1f);
+        colour = colour.darker(0.12f);
 
-    g.setColour(thumbColour);
-    g.fillEllipse(thumbX, thumbY, thumbSize, thumbSize);
+    g.setColour(colour);
+    g.fillEllipse(buttonBounds);
 }
 
 void BaseLookAndFeel::drawRotarySlider(
