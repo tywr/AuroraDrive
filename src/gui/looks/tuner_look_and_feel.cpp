@@ -1,10 +1,18 @@
 #include "tuner_look_and_feel.h"
+#include "BinaryData.h"
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
 TunerLookAndFeel::TunerLookAndFeel()
 {
     setColourScheme(getColourScheme());
+
+    if (auto svg = juce::XmlDocument::parse(juce::String::fromUTF8(
+            BinaryData::gitfork_svg, BinaryData::gitfork_svgSize
+        )))
+    {
+        icon = juce::Drawable::createFromSVG(*svg);
+    }
 }
 
 void TunerLookAndFeel::drawToggleButton(
@@ -19,46 +27,17 @@ void TunerLookAndFeel::drawToggleButton(
     else if (isMouseOverButton)
         colour = colour.brighter(0.2f);
 
-    g.setColour(colour);
+    if (icon == nullptr)
+        return;
 
     auto bounds = button.getLocalBounds().toFloat();
-    float iconSize = juce::jmin(bounds.getWidth(), bounds.getHeight()) * 0.5f;
-    auto iconBounds = bounds.withSizeKeepingCentre(iconSize, iconSize);
-    float centerX = iconBounds.getCentreX();
-    float centerY = iconBounds.getCentreY();
+    icon->replaceColour(currentIconColour, colour);
+    currentIconColour = colour;
 
-    float stroke = 1.4f;
-    juce::PathStrokeType strokeType(stroke, juce::PathStrokeType::curved, juce::PathStrokeType::rounded);
-
-    float forkWidth = iconSize * 0.5f;
-    float forkHeight = iconSize * 0.5f;
-    float handleLength = iconSize * 0.35f;
-    float dotRadius = 1.8f;
-    float dotGap = stroke + dotRadius;
-
-    // Total height from prong tops to dot bottom, used to vertically center the whole shape
-    float totalHeight = forkHeight + handleLength + dotGap + dotRadius;
-    float offsetY = centerY - totalHeight / 2.0f;
-
-    float leftProngX = centerX - forkWidth / 2.0f;
-    float rightProngX = centerX + forkWidth / 2.0f;
-    float topY = offsetY;
-    float curveY = topY + forkHeight;
-    float handleEndY = curveY + handleLength;
-
-    juce::Path tuningFork;
-
-    tuningFork.startNewSubPath(leftProngX, topY);
-    tuningFork.lineTo(leftProngX, curveY);
-    tuningFork.quadraticTo(leftProngX, curveY + handleLength * 0.25f, centerX, curveY + handleLength * 0.25f);
-    tuningFork.lineTo(centerX, handleEndY);
-
-    tuningFork.startNewSubPath(centerX, curveY + handleLength * 0.25f);
-    tuningFork.quadraticTo(rightProngX, curveY + handleLength * 0.25f, rightProngX, curveY);
-    tuningFork.lineTo(rightProngX, topY);
-
-    g.strokePath(tuningFork, strokeType);
-
-    float dotY = handleEndY + dotGap;
-    g.fillEllipse(centerX - dotRadius, dotY - dotRadius, dotRadius * 2.0f, dotRadius * 2.0f);
+    const float iconSize =
+        juce::jmin(bounds.getWidth(), bounds.getHeight()) * 0.5f;
+    icon->drawWithin(
+        g, bounds.withSizeKeepingCentre(iconSize, iconSize),
+        juce::RectanglePlacement::centred, 1.0f
+    );
 }

@@ -8,6 +8,8 @@ class TunerLookAndFeel : public juce::LookAndFeel_V4
 {
   private:
     juce::Font mainFont = Fonts::getFont(11.0f);
+    std::unique_ptr<juce::Drawable> icon;
+    juce::Colour currentIconColour = ColourCodes::white0;
 
   public:
     TunerLookAndFeel();

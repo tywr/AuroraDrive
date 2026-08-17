@@ -1,30 +1,37 @@
 #include "tuner.h"
+#include "BinaryData.h"
 #include "dimensions.h"
 #include "fonts.h"
 #include <cmath>
 #include <juce_gui_basics/juce_gui_basics.h>
 
-CloseButton::CloseButton() {}
+CloseButton::CloseButton()
+{
+    if (auto svg = juce::XmlDocument::parse(juce::String::fromUTF8(
+            BinaryData::x_svg, BinaryData::x_svgSize
+        )))
+    {
+        icon = juce::Drawable::createFromSVG(*svg);
+    }
+}
 
 void CloseButton::paint(juce::Graphics& g)
 {
     auto bounds = getLocalBounds().toFloat();
-    float iconSize = juce::jmin(bounds.getWidth(), bounds.getHeight()) * 0.5f;
-    auto iconBounds = bounds.withSizeKeepingCentre(iconSize, iconSize);
-    float cx = iconBounds.getCentreX();
-    float cy = iconBounds.getCentreY();
-    float arm = iconSize * 0.4f;
-
     juce::Colour colour = isHovered ? ColourCodes::orange : ColourCodes::white0;
-    g.setColour(colour);
 
-    juce::Path path;
-    path.startNewSubPath(cx - arm, cy - arm);
-    path.lineTo(cx + arm, cy + arm);
-    path.startNewSubPath(cx + arm, cy - arm);
-    path.lineTo(cx - arm, cy + arm);
+    if (icon == nullptr)
+        return;
 
-    g.strokePath(path, juce::PathStrokeType(1.4f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
+    icon->replaceColour(currentIconColour, colour);
+    currentIconColour = colour;
+
+    const float iconSize =
+        juce::jmin(bounds.getWidth(), bounds.getHeight()) * 0.5f;
+    icon->drawWithin(
+        g, bounds.withSizeKeepingCentre(iconSize, iconSize),
+        juce::RectanglePlacement::centred, 1.0f
+    );
 }
 
 void CloseButton::mouseDown(const juce::MouseEvent&)

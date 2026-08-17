@@ -19,6 +19,8 @@ public:
 
 private:
     IconType iconType;
+    std::unique_ptr<juce::Drawable> icon;
+    juce::Colour currentIconColour = ColourCodes::white0;
     bool isHovered = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IconButton)

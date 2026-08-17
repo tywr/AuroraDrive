@@ -29,6 +29,8 @@ constexpr int PANEL_KNOB_PADDING = 10;
 constexpr int BYPASS_BUTTON_WIDTH = 20;
 constexpr int BYPASS_BUTTON_PADDING = 8;
 
+constexpr int HEADER_GAIN_SLIDER_PADDING = 6;
+
 constexpr int KNOB_SIZE = 40;
 constexpr int KNOB_LABEL_HEIGHT = 20;
 

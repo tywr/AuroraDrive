@@ -71,7 +71,14 @@ endif()
 
 
 juce_add_binary_data(FontData
-    SOURCES ${CMAKE_SOURCE_DIR}/fonts/Inter.ttf
+    SOURCES
+        ${CMAKE_SOURCE_DIR}/fonts/Inter.ttf
+        ${CMAKE_SOURCE_DIR}/assets/icons/folder-open.svg
+        ${CMAKE_SOURCE_DIR}/assets/icons/folder-plus.svg
+        ${CMAKE_SOURCE_DIR}/assets/icons/git-fork.svg
+        ${CMAKE_SOURCE_DIR}/assets/icons/refresh-cw.svg
+        ${CMAKE_SOURCE_DIR}/assets/icons/save.svg
+        ${CMAKE_SOURCE_DIR}/assets/icons/x.svg
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE FontData)

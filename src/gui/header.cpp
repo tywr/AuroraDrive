@@ -23,7 +23,7 @@ Header::Header(
     inputGainSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     inputGainSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 50, 25);
     inputGainSlider.setColour(
-        juce::Slider::rotarySliderFillColourId, juce::Colours::black
+        juce::Slider::rotarySliderFillColourId, ColourCodes::bg0
     );
     inputGainSlider.setColour(
         juce::Slider::rotarySliderOutlineColourId, ColourCodes::white0
@@ -38,7 +38,7 @@ Header::Header(
     outputGainSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     outputGainSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 50, 25);
     outputGainSlider.setColour(
-        juce::Slider::rotarySliderFillColourId, juce::Colours::black
+        juce::Slider::rotarySliderFillColourId, ColourCodes::bg0
     );
     outputGainSlider.setColour(
         juce::Slider::rotarySliderOutlineColourId, ColourCodes::white0
@@ -67,13 +67,8 @@ Header::~Header()
 
 void Header::paint(juce::Graphics& g)
 {
-    auto bounds = getLocalBounds()
-                      .reduced(GuiDimensions::PANEL_GAP, 8)
-                      .toFloat();
     g.setColour(GuiColours::PANEL_BACKGROUND);
-    g.fillRoundedRectangle(
-        bounds, (float)GuiDimensions::BORDER_RADIUS
-    );
+    g.fillRect(getLocalBounds());
 }
 
 void Header::resized()
@@ -88,7 +83,10 @@ void Header::resized()
     // Left side: input meter and gain
     inputMeter.setBounds(bounds.removeFromLeft(meter_width));
     bounds.removeFromLeft(padding);
-    inputGainSlider.setBounds(bounds.removeFromLeft(knob_size + knob_padding));
+    inputGainSlider.setBounds(
+        bounds.removeFromLeft(knob_size + knob_padding)
+            .reduced(GuiDimensions::HEADER_GAIN_SLIDER_PADDING)
+    );
     bounds.removeFromLeft(padding);
 
     // Right side: output gain and meter
@@ -96,6 +94,7 @@ void Header::resized()
     bounds.removeFromRight(padding);
     outputGainSlider.setBounds(
         bounds.removeFromRight(knob_size + knob_padding)
+            .reduced(GuiDimensions::HEADER_GAIN_SLIDER_PADDING)
     );
     bounds.removeFromRight(padding);
 
