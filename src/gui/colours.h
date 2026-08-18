@@ -6,7 +6,7 @@ namespace ColourCodes
 {
 juce::Colour const bg = juce::Colour(0, 0, 0);
 juce::Colour const bg0 = juce::Colour(10, 10, 10);
-juce::Colour const bg1 = juce::Colour(16, 16, 16);
+juce::Colour const bg1 = juce::Colour(20, 20, 20);
 juce::Colour const bg2 = juce::Colour(30, 30, 30);
 juce::Colour const bg3 = juce::Colour(40, 40, 40);
 juce::Colour const grey0 = juce::Colour(50, 50, 50);

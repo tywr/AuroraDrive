@@ -86,36 +86,36 @@ inline void paintDesignHelios(
 {
     juce::Graphics::ScopedSaveState state(g);
 
-    auto center = bounds.getCentre();
-
-    // Background noise layers
-    const int numBackgroundNoiseLayers = 25;
-    const float backgroundNoiseFrequency = 1.0f;
-    const float backgroundNoiseAmount = 0.3f;
-    const float backgroundZOffsetStep = 0.1f;
-
-    juce::Path boxPath;
-    boxPath.addRectangle(bounds);
-    g.reduceClipRegion(boxPath);
-
-    float maxBackgroundRadius = bounds.getWidth();
-
-    for (int i = 0; i < numBackgroundNoiseLayers; ++i)
-    {
-        float proportion = (float)i / (numBackgroundNoiseLayers); // 0.0 to <1.0
-        float currentRadius = maxBackgroundRadius *
-                              (proportion * 0.8f); // Start larger, go to max
-
-        float zOffset =
-            (float)i * backgroundZOffsetStep +
-            100.0f; // Add a large offset to distinguish from thermal noise
-        auto path = createWobblyPath(
-            center, currentRadius, backgroundNoiseAmount,
-            backgroundNoiseFrequency, zOffset
-        );
-
-        g.setColour(GuiColours::DEFAULT_INACTIVE_COLOUR);
-        g.strokePath(path, juce::PathStrokeType(1.0f));
-    }
+    // auto center = bounds.getCentre();
+    //
+    // // Background noise layers
+    // const int numBackgroundNoiseLayers = 25;
+    // const float backgroundNoiseFrequency = 1.0f;
+    // const float backgroundNoiseAmount = 0.3f;
+    // const float backgroundZOffsetStep = 0.1f;
+    //
+    // juce::Path boxPath;
+    // boxPath.addRectangle(bounds);
+    // g.reduceClipRegion(boxPath);
+    //
+    // float maxBackgroundRadius = bounds.getWidth();
+    //
+    // for (int i = 0; i < numBackgroundNoiseLayers; ++i)
+    // {
+    //     float proportion = (float)i / (numBackgroundNoiseLayers); // 0.0 to <1.0
+    //     float currentRadius = maxBackgroundRadius *
+    //                           (proportion * 0.8f); // Start larger, go to max
+    //
+    //     float zOffset =
+    //         (float)i * backgroundZOffsetStep +
+    //         100.0f; // Add a large offset to distinguish from thermal noise
+    //     auto path = createWobblyPath(
+    //         center, currentRadius, backgroundNoiseAmount,
+    //         backgroundNoiseFrequency, zOffset
+    //     );
+    //
+    //     g.setColour(GuiColours::DEFAULT_INACTIVE_COLOUR);
+    //     g.strokePath(path, juce::PathStrokeType(1.0f));
+    // }
     paintSunFigureHelios(g, bounds, c1, c2);
 }

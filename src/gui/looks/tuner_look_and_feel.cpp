@@ -8,7 +8,7 @@ TunerLookAndFeel::TunerLookAndFeel()
     setColourScheme(getColourScheme());
 
     if (auto svg = juce::XmlDocument::parse(juce::String::fromUTF8(
-            BinaryData::gitfork_svg, BinaryData::gitfork_svgSize
+            BinaryData::gauge_svg, BinaryData::gauge_svgSize
         )))
     {
         icon = juce::Drawable::createFromSVG(*svg);

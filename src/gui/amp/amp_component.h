@@ -1,42 +1,35 @@
 #pragma once
 
 #include "../colours.h"
+#include "../components/effect_component.h"
 #include "amp_knobs_component.h"
 #include "amp_type.h"
 #include "designs/helios.h"
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
-class AmpComponent : public juce::Component
+class AmpComponent : public EffectComponent
 {
   public:
     AmpComponent(juce::AudioProcessorValueTreeState&);
-    ~AmpComponent() override;
 
     void setColours(juce::Colour, juce::Colour);
     void initType();
     void switchType(AmpType);
 
-    void resized() override;
-
-    void paint(juce::Graphics&) override;
     void paintTypeButtons(juce::Graphics&);
     void paintDesign(juce::Graphics&, juce::Rectangle<float>);
     void paintBorder(juce::Graphics&, juce::Rectangle<float>, float);
 
   private:
+    void paintContent(juce::Graphics&) override;
+    void resizedContent(juce::Rectangle<int>) override;
+    void bypassStateChanged() override;
     void buildCache(float scale, juce::Colour colour1, juce::Colour colour2);
     juce::Image background_cache;
     bool is_cache_dirty = true;
 
-    juce::AudioProcessorValueTreeState& parameters;
-
-    // Sub-components
-    juce::Label title_label;
     AmpKnobsComponent knobs_component;
-    juce::ToggleButton bypass_button;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>
-        bypass_attachment;
 
     juce::Slider type_slider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>

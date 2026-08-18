@@ -9,6 +9,10 @@ class BaseLookAndFeel : public juce::LookAndFeel_V4
   private:
     float strokeWidth = 2.0f;
     juce::Font mainFont = Fonts::getFont(12.0f);
+    std::unique_ptr<juce::Drawable> powerIcon;
+    juce::Colour currentPowerIconColour = ColourCodes::white0;
+    std::unique_ptr<juce::Drawable> checkIcon;
+    juce::Colour currentCheckIconColour = ColourCodes::white0;
 
   public:
     BaseLookAndFeel();
@@ -90,6 +94,23 @@ class BaseLookAndFeel : public juce::LookAndFeel_V4
     {
         return mainFont;
     }
+
+    void drawPopupMenuBackground(
+        juce::Graphics&, int width, int height
+    ) override;
+
+    void drawPopupMenuItem(
+        juce::Graphics&, const juce::Rectangle<int>& area,
+        bool isSeparator, bool isActive, bool isHighlighted, bool isTicked,
+        bool hasSubMenu, const juce::String& text,
+        const juce::String& shortcutKeyText, const juce::Drawable* icon,
+        const juce::Colour* textColour
+    ) override;
+
+    void getIdealPopupMenuItemSize(
+        const juce::String& text, bool isSeparator,
+        int standardMenuItemHeight, int& idealWidth, int& idealHeight
+    ) override;
 
     juce::Font getComboBoxFont(juce::ComboBox&) override
     {

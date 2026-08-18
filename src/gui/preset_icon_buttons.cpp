@@ -21,8 +21,8 @@ IconButton::IconButton(IconType type) : iconType(type)
             dataSize = BinaryData::save_svgSize;
             break;
         case Reload:
-            data = BinaryData::refreshcw_svg;
-            dataSize = BinaryData::refreshcw_svgSize;
+            data = BinaryData::rotateccw_svg;
+            dataSize = BinaryData::rotateccw_svgSize;
             break;
     }
 

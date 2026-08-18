@@ -9,35 +9,16 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 
 AmpComponent::AmpComponent(juce::AudioProcessorValueTreeState& params)
-    : parameters(params), knobs_component(params)
+    : EffectComponent(params, "OVERDRIVE", "amp_bypass"),
+      knobs_component(params)
 {
-    addAndMakeVisible(title_label);
     addAndMakeVisible(knobs_component);
-    addAndMakeVisible(bypass_button);
-
-    title_label.setText("OVERDRIVE", juce::dontSendNotification);
-    title_label.setJustificationType(juce::Justification::centredLeft);
-
-    bypass_attachment =
-        std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
-            parameters, "amp_bypass", bypass_button
-        );
-    bypass_button.setColour(
-        juce::ToggleButton::tickColourId, GuiColours::DEFAULT_INACTIVE_COLOUR
-    );
-    bypass_button.setColour(
-        juce::ToggleButton::tickDisabledColourId, ColourCodes::orange
-    );
-    bypass_button.onClick = [this]()
-    {
-        is_cache_dirty = true;
-        repaint();
-    };
     knobs_component.switchType();
 }
 
-AmpComponent::~AmpComponent()
+void AmpComponent::bypassStateChanged()
 {
+    is_cache_dirty = true;
 }
 
 void AmpComponent::paintDesign(juce::Graphics& g, juce::Rectangle<float> bounds)
@@ -72,32 +53,12 @@ void AmpComponent::paintBorder(
     g.fillPath(border_path);
 }
 
-void AmpComponent::paint(juce::Graphics& g)
+void AmpComponent::paintContent(juce::Graphics& g)
 {
-    bool bypass = bypass_button.getToggleState();
-    juce::Colour colour1, colour2, colour3;
-
-    if (!bypass)
-    {
-        colour1 = ColourCodes::orange;
-        colour2 = ColourCodes::orange_light;
-        colour3 = ColourCodes::white0;
-    }
-    else
-    {
-        colour1 = GuiColours::DEFAULT_INACTIVE_COLOUR;
-        colour2 = ColourCodes::grey0;
-        colour3 = ColourCodes::grey0;
-    }
-
+    const auto colour1 = getAccentColour();
+    const auto colour2 =
+        isBypassed() ? ColourCodes::grey0 : ColourCodes::orange_light;
     auto bounds = getLocalBounds();
-
-    title_label.setColour(juce::Label::textColourId, colour3);
-
-    g.setColour(GuiColours::AMP_BG_COLOUR);
-    g.fillRoundedRectangle(
-        bounds.toFloat(), (float)GuiDimensions::BORDER_RADIUS
-    );
 
     // Get design area bounds
     bounds.removeFromTop(GuiDimensions::PANEL_TITLE_BAR_HEIGHT);
@@ -114,26 +75,10 @@ void AmpComponent::paint(juce::Graphics& g)
     knobs_component.switchColour(colour1, colour2);
 }
 
-void AmpComponent::resized()
+void AmpComponent::resizedContent(juce::Rectangle<int> bounds)
 {
     is_cache_dirty = true;
-    auto bounds = getLocalBounds();
-    auto height = bounds.getHeight() - GuiDimensions::PANEL_TITLE_BAR_HEIGHT;
-
-    // Title bar with label and bypass button
-    auto title_bounds =
-        bounds.removeFromTop(GuiDimensions::PANEL_TITLE_BAR_HEIGHT);
-    title_bounds.removeFromLeft(GuiDimensions::BYPASS_BUTTON_PADDING);
-    bypass_button.setBounds(
-        title_bounds
-            .removeFromLeft(GuiDimensions::BYPASS_BUTTON_WIDTH)
-            .reduced(GuiDimensions::PANEL_BORDER_THICKNESS)
-    );
-    title_bounds.removeFromLeft(GuiDimensions::PANEL_KNOB_PADDING);
-    title_label.setBounds(title_bounds);
-
-    // Design area (upper half)
-    auto design_bounds = bounds.removeFromTop(height / 2);
+    bounds.removeFromTop(bounds.getHeight() / 2);
 
     // Knobs area (lower half)
     knobs_component.setBounds(bounds);

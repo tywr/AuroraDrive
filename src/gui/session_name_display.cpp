@@ -1,4 +1,5 @@
 #include "session_name_display.h"
+#include "dimensions.h"
 
 SessionNameDisplay::SessionNameDisplay(SessionManager& sm) : sessionManager(sm)
 {
@@ -29,7 +30,10 @@ void SessionNameDisplay::paint(juce::Graphics& g)
 
 void SessionNameDisplay::resized()
 {
-    collectionComboBox.setBounds(getLocalBounds());
+    collectionComboBox.setBounds(
+        getLocalBounds().withHeight(GuiDimensions::HEADER_COMBOBOX_HEIGHT)
+            .withCentre(getLocalBounds().getCentre())
+    );
 }
 
 void SessionNameDisplay::sessionChanged()

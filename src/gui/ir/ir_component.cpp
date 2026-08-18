@@ -9,30 +9,12 @@
 #include <juce_core/juce_core.h>
 
 IRComponent::IRComponent(juce::AudioProcessorValueTreeState& params)
-    : parameters(params)
+    : EffectComponent(params, "IMPULSE", "ir_bypass"), parameters(params)
 {
-    addAndMakeVisible(title_label);
-    title_label.setText("IMPULSE", juce::dontSendNotification);
-    title_label.setJustificationType(juce::Justification::centredLeft);
-
     addAndMakeVisible(drag_tooltip);
     drag_tooltip.setJustificationType(juce::Justification::centred);
     drag_tooltip.setAlwaysOnTop(true);
     drag_tooltip.setColour(juce::Label::backgroundColourId, ColourCodes::bg0);
-
-    addAndMakeVisible(bypassButton);
-    bypassButton.setButtonText("bypass");
-    bypassButton.setColour(
-        juce::ToggleButton::tickColourId, GuiColours::DEFAULT_INACTIVE_COLOUR
-    );
-    bypassButton.setColour(
-        juce::ToggleButton::tickDisabledColourId, ColourCodes::orange
-    );
-    bypassButton.onClick = [this]() { switchColour(); };
-    bypassButtonAttachment =
-        std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
-            parameters, "ir_bypass", bypassButton
-        );
 
     addAndMakeVisible(type_display);
     type_display.setFont(Fonts::getFont(24.0f), true);
@@ -76,32 +58,13 @@ IRComponent::IRComponent(juce::AudioProcessorValueTreeState& params)
     switchColour();
 }
 
-IRComponent::~IRComponent()
+void IRComponent::bypassStateChanged()
 {
+    switchColour();
 }
 
-void IRComponent::paint(juce::Graphics& g)
+void IRComponent::paintContent(juce::Graphics& g)
 {
-    bool bypass = bypassButton.getToggleState();
-    juce::Colour colour2;
-    if (!bypass)
-    {
-        colour2 = ColourCodes::white0;
-    }
-    else
-    {
-        colour2 = ColourCodes::grey0;
-    }
-
-    auto full_bounds = getLocalBounds();
-
-    title_label.setColour(juce::Label::textColourId, colour2);
-
-    g.setColour(GuiColours::COMPRESSOR_BG_COLOUR);
-    g.fillRoundedRectangle(
-        full_bounds.toFloat(), (float)GuiDimensions::BORDER_RADIUS
-    );
-
     // Calculate display bounds to match resized() layout
     auto bounds_for_display = getLocalBounds();
     bounds_for_display.removeFromTop(GuiDimensions::PANEL_TITLE_BAR_HEIGHT);
@@ -121,26 +84,12 @@ void IRComponent::paint(juce::Graphics& g)
     type_display.draw(g, 1.0f);
 }
 
-void IRComponent::resized()
+void IRComponent::resizedContent(juce::Rectangle<int> bounds)
 {
-    auto full_bounds = getLocalBounds();
-
-    // Title bar with label and bypass button
-    auto title_bounds =
-        full_bounds.removeFromTop(GuiDimensions::PANEL_TITLE_BAR_HEIGHT);
-    title_bounds.removeFromLeft(GuiDimensions::BYPASS_BUTTON_PADDING);
-    bypassButton.setBounds(title_bounds
-                               .removeFromLeft(
-                                   GuiDimensions::BYPASS_BUTTON_WIDTH
-                               )
-                               .reduced(GuiDimensions::PANEL_BORDER_THICKNESS));
-    title_bounds.removeFromLeft(GuiDimensions::PANEL_KNOB_PADDING);
-    title_label.setBounds(title_bounds);
-
     // Split remaining bounds into top row (display) and bottom row (knobs)
     auto display_section =
-        full_bounds.removeFromTop(full_bounds.getHeight() / 2);
-    auto knobs_section = full_bounds;
+        bounds.removeFromTop(bounds.getHeight() / 2);
+    auto knobs_section = bounds;
 
     // Position display centered in top section
     auto display_bounds = display_section.withSizeKeepingCentre(
@@ -163,7 +112,7 @@ void IRComponent::resized()
 
 void IRComponent::switchColour()
 {
-    if (bypassButton.getToggleState())
+    if (isBypassed())
     {
         current_colour = GuiColours::DEFAULT_INACTIVE_COLOUR;
     }

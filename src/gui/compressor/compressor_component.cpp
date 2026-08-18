@@ -10,64 +10,25 @@
 CompressorComponent::CompressorComponent(
     juce::AudioProcessorValueTreeState& params, juce::Value& value
 )
-    : parameters(params), knobs_component(params), meter_component(value)
+    : EffectComponent(params, "COMPRESSOR", "compressor_bypass"),
+      knobs_component(params), meter_component(value)
 {
-    addAndMakeVisible(title_label);
     addAndMakeVisible(knobs_component);
     addAndMakeVisible(meter_component);
-    addAndMakeVisible(bypass_button);
-
-    title_label.setText("COMPRESSOR", juce::dontSendNotification);
-    title_label.setJustificationType(juce::Justification::centredLeft);
-
-    bypass_attachment =
-        std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
-            parameters, "compressor_bypass", bypass_button
-        );
-
-    bypass_button.setColour(
-        juce::ToggleButton::tickColourId, GuiColours::DEFAULT_INACTIVE_COLOUR
-    );
-    bypass_button.setColour(
-        juce::ToggleButton::tickDisabledColourId, ColourCodes::orange
-    );
-    bypass_button.onClick = [this]() { repaint(); };
 }
 
-CompressorComponent::~CompressorComponent()
+void CompressorComponent::paintContent(juce::Graphics& g)
 {
+    const auto accentColour = getAccentColour();
+    const auto textColour = getTextColour();
+
+    knobs_component.switchColour(accentColour, textColour);
+    meter_component.switchColour(accentColour, textColour);
+
+    paintMeter(g);
 }
 
-void CompressorComponent::paint(juce::Graphics& g)
-{
-    bool bypass = bypass_button.getToggleState();
-    juce::Colour colour1;
-    juce::Colour colour2;
-    if (!bypass)
-    {
-        colour1 = ColourCodes::orange;
-        colour2 = ColourCodes::white0;
-    }
-    else
-    {
-        colour1 = GuiColours::DEFAULT_INACTIVE_COLOUR;
-        colour2 = ColourCodes::grey0;
-    }
-    auto bounds = getLocalBounds().toFloat();
-    title_label.setColour(juce::Label::textColourId, colour2);
-
-    g.setColour(GuiColours::COMPRESSOR_BG_COLOUR);
-    g.fillRoundedRectangle(bounds, (float)GuiDimensions::BORDER_RADIUS);
-
-    knobs_component.switchColour(colour1, colour2);
-    meter_component.switchColour(colour1, colour2);
-
-    paintMeter(g, colour1, colour1);
-}
-
-void CompressorComponent::paintMeter(
-    juce::Graphics& g, juce::Colour colour1, juce::Colour colour2
-)
+void CompressorComponent::paintMeter(juce::Graphics& g)
 {
     auto bounds = getLocalBounds();
     auto bounds_height =
@@ -167,21 +128,8 @@ void CompressorComponent::paintMeter(
     );
 }
 
-void CompressorComponent::resized()
+void CompressorComponent::resizedContent(juce::Rectangle<int> bounds)
 {
-    auto bounds = getLocalBounds();
-    auto width = bounds.getWidth();
-    auto height = bounds.getHeight() - GuiDimensions::PANEL_TITLE_BAR_HEIGHT;
-    auto title_bounds =
-        bounds.removeFromTop(GuiDimensions::PANEL_TITLE_BAR_HEIGHT);
-    title_bounds.removeFromLeft(GuiDimensions::BYPASS_BUTTON_PADDING);
-    bypass_button.setBounds(
-        title_bounds
-            .removeFromLeft(GuiDimensions::BYPASS_BUTTON_WIDTH)
-            .reduced(GuiDimensions::PANEL_BORDER_THICKNESS)
-    );
-    title_bounds.removeFromLeft(GuiDimensions::PANEL_KNOB_PADDING);
-    title_label.setBounds(title_bounds);
-    meter_component.setBounds(bounds.removeFromTop(height / 2));
+    meter_component.setBounds(bounds.removeFromTop(bounds.getHeight() / 2));
     knobs_component.setBounds(bounds);
 }
