@@ -108,6 +108,7 @@ juce_add_binary_data(FontData
         ${CMAKE_SOURCE_DIR}/assets/icons/power.svg
         ${CMAKE_SOURCE_DIR}/assets/icons/rotate-ccw.svg
         ${CMAKE_SOURCE_DIR}/assets/icons/save.svg
+        ${CMAKE_SOURCE_DIR}/assets/icons/settings.svg
         ${CMAKE_SOURCE_DIR}/assets/icons/x.svg
 )
 

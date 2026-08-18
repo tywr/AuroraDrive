@@ -14,9 +14,12 @@ class PluginEditor final : public juce::AudioProcessorEditor
     );
     ~PluginEditor() override;
 
+    void setStandaloneSettingsCallback(std::function<void()>);
+
     //==============================================================================
     void paint(juce::Graphics&) override;
     void resized() override;
+    void parentHierarchyChanged() override;
 
     void setupGainControl(
         juce::Slider& slider, juce::Label& label, double minRange,

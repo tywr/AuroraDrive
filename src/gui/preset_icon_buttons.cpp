@@ -24,6 +24,10 @@ IconButton::IconButton(IconType type) : iconType(type)
             data = BinaryData::rotateccw_svg;
             dataSize = BinaryData::rotateccw_svgSize;
             break;
+        case Settings:
+            data = BinaryData::settings_svg;
+            dataSize = BinaryData::settings_svgSize;
+            break;
     }
 
     if (auto svg = juce::XmlDocument::parse(

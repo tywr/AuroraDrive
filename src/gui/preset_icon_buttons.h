@@ -6,7 +6,7 @@
 class IconButton : public juce::Component
 {
 public:
-    enum IconType { Folder, Save, Reload, NewCollection };
+    enum IconType { Folder, Save, Reload, NewCollection, Settings };
 
     IconButton(IconType type);
 

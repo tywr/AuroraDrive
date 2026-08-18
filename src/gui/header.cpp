@@ -56,6 +56,13 @@ Header::Header(
             onTunerClicked();
     };
 
+    addChildComponent(settingsButton);
+    settingsButton.onClick = [this]()
+    {
+        if (onSettingsClicked)
+            onSettingsClicked();
+    };
+
     addAndMakeVisible(presetIconButtons);
     addAndMakeVisible(sessionNameDisplay);
     addAndMakeVisible(presetBar);
@@ -63,6 +70,13 @@ Header::Header(
 
 Header::~Header()
 {
+}
+
+void Header::setStandaloneSettingsCallback(std::function<void()> callback)
+{
+    onSettingsClicked = callback;
+    settingsButton.setVisible(onSettingsClicked != nullptr);
+    resized();
 }
 
 void Header::paint(juce::Graphics& g)
@@ -103,8 +117,11 @@ void Header::resized()
     int const iconButtonsWidth = iconButtonSize * 4;
     int const sessionNameWidth = 140;
     int const innerPadding = 5;
+    int const settingsButtonWidth =
+        settingsButton.isVisible() ? iconButtonSize : 0;
 
-    int const controlsWidth = 5 * iconButtonSize + sessionNameWidth;
+    int const controlsWidth =
+        5 * iconButtonSize + settingsButtonWidth + sessionNameWidth;
 
     // Preset bar takes remaining space on the right
     int const presetBarWidth = bounds.getWidth() - controlsWidth;
@@ -117,6 +134,8 @@ void Header::resized()
     bounds.removeFromLeft(horizontalOffset);
 
     tunerButton.setBounds(bounds.removeFromLeft(iconButtonSize));
+    if (settingsButton.isVisible())
+        settingsButton.setBounds(bounds.removeFromLeft(iconButtonSize));
     presetIconButtons.setBounds(bounds.removeFromLeft(iconButtonsWidth));
     sessionNameDisplay.setBounds(
         bounds.removeFromLeft(sessionNameWidth).reduced(innerPadding, 0)

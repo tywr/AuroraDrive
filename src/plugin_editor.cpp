@@ -3,6 +3,8 @@
 #include "gui/colours.h"
 #include "gui/looks/base_look_and_feel.h"
 #include "plugin_audio_processor.h"
+#include <juce_audio_utils/juce_audio_utils.h>
+#include <juce_audio_plugin_client/Standalone/juce_StandaloneFilterWindow.h>
 #include <juce_core/juce_core.h>
 
 using namespace juce;
@@ -49,6 +51,11 @@ PluginEditor::~PluginEditor()
     setLookAndFeel(nullptr);
 }
 
+void PluginEditor::setStandaloneSettingsCallback(std::function<void()> callback)
+{
+    header.setStandaloneSettingsCallback(callback);
+}
+
 //==============================================================================
 void PluginEditor::paint(juce::Graphics& g)
 {
@@ -65,6 +72,48 @@ void PluginEditor::resized()
 
     panels.setBounds(bounds);
     tuner.setBounds(getLocalBounds());
+}
+
+void PluginEditor::parentHierarchyChanged()
+{
+    auto* standaloneWindow =
+        findParentComponentOfClass<juce::StandaloneFilterWindow>();
+
+    if (standaloneWindow == nullptr)
+    {
+        setStandaloneSettingsCallback({});
+        return;
+    }
+
+    if (!standaloneWindow->isUsingNativeTitleBar())
+    {
+        const int editorWidth = getWidth();
+        const int editorHeight = getHeight();
+        standaloneWindow->setUsingNativeTitleBar(true);
+        standaloneWindow->setContentComponentSize(
+            editorWidth, editorHeight
+        );
+    }
+
+    for (auto* child : standaloneWindow->getChildren())
+    {
+        if (auto* button = dynamic_cast<juce::TextButton*>(child))
+        {
+            if (button->getButtonText() == "Options")
+                button->setVisible(false);
+        }
+    }
+
+    juce::Component::SafePointer<juce::StandaloneFilterWindow> safeWindow(
+        standaloneWindow
+    );
+    setStandaloneSettingsCallback(
+        [safeWindow]()
+        {
+            if (safeWindow != nullptr)
+                safeWindow->handleMenuResult(1);
+        }
+    );
 }
 
 void PluginEditor::showTuner()
