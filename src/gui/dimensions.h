@@ -31,6 +31,7 @@ constexpr int BYPASS_BUTTON_PADDING = 8;
 
 constexpr int HEADER_GAIN_SLIDER_PADDING = 6;
 constexpr int HEADER_COMBOBOX_HEIGHT = 32;
+constexpr int COMBOBOX_HORIZONTAL_PADDING = 10;
 
 constexpr int KNOB_SIZE = 40;
 constexpr int KNOB_LABEL_HEIGHT = 20;

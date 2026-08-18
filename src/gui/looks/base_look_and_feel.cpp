@@ -2,6 +2,7 @@
 #include "BinaryData.h"
 
 #include "../colours.h"
+#include "../dimensions.h"
 #include <juce_gui_basics/juce_gui_basics.h>
 
 BaseLookAndFeel::BaseLookAndFeel()
@@ -22,7 +23,7 @@ BaseLookAndFeel::BaseLookAndFeel()
         checkIcon = juce::Drawable::createFromSVG(*svg);
     }
 
-    setColour(juce::PopupMenu::backgroundColourId, ColourCodes::bg1);
+    setColour(juce::PopupMenu::backgroundColourId, ColourCodes::bg0);
     setColour(juce::PopupMenu::textColourId, ColourCodes::white0);
     setColour(
         juce::PopupMenu::highlightedBackgroundColourId, ColourCodes::orange
@@ -30,7 +31,7 @@ BaseLookAndFeel::BaseLookAndFeel()
     setColour(juce::PopupMenu::highlightedTextColourId, juce::Colours::black);
     setColour(juce::PopupMenu::headerTextColourId, ColourCodes::white0);
 
-    setColour(juce::ComboBox::backgroundColourId, ColourCodes::bg1);
+    setColour(juce::ComboBox::backgroundColourId, ColourCodes::bg0);
     setColour(juce::ComboBox::textColourId, ColourCodes::white0);
     setColour(juce::ComboBox::outlineColourId, juce::Colours::transparentBlack);
     setColour(juce::ComboBox::arrowColourId, ColourCodes::white0);
@@ -262,7 +263,7 @@ void BaseLookAndFeel::drawPopupMenuBackground(
     juce::Graphics& g, int width, int height
 )
 {
-    g.setColour(ColourCodes::bg1);
+    g.setColour(ColourCodes::bg);
     g.fillRect(0, 0, width, height);
 }
 
@@ -369,6 +370,21 @@ void BaseLookAndFeel::getIdealPopupMenuItemSize(
     idealHeight = 24;
     idealWidth =
         juce::GlyphArrangement::getStringWidthInt(mainFont, text) + 48;
+}
+
+void BaseLookAndFeel::positionComboBoxText(
+    juce::ComboBox& box, juce::Label& label
+)
+{
+    const int rightSpace = 28;
+    label.setBounds(
+        GuiDimensions::COMBOBOX_HORIZONTAL_PADDING, 0,
+        box.getWidth() - GuiDimensions::COMBOBOX_HORIZONTAL_PADDING -
+            rightSpace,
+        box.getHeight()
+    );
+    label.setFont(getComboBoxFont(box));
+    label.setJustificationType(juce::Justification::centredLeft);
 }
 
 void BaseLookAndFeel::drawComboBox(
