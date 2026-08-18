@@ -35,6 +35,7 @@ target_sources(${PROJECT_NAME}
         gui/preset_bar.cpp
         gui/preset_icon_buttons.cpp
         gui/session_name_display.cpp
+        gui/components/effect_component.cpp
         gui/components/labeled_knob.cpp
         gui/compressor/compressor_knobs_component.cpp
         gui/compressor/compressor_meter_component.cpp
@@ -65,6 +66,33 @@ target_sources(${PROJECT_NAME}
         dsp/synth_voices.cpp
         )
 
+target_precompile_headers(${PROJECT_NAME}
+    PRIVATE
+        pch.h
+)
+
+if(APPLE)
+    foreach(juce_module
+        juce_audio_basics
+        juce_audio_devices
+        juce_audio_formats
+        juce_audio_processors
+        juce_audio_utils
+        juce_core
+        juce_data_structures
+        juce_dsp
+        juce_events
+        juce_graphics
+        juce_gui_basics
+        juce_gui_extra
+    )
+        set_source_files_properties(
+            "${CMAKE_SOURCE_DIR}/modules/JUCE/modules/${juce_module}/${juce_module}.mm"
+            PROPERTIES SKIP_PRECOMPILE_HEADERS ON
+        )
+    endforeach()
+endif()
+
 if(JUCE_BUILD_STANDALONE)
     target_sources(${PROJECT_NAME} PRIVATE src/standalone.cpp)
 endif()
@@ -73,10 +101,12 @@ endif()
 juce_add_binary_data(FontData
     SOURCES
         ${CMAKE_SOURCE_DIR}/fonts/Inter.ttf
+        ${CMAKE_SOURCE_DIR}/assets/icons/check.svg
         ${CMAKE_SOURCE_DIR}/assets/icons/folder-open.svg
         ${CMAKE_SOURCE_DIR}/assets/icons/folder-plus.svg
-        ${CMAKE_SOURCE_DIR}/assets/icons/git-fork.svg
-        ${CMAKE_SOURCE_DIR}/assets/icons/refresh-cw.svg
+        ${CMAKE_SOURCE_DIR}/assets/icons/gauge.svg
+        ${CMAKE_SOURCE_DIR}/assets/icons/power.svg
+        ${CMAKE_SOURCE_DIR}/assets/icons/rotate-ccw.svg
         ${CMAKE_SOURCE_DIR}/assets/icons/save.svg
         ${CMAKE_SOURCE_DIR}/assets/icons/x.svg
 )
