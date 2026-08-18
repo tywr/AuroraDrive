@@ -71,27 +71,32 @@ target_precompile_headers(${PROJECT_NAME}
         pch.h
 )
 
-if(APPLE)
-    foreach(juce_module
-        juce_audio_basics
-        juce_audio_devices
-        juce_audio_formats
-        juce_audio_processors
-        juce_audio_utils
-        juce_core
-        juce_data_structures
-        juce_dsp
-        juce_events
-        juce_graphics
-        juce_gui_basics
-        juce_gui_extra
+foreach(juce_module
+    juce_audio_basics
+    juce_audio_devices
+    juce_audio_formats
+    juce_audio_processors
+    juce_audio_utils
+    juce_core
+    juce_data_structures
+    juce_dsp
+    juce_events
+    juce_graphics
+    juce_gui_basics
+    juce_gui_extra
+)
+    set_source_files_properties(
+        "${CMAKE_SOURCE_DIR}/modules/JUCE/modules/${juce_module}/${juce_module}.cpp"
+        PROPERTIES SKIP_PRECOMPILE_HEADERS ON
     )
+
+    if(APPLE)
         set_source_files_properties(
             "${CMAKE_SOURCE_DIR}/modules/JUCE/modules/${juce_module}/${juce_module}.mm"
             PROPERTIES SKIP_PRECOMPILE_HEADERS ON
         )
-    endforeach()
-endif()
+    endif()
+endforeach()
 
 if(JUCE_BUILD_STANDALONE)
     target_sources(${PROJECT_NAME} PRIVATE src/standalone.cpp)
