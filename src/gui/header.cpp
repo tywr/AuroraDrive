@@ -1,6 +1,7 @@
 #include "header.h"
 
 #include "colours.h"
+#include "dimensions.h"
 #include "looks/tuner_look_and_feel.h"
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_gui_basics/juce_gui_basics.h>
@@ -22,7 +23,7 @@ Header::Header(
     inputGainSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     inputGainSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 50, 25);
     inputGainSlider.setColour(
-        juce::Slider::rotarySliderFillColourId, juce::Colours::black
+        juce::Slider::rotarySliderFillColourId, ColourCodes::bg0
     );
     inputGainSlider.setColour(
         juce::Slider::rotarySliderOutlineColourId, ColourCodes::white0
@@ -37,7 +38,7 @@ Header::Header(
     outputGainSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     outputGainSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 50, 25);
     outputGainSlider.setColour(
-        juce::Slider::rotarySliderFillColourId, juce::Colours::black
+        juce::Slider::rotarySliderFillColourId, ColourCodes::bg0
     );
     outputGainSlider.setColour(
         juce::Slider::rotarySliderOutlineColourId, ColourCodes::white0
@@ -55,6 +56,13 @@ Header::Header(
             onTunerClicked();
     };
 
+    addChildComponent(settingsButton);
+    settingsButton.onClick = [this]()
+    {
+        if (onSettingsClicked)
+            onSettingsClicked();
+    };
+
     addAndMakeVisible(presetIconButtons);
     addAndMakeVisible(sessionNameDisplay);
     addAndMakeVisible(presetBar);
@@ -64,56 +72,17 @@ Header::~Header()
 {
 }
 
+void Header::setStandaloneSettingsCallback(std::function<void()> callback)
+{
+    onSettingsClicked = callback;
+    settingsButton.setVisible(onSettingsClicked != nullptr);
+    resized();
+}
+
 void Header::paint(juce::Graphics& g)
 {
-    auto bounds = getLocalBounds().toFloat();
-
-    // Calculate section bounds
-    int const padding = 10;
-    int const knob_padding = 3 * padding;
-    int const knob_size = getHeight() - padding * 2;
-    int const meter_width = 6;
-
-    float leftSeparatorX =
-        padding + meter_width + padding + knob_size + knob_padding + padding;
-    float rightSeparatorX = getWidth() - padding - meter_width - padding -
-                            knob_size - knob_padding - padding;
-
-    // Draw black background behind input slider section
-    juce::Rectangle<float> inputSection(
-        0.0f, 0.0f, leftSeparatorX, (float)getHeight()
-    );
-    g.setColour(juce::Colours::black);
-    g.fillRect(inputSection);
-
-    // Draw grey background behind center section (tuner)
-    juce::Rectangle<float> centerSection(
-        leftSeparatorX, 0.0f, rightSeparatorX - leftSeparatorX,
-        (float)getHeight()
-    );
-    g.setColour(ColourCodes::bg2);
-    g.fillRect(centerSection);
-
-    // Draw black background behind output slider section
-    juce::Rectangle<float> outputSection(
-        rightSeparatorX, 0.0f, getWidth() - rightSeparatorX, (float)getHeight()
-    );
-    g.setColour(juce::Colours::black);
-    g.fillRect(outputSection);
-
-    // Draw solid grey frame around entire header
-    g.setColour(ColourCodes::grey3);
-    g.drawRect(bounds, 2.0f);
-
-    // Draw separators between sections
-    float separatorY1 = 0.0f;
-    float separatorY2 = (float)getHeight();
-
-    g.setColour(ColourCodes::grey3);
-    g.drawLine(leftSeparatorX, separatorY1, leftSeparatorX, separatorY2, 2.0f);
-    g.drawLine(
-        rightSeparatorX, separatorY1, rightSeparatorX, separatorY2, 2.0f
-    );
+    g.setColour(GuiColours::PANEL_BACKGROUND);
+    g.fillRect(getLocalBounds());
 }
 
 void Header::resized()
@@ -128,7 +97,10 @@ void Header::resized()
     // Left side: input meter and gain
     inputMeter.setBounds(bounds.removeFromLeft(meter_width));
     bounds.removeFromLeft(padding);
-    inputGainSlider.setBounds(bounds.removeFromLeft(knob_size + knob_padding));
+    inputGainSlider.setBounds(
+        bounds.removeFromLeft(knob_size + knob_padding)
+            .reduced(GuiDimensions::HEADER_GAIN_SLIDER_PADDING)
+    );
     bounds.removeFromLeft(padding);
 
     // Right side: output gain and meter
@@ -136,6 +108,7 @@ void Header::resized()
     bounds.removeFromRight(padding);
     outputGainSlider.setBounds(
         bounds.removeFromRight(knob_size + knob_padding)
+            .reduced(GuiDimensions::HEADER_GAIN_SLIDER_PADDING)
     );
     bounds.removeFromRight(padding);
 
@@ -144,8 +117,11 @@ void Header::resized()
     int const iconButtonsWidth = iconButtonSize * 4;
     int const sessionNameWidth = 140;
     int const innerPadding = 5;
+    int const settingsButtonWidth =
+        settingsButton.isVisible() ? iconButtonSize : 0;
 
-    int const controlsWidth = 5 * iconButtonSize + sessionNameWidth;
+    int const controlsWidth =
+        5 * iconButtonSize + settingsButtonWidth + sessionNameWidth;
 
     // Preset bar takes remaining space on the right
     int const presetBarWidth = bounds.getWidth() - controlsWidth;
@@ -158,6 +134,8 @@ void Header::resized()
     bounds.removeFromLeft(horizontalOffset);
 
     tunerButton.setBounds(bounds.removeFromLeft(iconButtonSize));
+    if (settingsButton.isVisible())
+        settingsButton.setBounds(bounds.removeFromLeft(iconButtonSize));
     presetIconButtons.setBounds(bounds.removeFromLeft(iconButtonsWidth));
     sessionNameDisplay.setBounds(
         bounds.removeFromLeft(sessionNameWidth).reduced(innerPadding, 0)

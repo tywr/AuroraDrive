@@ -9,7 +9,7 @@ namespace Fonts
 inline juce::Typeface::Ptr getTypeface()
 {
     static auto typeface = juce::Typeface::createSystemTypefaceFor(
-        BinaryData::NordwandMono_ttf, BinaryData::NordwandMono_ttfSize);
+        BinaryData::Inter_ttf, BinaryData::Inter_ttfSize);
     return typeface;
 }
 

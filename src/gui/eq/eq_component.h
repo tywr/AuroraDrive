@@ -1,28 +1,18 @@
 #pragma once
 
-#include "../colours.h"
+#include "../components/effect_component.h"
 #include "eq_sliders_component.h"
-#include <juce_audio_processors/juce_audio_processors.h>
-#include <juce_gui_basics/juce_gui_basics.h>
 
-class EqComponent : public juce::Component
+class EqComponent : public EffectComponent
 {
   public:
     EqComponent(juce::AudioProcessorValueTreeState&);
-    ~EqComponent() override;
-
-    void resized() override;
-    void paint(juce::Graphics&) override;
 
   private:
-    juce::AudioProcessorValueTreeState& parameters;
+    void paintContent(juce::Graphics&) override;
+    void resizedContent(juce::Rectangle<int>) override;
 
-    juce::Label title_label;
     EqSlidersComponent sliders_component;
-
-    juce::ToggleButton bypass_button;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>
-        bypass_attachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(EqComponent)
 };

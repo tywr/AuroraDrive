@@ -1,18 +1,19 @@
-BUILD_DEBUG_DIR = builds/debug
+BUILD_DEBUG_DIR = builds/debug-ninja
 BUILD_RELEASE_DIR = builds/release
 PROJECT_NAME = orbital-bass-engine
+DEBUG_TARGET = $(PROJECT_NAME)_Standalone
 
 init-debug:
-	cmake -S . -B builds/debug -D CMAKE_BUILD_TYPE=Debug
+	cmake -S . -B ${BUILD_DEBUG_DIR} -G Ninja -D CMAKE_BUILD_TYPE=Debug
 
 init-release:
 	cmake -S . -B builds/release -D CMAKE_BUILD_TYPE=Release
 
-build-debug:
-	cmake --build ${BUILD_DEBUG_DIR} --config Debug
+build-debug: init-debug
+	cmake --build ${BUILD_DEBUG_DIR} --config Debug --target ${DEBUG_TARGET} --parallel
 
 build-release:
-	cmake --build ${BUILD_RELEASE_DIR} --config Release
+	cmake --build ${BUILD_RELEASE_DIR} --config Release --parallel
 
 run: build-release
 	killall ${PROJECT_NAME} || true

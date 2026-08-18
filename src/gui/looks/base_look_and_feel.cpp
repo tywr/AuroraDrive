@@ -1,13 +1,29 @@
 #include "base_look_and_feel.h"
+#include "BinaryData.h"
 
 #include "../colours.h"
+#include "../dimensions.h"
 #include <juce_gui_basics/juce_gui_basics.h>
 
 BaseLookAndFeel::BaseLookAndFeel()
 {
     setColourScheme(getColourScheme());
 
-    setColour(juce::PopupMenu::backgroundColourId, ColourCodes::bg1);
+    if (auto svg = juce::XmlDocument::parse(juce::String::fromUTF8(
+            BinaryData::power_svg, BinaryData::power_svgSize
+        )))
+    {
+        powerIcon = juce::Drawable::createFromSVG(*svg);
+    }
+
+    if (auto svg = juce::XmlDocument::parse(juce::String::fromUTF8(
+            BinaryData::check_svg, BinaryData::check_svgSize
+        )))
+    {
+        checkIcon = juce::Drawable::createFromSVG(*svg);
+    }
+
+    setColour(juce::PopupMenu::backgroundColourId, ColourCodes::bg0);
     setColour(juce::PopupMenu::textColourId, ColourCodes::white0);
     setColour(
         juce::PopupMenu::highlightedBackgroundColourId, ColourCodes::orange
@@ -15,7 +31,7 @@ BaseLookAndFeel::BaseLookAndFeel()
     setColour(juce::PopupMenu::highlightedTextColourId, juce::Colours::black);
     setColour(juce::PopupMenu::headerTextColourId, ColourCodes::white0);
 
-    setColour(juce::ComboBox::backgroundColourId, ColourCodes::bg1);
+    setColour(juce::ComboBox::backgroundColourId, ColourCodes::bg0);
     setColour(juce::ComboBox::textColourId, ColourCodes::white0);
     setColour(juce::ComboBox::outlineColourId, juce::Colours::transparentBlack);
     setColour(juce::ComboBox::arrowColourId, ColourCodes::white0);
@@ -68,18 +84,7 @@ void BaseLookAndFeel::drawButtonBackground(
 
     g.setColour(colour);
 
-    bool isInsideAlertWindow =
-        (button.findParentComponentOfClass<juce::AlertWindow>() != nullptr);
-    if (isInsideAlertWindow)
-    {
-        g.fillRect(bounds);
-        g.setColour(ColourCodes::grey3);
-        g.drawRect(bounds, 1.0f);
-    }
-    else
-    {
-        g.drawEllipse(bounds.reduced(strokeWidth), strokeWidth);
-    }
+    g.fillRoundedRectangle(bounds, 8.0f);
 }
 
 void BaseLookAndFeel::drawButtonText(
@@ -118,50 +123,29 @@ void BaseLookAndFeel::drawToggleButton(
 )
 {
     auto bounds = button.getLocalBounds().toFloat();
-
-    // Define switch dimensions (horizontal slider)
-    const float switchHeight =
-        juce::jmin(bounds.getWidth(), bounds.getHeight()) * 0.5f;
-    const float switchWidth = switchHeight * 2.0f;
-    const float thumbSize = switchHeight * 0.8f;
-    const float padding = (switchHeight - thumbSize) / 2.0f;
-
-    // Center the switch in the button bounds
-    auto switchBounds = juce::Rectangle<float>(switchWidth, switchHeight)
-                            .withCentre(bounds.getCentre());
-
-    // Determine colors based on state
-    juce::Colour trackColour;
-    if (button.getToggleState())
-        trackColour = button.findColour(juce::ToggleButton::tickColourId);
-    else
-        trackColour =
-            button.findColour(juce::ToggleButton::tickDisabledColourId);
+    auto colour = button.getToggleState()
+                      ? button.findColour(juce::ToggleButton::tickColourId)
+                      : button.findColour(
+                            juce::ToggleButton::tickDisabledColourId
+                        );
 
     if (isMouseOverButton)
-        trackColour = trackColour.brighter(0.1f);
-
-    // Draw the squared track
-    g.setColour(trackColour);
-    g.fillRect(switchBounds);
-
-    // Calculate thumb position (right when on, left when off)
-    float thumbX;
-    if (button.getToggleState())
-        thumbX = switchBounds.getRight() - thumbSize -
-                 padding; // Right position (ON)
-    else
-        thumbX = switchBounds.getX() + padding; // Left position (OFF)
-
-    float thumbY = switchBounds.getCentreY() - thumbSize / 2.0f;
-
-    // Draw the squared thumb
-    juce::Colour thumbColour = juce::Colours::white;
+        colour = colour.brighter(0.12f);
     if (isButtonDown)
-        thumbColour = thumbColour.darker(0.1f);
+        colour = colour.darker(0.12f);
 
-    g.setColour(thumbColour);
-    g.fillRect(thumbX, thumbY, thumbSize, thumbSize);
+    if (powerIcon == nullptr)
+        return;
+
+    powerIcon->replaceColour(currentPowerIconColour, colour);
+    currentPowerIconColour = colour;
+
+    const float iconSize =
+        juce::jmin(bounds.getWidth(), bounds.getHeight()) * 0.7f;
+    powerIcon->drawWithin(
+        g, bounds.withSizeKeepingCentre(iconSize, iconSize),
+        juce::RectanglePlacement::centred, 1.0f
+    );
 }
 
 void BaseLookAndFeel::drawRotarySlider(
@@ -272,7 +256,135 @@ void BaseLookAndFeel::drawLabel(juce::Graphics& g, juce::Label& label)
     juce::String text = label.getText();
     g.setFont(mainFont);
     g.setColour(label.findColour(juce::Label::textColourId));
-    g.drawFittedText(text, bounds, juce::Justification::centred, 1);
+    g.drawFittedText(text, bounds, label.getJustificationType(), 1);
+}
+
+void BaseLookAndFeel::drawPopupMenuBackground(
+    juce::Graphics& g, int width, int height
+)
+{
+    g.setColour(ColourCodes::bg);
+    g.fillRect(0, 0, width, height);
+}
+
+void BaseLookAndFeel::drawPopupMenuItem(
+    juce::Graphics& g, const juce::Rectangle<int>& area, bool isSeparator,
+    bool isActive, bool isHighlighted, bool isTicked, bool hasSubMenu,
+    const juce::String& text, const juce::String& shortcutKeyText,
+    const juce::Drawable* icon, const juce::Colour* textColour
+)
+{
+    if (isSeparator)
+    {
+        g.setColour(ColourCodes::grey0);
+        g.fillRect(area.reduced(8, 0).withHeight(1).withCentre(area.getCentre()));
+        return;
+    }
+
+    auto row = area.reduced(4, 2);
+    if (isHighlighted && isActive)
+    {
+        g.setColour(GuiColours::CONTROL_BACKGROUND);
+        g.fillRoundedRectangle(row.toFloat(), 6.0f);
+    }
+
+    auto content = row.reduced(8, 0);
+    auto colour = textColour != nullptr ? *textColour : ColourCodes::white0;
+    colour = colour.withMultipliedAlpha(isActive ? 1.0f : 0.45f);
+
+    if (hasSubMenu)
+    {
+        auto arrowArea = content.removeFromRight(14).toFloat();
+        juce::Path arrow;
+        arrow.startNewSubPath(
+            arrowArea.getCentreX() - 2.0f, arrowArea.getCentreY() - 3.0f
+        );
+        arrow.lineTo(
+            arrowArea.getCentreX() + 1.0f, arrowArea.getCentreY()
+        );
+        arrow.lineTo(
+            arrowArea.getCentreX() - 2.0f, arrowArea.getCentreY() + 3.0f
+        );
+        g.setColour(colour);
+        g.strokePath(
+            arrow, juce::PathStrokeType(
+                       1.25f, juce::PathStrokeType::curved,
+                       juce::PathStrokeType::rounded
+                   )
+        );
+    }
+
+    if (isTicked && checkIcon != nullptr)
+    {
+        auto checkArea = content.removeFromRight(16).toFloat();
+        checkIcon->replaceColour(
+            currentCheckIconColour, ColourCodes::orange
+        );
+        currentCheckIconColour = ColourCodes::orange;
+        checkIcon->drawWithin(
+            g, checkArea.reduced(2.0f), juce::RectanglePlacement::centred, 1.0f
+        );
+    }
+    else if (icon != nullptr)
+    {
+        auto iconArea = content.removeFromLeft(16).toFloat();
+        icon->drawWithin(
+            g, iconArea, juce::RectanglePlacement::centred, 1.0f
+        );
+        content.removeFromLeft(6);
+    }
+
+    if (shortcutKeyText.isNotEmpty())
+    {
+        auto shortcutArea = content.removeFromRight(
+            juce::GlyphArrangement::getStringWidthInt(
+                mainFont, shortcutKeyText
+            ) + 8
+        );
+        g.setColour(colour.withAlpha(0.55f));
+        g.setFont(mainFont);
+        g.drawText(
+            shortcutKeyText, shortcutArea, juce::Justification::centredRight
+        );
+    }
+
+    g.setColour(colour);
+    g.setFont(mainFont);
+    g.drawFittedText(text, content, juce::Justification::centredLeft, 1);
+}
+
+void BaseLookAndFeel::getIdealPopupMenuItemSize(
+    const juce::String& text, bool isSeparator, int standardMenuItemHeight,
+    int& idealWidth, int& idealHeight
+)
+{
+    juce::ignoreUnused(standardMenuItemHeight);
+
+    if (isSeparator)
+    {
+        idealWidth = 40;
+        idealHeight = 8;
+        return;
+    }
+
+    idealHeight = 24;
+    idealWidth =
+        juce::GlyphArrangement::getStringWidthInt(mainFont, text) + 48;
+}
+
+void BaseLookAndFeel::positionComboBoxText(
+    juce::ComboBox& box, juce::Label& label
+)
+{
+    const int rightSpace = 28;
+    label.setBounds(
+        GuiDimensions::COMBOBOX_HORIZONTAL_PADDING, 0,
+        box.getWidth() - GuiDimensions::COMBOBOX_HORIZONTAL_PADDING -
+            rightSpace,
+        box.getHeight()
+    );
+    label.setFont(getComboBoxFont(box));
+    label.setJustificationType(juce::Justification::centredLeft);
 }
 
 void BaseLookAndFeel::drawComboBox(
@@ -285,26 +397,23 @@ void BaseLookAndFeel::drawComboBox(
     auto bounds = juce::Rectangle<float>(0, 0, (float)width, (float)height);
 
     g.setColour(box.findColour(juce::ComboBox::backgroundColourId));
-    g.fillRect(bounds);
+    g.fillRoundedRectangle(bounds, 8.0f);
 
-    g.setColour(ColourCodes::grey3);
-    g.drawRect(bounds, 1.0f);
-
-    // Arrow
-    float arrowSize = (float)height * 0.3f;
-    float arrowX = (float)width - (float)height * 0.6f;
-    float arrowY = (float)height * 0.5f;
-
+    const float arrowX = (float)width - 15.0f;
+    const float arrowY = (float)height * 0.5f;
     juce::Path arrow;
-    arrow.addTriangle(
-        arrowX - arrowSize * 0.5f, arrowY - arrowSize * 0.25f,
-        arrowX + arrowSize * 0.5f, arrowY - arrowSize * 0.25f, arrowX,
-        arrowY + arrowSize * 0.25f
-    );
+    arrow.startNewSubPath(arrowX - 3.0f, arrowY - 1.5f);
+    arrow.lineTo(arrowX, arrowY + 1.5f);
+    arrow.lineTo(arrowX + 3.0f, arrowY - 1.5f);
 
     g.setColour(box.findColour(juce::ComboBox::arrowColourId)
                     .withAlpha(isButtonDown ? 1.0f : 0.7f));
-    g.fillPath(arrow);
+    g.strokePath(
+        arrow, juce::PathStrokeType(
+                   1.25f, juce::PathStrokeType::curved,
+                   juce::PathStrokeType::rounded
+               )
+    );
 }
 
 void BaseLookAndFeel::drawAlertBox(
@@ -315,10 +424,7 @@ void BaseLookAndFeel::drawAlertBox(
     auto bounds = alert.getLocalBounds().toFloat();
 
     g.setColour(alert.findColour(juce::AlertWindow::backgroundColourId));
-    g.fillRect(bounds);
-
-    g.setColour(alert.findColour(juce::AlertWindow::outlineColourId));
-    g.drawRect(bounds, 2.0f);
+    g.fillRoundedRectangle(bounds, 12.0f);
 
     g.setColour(alert.findColour(juce::AlertWindow::textColourId));
     textLayout.draw(g, textArea.toFloat());

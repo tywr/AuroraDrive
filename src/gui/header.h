@@ -21,6 +21,7 @@ class Header : public juce::Component
     PresetIconButtons& getPresetIconButtons() { return presetIconButtons; }
     PresetBar& getPresetBar() { return presetBar; }
     SessionNameDisplay& getSessionNameDisplay() { return sessionNameDisplay; }
+    void setStandaloneSettingsCallback(std::function<void()>);
 
   private:
     juce::AudioProcessorValueTreeState& parameters;
@@ -38,6 +39,8 @@ class Header : public juce::Component
         outputGainAttachment;
 
     juce::ToggleButton tunerButton;
+    IconButton settingsButton{IconButton::Settings};
+    std::function<void()> onSettingsClicked;
 
     PresetIconButtons presetIconButtons;
     SessionNameDisplay sessionNameDisplay;

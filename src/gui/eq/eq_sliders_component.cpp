@@ -105,7 +105,7 @@ void EqSlidersComponent::paintOverChildren(juce::Graphics& g)
     const int bottom_knob_width = total_width / num_bottom_knobs;
 
     // Draw vertical separators between EQ sections (SSL-style)
-    g.setColour(ColourCodes::grey0);
+    g.setColour(ColourCodes::bg2);
     float line_thickness = 1.0f;
 
     float height = bounds.getHeight();

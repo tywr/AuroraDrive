@@ -18,6 +18,8 @@ class CloseButton : public juce::Component
     std::function<void()> onClick;
 
   private:
+    std::unique_ptr<juce::Drawable> icon;
+    juce::Colour currentIconColour = ColourCodes::white0;
     bool isHovered = false;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CloseButton)
 };

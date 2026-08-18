@@ -19,14 +19,19 @@ constexpr int DEFAULT_SMALL_KNOB_WIDTH = 50;
 constexpr int DEFAULT_SMALL_KNOB_HEIGHT = 70;
 constexpr int DEFAULT_SMALL_LABEL_HEIGHT = 30;
 
+constexpr int BORDER_RADIUS = 16;
 constexpr int PANEL_GAP = 10;
 
-constexpr int PANEL_TITLE_BAR_HEIGHT = 25;
+constexpr int PANEL_TITLE_BAR_HEIGHT = 32;
 constexpr int PANEL_BORDER_THICKNESS = 1;
 constexpr int PANEL_KNOB_PADDING = 10;
 
-constexpr int BYPASS_BUTTON_WIDTH = 25;
-constexpr int BYPASS_BUTTON_PADDING = 10;
+constexpr int BYPASS_BUTTON_WIDTH = 20;
+constexpr int BYPASS_BUTTON_PADDING = 8;
+
+constexpr int HEADER_GAIN_SLIDER_PADDING = 6;
+constexpr int HEADER_COMBOBOX_HEIGHT = 32;
+constexpr int COMBOBOX_HORIZONTAL_PADDING = 10;
 
 constexpr int KNOB_SIZE = 40;
 constexpr int KNOB_LABEL_HEIGHT = 20;

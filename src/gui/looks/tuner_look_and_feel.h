@@ -1,13 +1,15 @@
 #pragma once
 
 #include "../colours.h"
+#include "../fonts.h"
 #include <juce_gui_basics/juce_gui_basics.h>
 
 class TunerLookAndFeel : public juce::LookAndFeel_V4
 {
   private:
-    juce::Font mainFont =
-        juce::Font(juce::FontOptions("Oxanium", 11.0f, juce::Font::plain));
+    juce::Font mainFont = Fonts::getFont(11.0f);
+    std::unique_ptr<juce::Drawable> icon;
+    juce::Colour currentIconColour = ColourCodes::white0;
 
   public:
     TunerLookAndFeel();
